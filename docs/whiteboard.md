@@ -7,105 +7,52 @@
 
 ## Phase Status
 
-**Phase 1 — Foundation & Multi-Tenant Shell:** 7/8 tasks done.
-**Current:** Task 1.8 — Deploy to **Cloudflare Workers (OpenNext)**. Part A (scaffold) ✅ done. Part B–G (Cloudflare account + deploy + domain) pending.
-**Next up:** Phase 2, Task 2.1 — PayNow QR generation utility (can start without a domain).
+**Phase 1 — Foundation:** ✅ COMPLETE (8/8)
+**Phase 2 — PayNow QR Spike:** ✅ COMPLETE (2/2)
+**Phase 3 — Seller Onboarding:** ✅ CODE COMPLETE (8/8) — 👤 **awaiting your manual walkthrough below**
+**Next up:** Phase 4, Task 4.1 — public buyer storefront (data loading + vibe rendering).
 
 ---
 
-## Domain decision — defer until pre-launch ✅
+## 👉 YOUR MANUAL CHECK — Phase 3: full onboarding walkthrough
 
-**You do not need to buy a domain now.**
+### Part A — Apply the storage migration (REQUIRED before testing image uploads)
 
-| When | What |
-|---|---|
-| **Now (building)** | Local dev on `lvh.me` — full multi-tenant (marketing / app / storefront). |
-| **Anytime (optional)** | `npm run deploy` → smoke test on `nomi.<account>.workers.dev` (single host, marketing page only). Confirms deploy pipeline works. |
-| **Pre-launch (required)** | Buy domain → set `NEXT_PUBLIC_ROOT_DOMAIN=<domain>` on Worker → attach apex + `app.` + `*.` wildcard in Cloudflare → update Supabase OAuth URLs. |
+1. Open Supabase Dashboard → **SQL Editor**.
+2. Paste and run the contents of:
+   `supabase/migrations/20260702120000_storage_store_images.sql`
+3. Expect "Success". This creates the public `store-images` bucket (hero + product photos) with per-user upload permissions.
 
-`nomi.store` in docs is a **placeholder**, not a locked choice. Any domain works — routing is one env var (`NEXT_PUBLIC_ROOT_DOMAIN`). If `nomi.store` is taken, pick another (e.g. `getnomi.com`, `shopnomi.sg`) and update env + Supabase redirects once.
+### Part B — Walk through onboarding as a new seller
+
+4. `npm run dev`, then open **http://app.lvh.me:3000** and sign in with Google.
+5. You should be **redirected to `/onboarding` automatically** (your account has no store yet).
+6. **Step 1 — Store name:** type a name (e.g. `Sarah Bakes`) → watch the slug auto-generate → confirm "✓ available". Try `nomi` or `admin` → should show "reserved". Try editing the slug to `Bad--Slug` → format error. Continue.
+7. **Step 2 — Vibe:** swipe/scroll the 4 phone previews. Industrial should look dark teal/rust with condensed uppercase type. Pick any vibe.
+8. **Step 3 — Hero:** fill in title/subheading/CTA, upload a photo (any image — it's compressed client-side), reorder blocks with ↑/↓ and watch the live preview update. Continue.
+9. **Step 4 — Product:** add one product with price + image. Try "Add another product", then "Continue setup".
+10. **Step 5 — Fulfillment:** enable pickup and/or delivery. Confirm "Continue" stays disabled until required fields are filled.
+11. **Step 6 — PayNow:** enter your real PayNow mobile (or UEN) + recipient name. A **sample QR** should render — optionally scan it with your banking app to confirm recipient. Continue.
+12. **Step 7 — Publish:** all 7 checklist items should be ✓. Hit **Publish Store** → success screen. Test **Copy Link** and **Open Store** (opens `{slug}.lvh.me:3000` — currently the Phase 1 placeholder page; the real storefront is Phase 4).
+13. **Resume check:** sign out mid-onboarding at any earlier step (or refresh) → sign back in → you should land on the same incomplete step.
+14. **Dashboard check:** after publishing, `app.lvh.me:3000` should show your store card (not the wizard).
+
+**Reply with:** `phase 3 ✅` or paste what broke (step + error).
 
 ---
 
-## Deployment direction (changed 2026-07-02)
+## Known limitations (by design, not bugs)
 
-Nomi deploys to **Cloudflare Workers** via the **OpenNext adapter** (`@opennextjs/cloudflare`), not Vercel.
-
-- OpenNext supports Next.js 16 (our version, 16.2.10) on both Turbopack and webpack.
-- **Deploy via Workers only** (`opennextjs-cloudflare deploy` or Cloudflare **Workers** Builds). Do **NOT** use Cloudflare Pages Git builds — they pin an old wrangler (3.114.17) that miscompiles OpenNext workers → boot-time 500s. Need wrangler ≥ 4.33.
-- Middleware uses only Web APIs → runs on Workers unchanged.
-- Wildcard `*.nomi.store` handled by Cloudflare DNS + Worker Custom Domains/routes.
-- No Next.js app/route code changes — routing stays env-driven via `NEXT_PUBLIC_ROOT_DOMAIN`.
-
----
-
-## 👉 YOUR MANUAL CHECK — Deploy to Cloudflare Workers
-
-### Part A — Agent scaffolds OpenNext ✅ DONE
-
-Added `@opennextjs/cloudflare`, `wrangler.jsonc`, `open-next.config.ts`, package scripts, dev hook in `next.config.ts`. Verified:
-- `npm run build` ✅
-- `opennextjs-cloudflare build` ✅
-- `npm run preview` → `http://localhost:8787` returns 200 ✅
-
-### Part B — Push latest code to GitHub
-
-Your local repo has uncommitted work. Push all changes to `origin/main` (`doughyvibe/nomiv1`), or ask the agent: "commit and push my changes".
-
-### Part C — Cloudflare account + first deploy
-
-1. Create a Cloudflare account at **https://dash.cloudflare.com**.
-2. In the project: `npx wrangler login` (opens browser to authorize).
-3. `npm run deploy` — this builds with OpenNext and uploads the Worker.
-   - Alternative: connect the GitHub repo as a Cloudflare **Workers** build (Workers & Pages → Create → Workers → connect repo). NOT a Pages project.
-
-### Part D — Environment variables (Cloudflare dashboard → your Worker → Settings → Variables)
-
-Add for Production:
-
-| Variable | Value | Type |
-|---|---|---|
-| `NEXT_PUBLIC_ROOT_DOMAIN` | `<your-domain>` *(set when domain purchased; skip for workers.dev smoke test)* | Plaintext var |
-| `NEXT_PUBLIC_SUPABASE_URL` | *(from `.env.local`)* | Plaintext var |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | *(from `.env.local`)* | Plaintext var |
-
-(These are `NEXT_PUBLIC_*` so they are not secret. A future server-only `SUPABASE_SECRET_KEY` will be added as an encrypted **Secret**.) Re-deploy after adding.
-
-### Part E — Custom domain + wildcard (defer until pre-launch)
-
-**Skip this until you own a domain and are ready to go live.**
-
-4. Cloudflare dashboard → add **your domain** as a zone. Point registrar nameservers to Cloudflare.
-5. Attach the Worker to: apex (`yourdomain.com`), `app.yourdomain.com`, `*.yourdomain.com` (wildcard for storefronts).
-6. Set `NEXT_PUBLIC_ROOT_DOMAIN=yourdomain.com` on the Worker and redeploy.
-
-**Before domain:** `*.workers.dev` URL works for deploy smoke test (marketing page only — no subdomain routing).
-
-### Part F — Supabase production auth URLs
-
-7. Supabase → **Authentication → URL Configuration** — add (keep local lvh.me URLs too):
-
-| Setting | Production value |
-|---|---|
-| Site URL | `https://app.<your-domain>` |
-| Redirect URLs | `https://app.<your-domain>/auth/callback` |
-
-### Part G — Verify production
-
-8. After DNS is live, open:
-   - **https://nomi.store** → Marketing page
-   - **https://app.nomi.store** → Login (or dashboard if signed in)
-   - **https://demo.nomi.store** → "Storefront for: demo"
-9. Sign in with Google on **https://app.nomi.store** → should land on dashboard.
-10. **https://nomi.store/api/health/supabase** → `"schema":true`
-
-**Reply with:** `task 1.8 ✅` + your production URL, or paste errors.
+- Published storefront subdomain still shows the **Phase 1 placeholder** — real buyer storefront is Phase 4 (Tasks 4.1–4.2).
+- Unicorn/Outback/Futuristic vibes use **provisional tokens** — refined in Phase 7. Industrial is the reference.
+- Hero block **drag-and-drop** parked in Backlog (move up/down buttons per PRD fallback).
+- One store per seller (enforced in `createStore`).
 
 ---
 
 ## Suggested Next Step
 
-**Phase 2, Task 2.1 — PayNow QR generation utility.** This is local/code-only, so it can start even before the domain DNS is finished. Say "start task 2.1".
+**Phase 4, Task 4.1 — Storefront data loading + 404/unavailable states.** Say "start task 4.1" (or "start phase 4") after the walkthrough passes.
 
 ---
 
@@ -113,13 +60,14 @@ Add for Production:
 
 | Date | Decision | Why |
 |---|---|---|
-| 2026-07-02 | Google OAuth only for sellers (PRD §31) | Buyers stay anonymous |
-| 2026-07-02 | Auth callback always redirects to `app.*` dashboard | Avoids landing on localhost/marketing after OAuth |
-| 2026-07-02 | `allowedDevOrigins` for `*.lvh.me` in next.config | Next.js blocks client JS from non-localhost dev origins |
-| 2026-07-02 | `NEXT_PUBLIC_ROOT_DOMAIN` switches dev/prod | `lvh.me` locally, `nomi.store` in prod |
-| 2026-07-02 | **Deploy to Cloudflare Workers (OpenNext), not Vercel** | New direction; OpenNext supports Next 16, keeps all app code |
-| 2026-07-02 | Workers deploy, never Cloudflare Pages Git builds | Pages pins old wrangler → OpenNext boot 500s; need wrangler ≥ 4.33 |
-| 2026-07-02 | Wildcard `*.nomi.store` via Cloudflare DNS + Worker routes | Required for seller storefronts |
+| 2026-07-02 | Deploy to Cloudflare Workers (OpenNext), not Vercel | OpenNext supports Next 16; keeps all app code |
+| 2026-07-02 | Domain purchase deferred until pre-launch | `NEXT_PUBLIC_ROOT_DOMAIN` env-driven; lvh.me for dev |
+| 2026-07-02 | PayNow payload built in-house (`lib/paynow/`) | No maintained npm lib; validated in real banking apps (Task 2.2 ✅) |
+| 2026-07-02 | Onboarding progress **derived from store data**, no step counter column | Zero schema change; resume correct by construction |
+| 2026-07-02 | Server actions for all onboarding mutations, RLS as enforcement layer | No API routes needed; owner checks in DB policies |
+| 2026-07-02 | Images: client-side webp compression → `store-images/{user_id}/` | 5 MB bucket cap; per-user folder RLS; public read |
+| 2026-07-02 | Vibe tokens on `[data-vibe]` attribute; Industrial fully designed, other 3 provisional | One preview component renders all vibes; Phase 7 refines |
+| 2026-07-02 | Publish gated client-side (checklist) + server-side (`publishStore` re-checks) | Never trust the client on the money path |
 
 ---
 
@@ -127,10 +75,8 @@ Add for Production:
 
 | Item | Status |
 |---|---|
-| OpenNext scaffolded (wrangler.jsonc, adapter, scripts)? | ✅ Part A done |
-| Code pushed to GitHub? | ⏳ Needed before repo-connected deploy |
-| Cloudflare account + `npm run deploy` smoke test? | ⏳ Optional now; required before launch |
-| Domain purchased + wildcard DNS? | ⏸️ Defer until pre-launch |
-| Task 1.8 production verification (3 surfaces + OAuth) | ⏳ After domain attached |
+| Storage migration applied? | ⏳ **Part A — required for image uploads** |
+| Phase 3 manual walkthrough | ⏳ Part B — awaiting human |
+| Custom domain for production | ⏸️ Deferred until pre-launch |
 
 ---

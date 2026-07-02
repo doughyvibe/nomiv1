@@ -12,6 +12,11 @@ export async function middleware(request: NextRequest) {
   const { surface, slug } = resolveSurface(host);
   const { pathname } = request.nextUrl;
 
+  // ponytail: hide internal dev tools in production
+  if (pathname.startsWith("/dev") && process.env.NODE_ENV === "production") {
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (surface === "dashboard") {
     let response: NextResponse;
 

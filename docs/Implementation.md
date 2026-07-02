@@ -1,9 +1,9 @@
 # Nomi — Implementation Plan (Living Document)
 
 > **Last Updated:** 2026-07-02
-> **Current Phase:** Phase 1 — Foundation & Multi-Tenant Shell
-> **Current Task:** Task 1.8 — Deploy to Cloudflare Workers (OpenNext)
-> **Overall Progress:** 7 / 38 tasks complete
+> **Current Phase:** Phase 4 — Public Buyer Storefront (pending Phase 3 manual check)
+> **Current Task:** Task 4.1 — Storefront Data Loading (next)
+> **Overall Progress:** 18 / 38 tasks complete
 
 ---
 
@@ -94,6 +94,31 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | `app/auth/callback/route.ts` | OAuth PKCE code exchange | 1.7 |
 | `open-next.config.ts` | OpenNext Cloudflare adapter config | 1.8 |
 | `wrangler.jsonc` | Cloudflare Worker config (name, compat flags, assets) | 1.8 |
+| `lib/paynow/build-payload.ts` | EMVCo PayNow payload builder (mobile + UEN) | 2.1 |
+| `lib/paynow/crc16.ts` | CRC-16/CCITT-FALSE for EMVCo QR | 2.1 |
+| `lib/paynow/tlv.ts` | TLV field formatter | 2.1 |
+| `lib/paynow/validate-payload.ts` | CRC validation helper | 2.1 |
+| `lib/paynow/build-payload.test.ts` | Unit tests (CRC, TLV, field formats) | 2.1 |
+| `components/dev/paynow-test-form.tsx` | Internal PayNow QR test UI | 2.1 |
+| `app/dev/paynow-test/page.tsx` | Hidden dev test page (`/dev/paynow-test`) | 2.1 |
+| `lib/stores/types.ts` | Store/Product types + jsonb shapes + completeness checks | 3.1 |
+| `lib/stores/progress.ts` | Derived onboarding step logic | 3.1 |
+| `app/(dashboard)/dashboard/onboarding/page.tsx` | Onboarding server loader | 3.1 |
+| `app/(dashboard)/dashboard/onboarding/actions.ts` | All onboarding server actions | 3.1–3.8 |
+| `components/onboarding/wizard.tsx` | Wizard shell + step indicator | 3.1 |
+| `lib/slug.ts` + `lib/slug.test.ts` | Slug rules (PRD §7) + tests | 3.2 |
+| `components/onboarding/step-name-slug.tsx` | Step 1: name + slug claim | 3.2 |
+| `lib/vibes.ts` | Vibe registry metadata | 3.3 |
+| `components/storefront/mini-preview.tsx` | Phone-frame vibe preview | 3.3 |
+| `components/onboarding/step-vibe.tsx` | Step 2: vibe carousel | 3.3 |
+| `lib/images/compress.ts` | Client image compression + storage upload | 3.4 |
+| `supabase/migrations/20260702120000_storage_store_images.sql` | store-images bucket + RLS | 3.4 |
+| `components/onboarding/step-hero.tsx` | Step 3: hero designer | 3.4 |
+| `components/onboarding/step-product.tsx` | Step 4: first product | 3.5 |
+| `components/onboarding/step-fulfillment.tsx` | Step 5: fulfillment | 3.6 |
+| `lib/paynow/validate-input.ts` | SG mobile / UEN validation | 3.7 |
+| `components/onboarding/step-paynow.tsx` | Step 6: PayNow setup | 3.7 |
+| `components/onboarding/step-publish.tsx` | Step 7: checklist + publish + success | 3.8 |
 
 ---
 
@@ -310,7 +335,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 1.8 — Deploy Baseline to Cloudflare Workers (OpenNext) + Wildcard Domain 👤 🔄
+### Task 1.8 — Deploy Baseline to Cloudflare Workers (OpenNext) + Wildcard Domain 👤 ✅
 
 **What:** Add the OpenNext-for-Cloudflare adapter, deploy the app to Cloudflare Workers, and serve production hostnames (`nomi.store`, `app.nomi.store`, `*.nomi.store` — or whatever domain is chosen at launch).
 
@@ -361,7 +386,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 2.1 — PayNow QR Generation Utility + Test Page ⬜
+### Task 2.1 — PayNow QR Generation Utility + Test Page ✅
 
 **What:** Build the EMVCo/SGQR PayNow payload generator and render it as a QR code.
 
@@ -376,13 +401,17 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Payload passes CRC validation
 - Unit tests pass
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/paynow/` — payload builder, CRC, TLV helpers, validation, unit tests
+- `components/dev/paynow-test-form.tsx`, `app/dev/paynow-test/page.tsx`
+- `middleware.ts` — block `/dev/*` in production
+- `package.json` — `react-qr-code`, `tsx`, `test:paynow` script
 
-**Notes:** Check Context7/docs for an existing maintained PayNow payload library before writing from scratch.
+**Notes:** Implemented from scratch (no external PayNow lib — Context7 had no maintained npm match; algorithm aligned with EMVCo SGQR spec). Checked against sgqr-code CRC approach during dev. Test page at **http://lvh.me:3000/dev/paynow-test** (404 in production). Run `npm run test:paynow` for unit tests.
 
 ---
 
-### Task 2.2 — Real-World Banking App Validation 👤⬜
+### Task 2.2 — Real-World Banking App Validation 👤 ✅
 
 **What:** Human tests the generated QR against real Singapore banking apps.
 
@@ -401,7 +430,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 **Files Changed:** *(none — validation task)*
 
-**Notes:** If this fails, we stop and rethink payment approach before continuing. This is the project's biggest risk.
+**Notes:** Human confirmed `task 2.2 ✅` (2026-07-02). Dynamic PayNow QR accepted by real banking apps — core USP de-risked. Proceed to Phase 3.
 
 ---
 
@@ -417,7 +446,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 3.1 — Onboarding Shell & Progress State ⬜
+### Task 3.1 — Onboarding Shell & Progress State ✅
 
 **What:** Build the 7-step onboarding wizard shell with progress persistence.
 
@@ -432,13 +461,18 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Refresh/resume returns to correct step
 - Dashboard is reachable only after onboarding completes (or via explicit skip once store exists)
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/stores/types.ts` — Store/Product types + hero/fulfillment/paynow jsonb shapes + completeness checks
+- `lib/stores/progress.ts` — `deriveOnboardingStep()` + step registry
+- `app/(dashboard)/dashboard/onboarding/page.tsx` — server loader (store + products → derived step)
+- `components/onboarding/wizard.tsx` — client shell, tappable step indicator, back-nav to completed steps
+- `app/(dashboard)/dashboard/page.tsx` — redirects to `/onboarding` until onboarding is done; shows store card after
 
-**Notes:** *(to be filled)*
+**Notes:** Progress is **derived from data**, not a stored step counter — no schema change needed and resume is correct by construction (no vibe → step 2, no hero title → step 3, no products → step 4, etc.). Completed steps can be revisited via the step indicator; the server-derived step is authority after each save (`router.refresh()`).
 
 ---
 
-### Task 3.2 — Step 1: Store Name + Slug Claim ⬜
+### Task 3.2 — Step 1: Store Name + Slug Claim ✅
 
 **What:** Store name input with live slug suggestion, availability check, and claim.
 
@@ -454,13 +488,17 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Reserved slugs blocked
 - Draft store created with claimed slug
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/slug.ts` — `slugify()`, `validateSlugFormat()` (PRD §7 rules), `suggestAlternatives()`
+- `lib/slug.test.ts` — unit tests (run with `npx tsx --test lib/slug.test.ts`)
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `checkSlugAvailability` (format + reserved + uniqueness) and `createStore` server actions
+- `components/onboarding/step-name-slug.tsx` — name → auto-slug, debounced availability, ✓/✗ states, taken-slug suggestion chips
 
-**Notes:** *(to be filled)*
+**Notes:** Validation runs three times: client format check (instant), debounced server availability check, and again inside `createStore` before insert. A unique-violation on insert (slug race) maps to "Already taken". Suggestions follow PRD §7 examples (`-sg`, `official`, year).
 
 ---
 
-### Task 3.3 — Vibe System Core + Step 2: Vibe Selection ⬜
+### Task 3.3 — Vibe System Core + Step 2: Vibe Selection ✅
 
 **What:** Build the vibe token infrastructure and the vibe picker (Industrial fully designed; other three with provisional tokens).
 
@@ -476,13 +514,18 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Industrial preview visibly matches JigWave direction
 - Selection persists
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/vibes.ts` — vibe registry (name, tagline, suitable-for, swatches, provisional flag)
+- `styles/tokens.css` — full Industrial tokens per PRD §10 (bg `8 14 19`, teal `45 212 191`, rust `168 106 58`, `metal-panel` + `rust-edge` surface classes, Oswald display) + provisional Unicorn/Outback/Futuristic token sets; vibe vars scoped to `[data-vibe]`
+- `lib/fonts.ts`, `app/layout.tsx` — Oswald display font loaded via `next/font`
+- `components/storefront/mini-preview.tsx` — phone-frame storefront preview (hero + category pills + product grid) rendered with real vibe tokens
+- `components/onboarding/step-vibe.tsx` — snap-scroll carousel with JigWave sample data, "Use this vibe" CTA
 
-**Notes:** Industrial is the quality bar; the other three get a refinement pass in Phase 7.
+**Notes:** Industrial is the quality bar; the other three get a refinement pass in Phase 7. `[data-vibe]` attribute drives tokens so the same `MiniPreview` renders all four vibes — it's reused by the hero designer (live preview) and publish step (real data).
 
 ---
 
-### Task 3.4 — Step 3: Hero Designer ⬜
+### Task 3.4 — Step 3: Hero Designer 👤 ✅
 
 **What:** Hero content editor: eyebrow, title, subheading, CTA text, image upload, block reordering.
 
@@ -498,13 +541,17 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Image uploads and displays
 - Reordering works and persists
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/onboarding/step-hero.tsx` — fields, image upload, ↑/↓ block reordering, live `MiniPreview`
+- `lib/images/compress.ts` — canvas-based client downscale (max 1600px, webp q0.82) + `uploadStoreImage()` to Supabase Storage
+- `supabase/migrations/20260702120000_storage_store_images.sql` — `store-images` public bucket (5 MB cap) + per-user-folder RLS policies **(👤 must be applied in SQL Editor)**
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `saveHero` (validates title + block order server-side)
 
-**Notes:** Drag-and-drop parked in Backlog per PRD fallback guidance.
+**Notes:** Drag-and-drop parked in Backlog per PRD fallback guidance. Uploads go to `store-images/{user_id}/hero-*.webp`; RLS restricts writes to the owner's folder, reads are public (storefront content).
 
 ---
 
-### Task 3.5 — Step 4: Add First Product ⬜
+### Task 3.5 — Step 4: Add First Product ✅
 
 **What:** First product form: name, price, image, description, optional category.
 
@@ -519,13 +566,15 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Can add multiple products
 - Can continue with just one product
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/onboarding/step-product.tsx` — form (name, S$ price, image, description, optional category), "Product added — Add another / Continue setup" flow, list of added products
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `addProduct` (server-side name/price validation, price stored as integer cents)
 
-**Notes:** *(to be filled)*
+**Notes:** Prices entered in dollars, stored as `price_cents` (matches schema). Image upload reuses the Task 3.4 compression + storage path (`product-*.webp`). Category free-text feeds the storefront filter pills later.
 
 ---
 
-### Task 3.6 — Step 5: Configure Fulfillment ⬜
+### Task 3.6 — Step 5: Configure Fulfillment ✅
 
 **What:** Self-pickup and/or local delivery configuration.
 
@@ -539,13 +588,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Seller can enable either or both with conditional fields
 - Validation: at least one method, fee required if delivery enabled
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/onboarding/step-fulfillment.tsx` — pickup/delivery checkboxes with conditional fields per PRD §16 Step 5
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `saveFulfillment` (server re-validates "at least one method complete")
+- `lib/stores/types.ts` — `FulfillmentConfig` jsonb shape + `fulfillmentIsComplete()`
 
-**Notes:** *(to be filled)*
+**Notes:** Delivery fee stored as integer cents in the store's `fulfillment` jsonb — checkout (Phase 4) adds it to the PayNow total.
 
 ---
 
-### Task 3.7 — Step 6: Configure PayNow Payment ⬜
+### Task 3.7 — Step 6: Configure PayNow Payment ✅
 
 **What:** PayNow recipient setup: mobile or UEN, recipient display name.
 
@@ -560,13 +612,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Valid PayNow details saved
 - Sample QR preview renders with their recipient details
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/paynow/validate-input.ts` — `isValidSgMobile` (8/9-prefixed 8 digits) + `isValidUen` (3 UEN formats); exported from `lib/paynow`
+- `components/onboarding/step-paynow.tsx` — mobile/UEN radio, live format validation, manual-verification explainer, live sample QR (S$23.00 / SAMPLE-001) via Phase 2 `buildPayNowPayload`
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `savePayNow` (server re-validates mobile/UEN format)
 
-**Notes:** *(to be filled)*
+**Notes:** Sample QR uses the seller's real proxy so they can scan it themselves to sanity-check recipient before publishing — same code path the buyer payment page will use in Phase 4.
 
 ---
 
-### Task 3.8 — Step 7: Preview & Publish ⬜
+### Task 3.8 — Step 7: Preview & Publish ✅
 
 **What:** Full storefront preview + pre-publish checklist + publish action.
 
@@ -581,13 +636,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Store becomes publicly reachable at its subdomain after publish
 - Success screen actions work
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/onboarding/step-publish.tsx` — 7-item pre-publish checklist, phone-frame preview with real store data, publish action, success screen (Copy Link / Open Store / Share on WhatsApp / Go to Dashboard)
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `publishStore` (server re-checks all completeness gates before setting `status='published'`)
+- `lib/host.ts` — `getStorefrontUrl(slug)` helper
 
-**Notes:** *(to be filled)*
+**Notes:** Publish is gated client-side (checklist) **and** server-side (`publishStore` re-verifies). After publish, RLS `stores_public_read_published` makes the store publicly readable; the subdomain currently serves the Phase 1 placeholder — the real buyer storefront is Task 4.1/4.2. "Add to Instagram Bio" from PRD copy omitted (no deep-link exists; Copy Link covers it).
 
 ---
 
-**🏁 Phase 3 Checkpoint:** A seller can complete the full onboarding and publish a live store at their subdomain.
+**🏁 Phase 3 Checkpoint:** A seller can complete the full onboarding and publish a live store at their subdomain. *(Code complete 2026-07-02 — awaiting 👤 manual walkthrough; storage migration must be applied first. See whiteboard.)*
 
 ---
 
@@ -1114,6 +1172,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | 2026-07-02 | Vercel instead of Cloudflare Pages/Workers | Simpler wildcard subdomains + Next.js hosting for first-time builder |
 | 2026-07-02 | **Reversed: Cloudflare Workers (OpenNext) instead of Vercel** | New deployment direction. OpenNext supports Next.js 16; keeps all existing app code. Deploy via Workers (not Pages). Cloudflare DNS for wildcard `*.nomi.store`. |
 | 2026-07-02 | PayNow spike moved to Phase 2 (before feature build) | De-risk core USP as early as possible |
+| 2026-07-02 | Phase 3 built: onboarding progress derived from data (no step column); server actions + RLS; store-images bucket added | Simplest resume-safe design; second storage migration required |
 | 2026-07-02 | Industrial vibe built first; other 3 refined in Phase 7 | Industrial has a full design reference (JigWave); quality bar |
 
 ---

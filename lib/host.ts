@@ -15,6 +15,16 @@ export function getDashboardUrl(path = "/"): string {
   return `${protocol}://app.${root}${port}${normalizedPath}`;
 }
 
+/** Public storefront origin for a slug (demo.nomi.store / demo.lvh.me:3000) */
+export function getStorefrontUrl(slug: string, path = "/"): string {
+  const root = getRootDomain();
+  const isDev = process.env.NODE_ENV === "development";
+  const port = isDev ? ":3000" : "";
+  const protocol = isDev ? "http" : "https";
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${protocol}://${slug}.${root}${port}${normalizedPath}`;
+}
+
 /** ponytail: naive hostname parse; upgrade path = shared util + unit tests if edge cases appear */
 export function resolveSurface(host: string | null): {
   surface: AppSurface;
