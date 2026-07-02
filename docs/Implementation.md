@@ -1,9 +1,9 @@
 # Nomi — Implementation Plan (Living Document)
 
 > **Last Updated:** 2026-07-02
-> **Current Phase:** Not Started
-> **Current Task:** None
-> **Overall Progress:** 0 / 38 tasks complete
+> **Current Phase:** Phase 1 — Foundation & Multi-Tenant Shell
+> **Current Task:** Task 1.2 (next)
+> **Overall Progress:** 1 / 38 tasks complete
 
 ---
 
@@ -60,7 +60,15 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 | File | Purpose | Created in Task |
 |---|---|---|
-| *(empty — will be populated as we build)* | | |
+| `package.json` | Project scripts and dependencies (Next.js 16, React 19, Tailwind 4) | 1.1 |
+| `next.config.ts` | Next.js configuration | 1.1 |
+| `tsconfig.json` | TypeScript config with `@/*` path alias | 1.1 |
+| `postcss.config.mjs` | PostCSS + Tailwind pipeline | 1.1 |
+| `eslint.config.mjs` | ESLint config (Next.js defaults) | 1.1 |
+| `app/layout.tsx` | Root layout, Nomi metadata | 1.1 |
+| `app/page.tsx` | Minimal blank home page | 1.1 |
+| `app/globals.css` | Tailwind import only | 1.1 |
+| `.gitignore` | Ignores node_modules, .next, env files | 1.1 |
 
 ---
 
@@ -85,7 +93,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 1.1 — Initialize Next.js + TypeScript Project ⬜
+### Task 1.1 — Initialize Next.js + TypeScript Project ✅
 
 **What:** Create the Next.js project with TypeScript and App Router in the repo root.
 
@@ -100,9 +108,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - `npm run build` succeeds
 - Git repo initialized with first commit
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `package.json`, `package-lock.json` — Next.js 16.2.10, React 19, Tailwind CSS 4, TypeScript, ESLint
+- `next.config.ts`, `tsconfig.json`, `postcss.config.mjs`, `eslint.config.mjs` — scaffold config
+- `app/layout.tsx` — stripped Geist fonts; Nomi metadata
+- `app/page.tsx` — minimal blank `<main>`
+- `app/globals.css` — Tailwind import only
+- `.gitignore` — from create-next-app (covers node_modules, .next, .env*)
+- Removed default `public/*.svg` boilerplate assets
 
-**Notes:** *(to be filled)*
+**Notes:** Git initialized by create-next-app (`Initial commit from Create Next App`). Boilerplate cleanup committed separately. Build and dev both pass. Harmless Turbopack warning about a parent-directory lockfile at `/Users/therealdoughy/package-lock.json` — not blocking; can silence later with `turbopack.root` in next.config if needed.
 
 ---
 
