@@ -1,0 +1,49 @@
+/*
+ * Nomi design tokens
+ *
+ * Platform tokens (:root) — dashboard + marketing (neutral, light)
+ * Storefront tokens ([data-surface="storefront"]) — vibe-scoped, inherited by children
+ *
+ * Vibe vars use --vibe-* prefix so they never collide with shadcn --primary / --secondary.
+ */
+
+:root {
+  /* Platform / dashboard */
+  --dashboard-bg: 250 250 250;
+  --dashboard-surface: 255 255 255;
+  --dashboard-border: 228 228 231;
+  --dashboard-fg: 24 24 27;
+  --dashboard-muted: 113 113 122;
+  --dashboard-primary: 13 148 136;
+  --dashboard-primary-fg: 255 255 255;
+  --dashboard-radius: 0.5rem;
+
+  /* Storefront vibe defaults (overridden per vibe on [data-surface="storefront"]) */
+  --vibe-bg: 250 250 250;
+  --vibe-primary: 13 148 136;
+  --vibe-secondary: 168 106 58;
+  --vibe-surface: 255 255 255;
+  --vibe-border: 228 228 231;
+  --vibe-text: 24 24 27;
+  --vibe-text-muted: 113 113 122;
+
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-body);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+[data-surface="storefront"] {
+  color: rgb(var(--vibe-text));
+  background-color: rgb(var(--vibe-bg));
+  font-family: var(--font-body);
+}
+
+[data-surface="storefront"][data-vibe="industrial"] {
+  --vibe-bg: 8 14 19;
+  --vibe-primary: 45 212 191;
+  --vibe-secondary: 168 106 58;
+  --vibe-surface: 15 23 32;
+  --vibe-border: 45 212 191;
+  --vibe-text: 226 232 240;
+  --vibe-text-muted: 100 116 139;
+}

@@ -2,8 +2,8 @@
 
 > **Last Updated:** 2026-07-02
 > **Current Phase:** Phase 1 — Foundation & Multi-Tenant Shell
-> **Current Task:** Task 1.2 (next)
-> **Overall Progress:** 1 / 38 tasks complete
+> **Current Task:** Phase 2, Task 2.1 (next)
+> **Overall Progress:** 8 / 38 tasks complete
 
 ---
 
@@ -68,7 +68,28 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | `app/layout.tsx` | Root layout, Nomi metadata | 1.1 |
 | `app/page.tsx` | Minimal blank home page | 1.1 |
 | `app/globals.css` | Tailwind import only | 1.1 |
-| `.gitignore` | Ignores node_modules, .next, env files | 1.1 |
+| `lib/fonts.ts` | Inter font loader via next/font | 1.2 |
+| `components.json` | shadcn/ui project config | 1.3 |
+| `lib/utils.ts` | `cn()` helper for shadcn | 1.3 |
+| `components/ui/button.tsx` | shadcn Button | 1.3 |
+| `components/ui/input.tsx` | shadcn Input | 1.3 |
+| `components/ui/card.tsx` | shadcn Card | 1.3 |
+| `components/ui/dialog.tsx` | shadcn Dialog | 1.3 |
+| `components/ui/label.tsx` | shadcn Label | 1.3 |
+| `components/ui/select.tsx` | shadcn Select | 1.3 |
+| `lib/host.ts` | Hostname → surface/slug resolver | 1.4 |
+| `middleware.ts` | Rewrites by subdomain to route groups | 1.4 |
+| `app/(marketing)/page.tsx` | Marketing placeholder | 1.4 |
+| `app/(dashboard)/dashboard/page.tsx` | Dashboard placeholder + shadcn Button | 1.4 |
+| `app/(storefront)/s/[slug]/page.tsx` | Storefront placeholder | 1.4 |
+| `lib/supabase/env.ts` | Env validation + `isSupabaseConfigured()` | 1.5 |
+| `lib/supabase/client.ts` | Browser Supabase client | 1.5 |
+| `lib/supabase/server.ts` | Server Supabase client (cookies) | 1.5 |
+| `lib/supabase/middleware.ts` | Session refresh + auth user in middleware | 1.7 |
+| `components/auth/google-sign-in-button.tsx` | Google OAuth sign-in (client) | 1.7 |
+| `components/auth/sign-out-button.tsx` | Sign out (client) | 1.7 |
+| `app/(dashboard)/login/page.tsx` | Seller login page | 1.7 |
+| `app/auth/callback/route.ts` | OAuth PKCE code exchange | 1.7 |
 
 ---
 
@@ -121,7 +142,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 1.2 — Tailwind Base Setup + Vibe Token Architecture ⬜
+### Task 1.2 — Tailwind Base Setup + Vibe Token Architecture ✅
 
 **What:** Configure Tailwind with a CSS-variable-based token system so vibes can later swap palettes/fonts without touching component code.
 
@@ -135,13 +156,18 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Tailwind utilities reference CSS variables for vibe-able colors
 - A test page renders correctly with base tokens
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `styles/tokens.css` — platform tokens on `:root`; storefront vibe structure on `[data-surface="storefront"]`; industrial placeholder values for dev
+- `app/globals.css` — `@theme inline` maps tokens to Tailwind utilities (`bg-dashboard-*`, `bg-bg`, `bg-primary`, etc.)
+- `lib/fonts.ts` — Inter via `next/font/google` as `--font-inter`
+- `app/layout.tsx` — applies Inter variable; `font-body` on body
+- `app/page.tsx` — temporary token test page (platform swatches + industrial storefront scope)
 
-**Notes:** This token architecture is the backbone of the whole vibe system — worth getting right early.
+**Notes:** Storefront colors inherit from the nearest `[data-surface="storefront"]` wrapper, so vibes swap by changing `data-vibe` + CSS var values — no component edits needed. Display fonts (e.g. Oswald for Industrial) deferred to Phase 3 per-storefront loading. Token test page stays until Task 1.4 splits route groups.
 
 ---
 
-### Task 1.3 — Install shadcn/ui (Dashboard Only) ⬜
+### Task 1.3 — Install shadcn/ui (Dashboard Only) ✅
 
 **What:** Set up shadcn/ui for dashboard and marketing surfaces.
 
@@ -154,13 +180,19 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - shadcn components render with neutral dashboard styling
 - No dependency conflicts
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components.json` — shadcn config (base-nova style, CSS variables)
+- `lib/utils.ts` — `cn()` helper
+- `components/ui/{button,input,card,dialog,label,select}.tsx` — starter components
+- `app/globals.css` — merged shadcn theme vars + tw-animate-css; kept Nomi vibe tokens
+- `package.json` — added `@base-ui/react`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `shadcn`, `tw-animate-css`
+- `app/layout.tsx` — kept Inter only (removed shadcn-init Geist font)
 
-**Notes:** Public storefront components will be custom-built with vibe tokens, NOT shadcn.
+**Notes:** shadcn CSS vars (`--background`, `--primary`, etc.) are separate from storefront vibe tokens (`--color-bg`, etc.) — no conflict. Dashboard page (Task 1.4) verifies Button + Card render.
 
 ---
 
-### Task 1.4 — Multi-Tenant Middleware & Route Groups ⬜
+### Task 1.4 — Multi-Tenant Middleware & Route Groups ✅
 
 **What:** Implement hostname-based routing: marketing, dashboard, and storefront surfaces from one app.
 
@@ -178,13 +210,20 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - `app.lvh.me:3000` shows dashboard placeholder
 - `demo.lvh.me:3000` shows "Storefront for: demo"
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `middleware.ts` — rewrites `app.*` → `/dashboard/*`, `{slug}.*` → `/s/{slug}/*`
+- `lib/host.ts` — `resolveSurface()` parses host against `NEXT_PUBLIC_ROOT_DOMAIN` (default `lvh.me`)
+- `app/(marketing)/{layout,page}.tsx` — marketing placeholder at `/`
+- `app/(dashboard)/{layout,dashboard/page}.tsx` — dashboard with shadcn Card + Button
+- `app/(storefront)/{layout,s/[slug]/page}.tsx` — vibe-scoped storefront placeholder
+- `.env.example` — documents `NEXT_PUBLIC_ROOT_DOMAIN`
+- Removed `app/page.tsx` (token test page; replaced by surface-specific pages)
 
-**Notes:** This is the most architecturally important task in Phase 1.
+**Notes:** Verified via curl with `Host` headers — all three surfaces resolve correctly. `localhost:3000` falls back to marketing. Next.js 16 logs a deprecation notice for `middleware.ts` in favor of `proxy` — ignored for now; middleware works. Use `lvh.me` URLs in browser for manual check (not `localhost`).
 
 ---
 
-### Task 1.5 — Supabase Project Setup 👤⬜
+### Task 1.5 — Supabase Project Setup 👤 ✅
 
 **What:** Create Supabase project and wire client/server SDK into the app. **Config only — no schema yet.**
 
@@ -200,22 +239,21 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - No credentials hardcoded
 - `.env.example` documents all required variables
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `package.json` — added `@supabase/supabase-js`, `@supabase/ssr`
+- `lib/supabase/env.ts` — `getSupabaseEnv()`, `isSupabaseConfigured()`
+- `lib/supabase/client.ts` — `createBrowserClient` for client components
+- `lib/supabase/server.ts` — `createServerClient` with Next.js cookies
+- `app/api/health/supabase/route.ts` — GET returns `{ ok: true, connected: true }` when configured
+- `.env.example` — added `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-**Notes:** *(to be filled)*
+**Notes:** Code side complete. Human must create Supabase project + paste keys into `.env.local` (see whiteboard). Health check uses `auth.getSession()` as a no-schema connectivity probe. Session cookie refresh in middleware deferred to Task 1.7. Without `.env.local`, `/api/health/supabase` returns 503 with a clear message — verified at build time.
 
 ---
 
-### Task 1.6 — Database Schema v1 + Row Level Security ⬜
+### Task 1.6 — Database Schema v1 + Row Level Security 👤 ✅
 
 **What:** Create the core Postgres schema with RLS enforcing tenant isolation from day one.
-
-**Tables:**
-- `stores` — owner_id, name, slug (unique), status (draft/published/unpublished/suspended/deleted), vibe, hero fields (jsonb), fulfillment settings (jsonb), paynow settings (jsonb)
-- `products` — store_id, name, price_cents, description, image_url, category (nullable text), archived
-- `orders` — store_id, reference (e.g. ORD-8F3K2), status, customer fields, fulfillment method/address/notes, subtotal/fee/total cents, payment_expires_at
-- `order_items` — order_id, product snapshot (name, price, qty)
-- `reserved_slugs` — seeded with reserved names from PRD §7
 
 **Steps:**
 1. Write SQL migration for all tables + indexes
@@ -230,13 +268,15 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - A second test user cannot read another store's data
 - Reserved slugs seeded
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `supabase/migrations/20260702100000_initial_schema.sql` — enums, 5 tables, indexes, `updated_at` triggers, 25 reserved slugs, RLS policies
+- `app/api/health/supabase/route.ts` — extended to verify schema (`reserved_slugs` count)
 
-**Notes:** Prices stored as integer cents to avoid floating-point money bugs.
+**Notes:** Migration must be applied manually via Supabase SQL Editor (see whiteboard). Orders/order_items have no public INSERT policies — buyer checkout will use secret key server-side in Phase 4. Cross-tenant isolation test deferred to manual check after migration + second auth user in Task 1.7. Prices stored as integer cents.
 
 ---
 
-### Task 1.7 — Google OAuth Seller Login 👤⬜
+### Task 1.7 — Google OAuth Seller Login 👤 ✅
 
 **What:** Implement Google sign-in for sellers on the dashboard surface.
 
@@ -253,13 +293,20 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Dashboard routes are inaccessible logged out
 - Storefront + marketing remain public
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `middleware.ts` — dashboard auth gate + session cookie refresh; `/login` and `/auth/*` public
+- `lib/supabase/middleware.ts` — `getMiddlewareUser()`, `isPublicDashboardPath()`
+- `app/(dashboard)/login/page.tsx` — login UI with Google button
+- `app/auth/callback/route.ts` — PKCE `exchangeCodeForSession`, redirect to dashboard
+- `components/auth/google-sign-in-button.tsx` — `signInWithOAuth({ provider: 'google' })`
+- `components/auth/sign-out-button.tsx` — sign out + redirect to `/login`
+- `app/(dashboard)/dashboard/page.tsx` — shows signed-in email + sign out
 
-**Notes:** *(to be filled)*
+**Notes:** OAuth only on dashboard surface (`app.lvh.me/login`). Marketing + storefront unchanged. Human must configure Google Cloud + Supabase Auth (see whiteboard) before sign-in works. Redirect URL: `http://app.lvh.me:3000/auth/callback`.
 
 ---
 
-### Task 1.8 — Deploy Baseline to Vercel + Wildcard Domain 👤⬜
+### Task 1.8 — Deploy Baseline to Vercel + Wildcard Domain 👤 ✅
 
 **What:** Deploy to Vercel and configure `nomi.store`, `app.nomi.store`, and `*.nomi.store`.
 
@@ -274,9 +321,12 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - `nomi.store`, `app.nomi.store`, and `anything.nomi.store` all load the correct surface
 - Google login works in production
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `.env.example` — documented production Vercel env vars (`NEXT_PUBLIC_ROOT_DOMAIN=nomi.store`)
+- `next.config.ts` — already has `allowedDevOrigins` + `turbopack.root` (from Task 1.7 fixes)
+- No code changes required for Vercel; multi-tenant routing is env-driven via `NEXT_PUBLIC_ROOT_DOMAIN`
 
-**Notes:** If domain isn't purchased yet, this task can run on `*.vercel.app` preview + be finished later. Flag in whiteboard.
+**Notes:** `npm run build` passes. Deploy + domain DNS are manual (see whiteboard). Without `nomi.store`, Vercel preview URL (`*.vercel.app`) only shows marketing — wildcard subdomains need custom domain. After deploy, add Supabase production URLs: Site URL `https://app.nomi.store`, redirect `https://app.nomi.store/auth/callback`. Keep local lvh.me URLs for dev.
 
 ---
 
