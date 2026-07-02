@@ -2,8 +2,8 @@
 
 > **Last Updated:** 2026-07-02
 > **Current Phase:** Phase 1 — Foundation & Multi-Tenant Shell
-> **Current Task:** Phase 2, Task 2.1 (next)
-> **Overall Progress:** 8 / 38 tasks complete
+> **Current Task:** Task 1.8 — Deploy to Cloudflare Workers (OpenNext)
+> **Overall Progress:** 7 / 38 tasks complete
 
 ---
 
@@ -33,10 +33,12 @@
 | Image Storage | Supabase Storage |
 | Transactional Email | Resend |
 | PayNow QR | Self-generated EMVCo/SGQR payload + QR rendering library |
-| Hosting | Vercel (wildcard subdomain support via Vercel DNS) |
-| DNS | Vercel DNS for `nomi.store` + `*.nomi.store` |
+| Hosting | Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`) |
+| DNS | Cloudflare DNS for `nomi.store`, `app.nomi.store`, `*.nomi.store` |
 
-> **Deviation from PRD:** PRD suggested Cloudflare Pages/Workers. We use Vercel because wildcard subdomains + Next.js middleware are dramatically simpler there for a first-time builder. See Decision Log in whiteboard.md.
+> **Deployment target:** Cloudflare Workers via the OpenNext adapter (`@opennextjs/cloudflare`), aligned with the PRD. This runs the Next.js app on the Cloudflare Workers Node.js runtime. Deploy with `opennextjs-cloudflare deploy` (Workers) — **never** Cloudflare Pages Git builds (they pin an old wrangler that miscompiles OpenNext workers). Custom domains + wildcard `*.nomi.store` are added as Worker Custom Domains / routes in the Cloudflare dashboard. See Decision Log in whiteboard.md.
+>
+> **Runtime note:** the middleware (`middleware.ts`) uses only Web-standard `NextRequest`/`NextResponse` APIs — no Node.js middleware features (unsupported by OpenNext), so it runs unchanged on Workers.
 
 ---
 
@@ -90,6 +92,8 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | `components/auth/sign-out-button.tsx` | Sign out (client) | 1.7 |
 | `app/(dashboard)/login/page.tsx` | Seller login page | 1.7 |
 | `app/auth/callback/route.ts` | OAuth PKCE code exchange | 1.7 |
+| `open-next.config.ts` | OpenNext Cloudflare adapter config | 1.8 |
+| `wrangler.jsonc` | Cloudflare Worker config (name, compat flags, assets) | 1.8 |
 
 ---
 
@@ -110,7 +114,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ## PHASE 1: Foundation & Multi-Tenant Shell
 
-> **Goal:** App runs locally with hostname-based routing (marketing / dashboard / storefront), Supabase connected, Google login works, deployed to Vercel.
+> **Goal:** App runs locally with hostname-based routing (marketing / dashboard / storefront), Supabase connected, Google login works, deployed to Cloudflare Workers (OpenNext).
 
 ---
 
@@ -306,31 +310,46 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 1.8 — Deploy Baseline to Vercel + Wildcard Domain 👤 ✅
+### Task 1.8 — Deploy Baseline to Cloudflare Workers (OpenNext) + Wildcard Domain 👤 🔄
 
-**What:** Deploy to Vercel and configure `nomi.store`, `app.nomi.store`, and `*.nomi.store`.
+**What:** Add the OpenNext-for-Cloudflare adapter, deploy the app to Cloudflare Workers, and serve production hostnames (`nomi.store`, `app.nomi.store`, `*.nomi.store` — or whatever domain is chosen at launch).
 
-**Steps:**
-1. Verify `npm run build` succeeds
-2. 👤 MANUAL: Human creates Vercel project, connects git repo, sets env vars (instructions provided)
-3. 👤 MANUAL: Human points `nomi.store` nameservers to Vercel DNS and adds `nomi.store`, `app.nomi.store`, `*.nomi.store` domains
-4. Update Supabase auth redirect URLs for production
-5. Verify all three surfaces resolve on production
+**Why OpenNext + Workers (not Pages):** OpenNext runs the full Next.js app (App Router, middleware, RSC, SSR) on the Cloudflare Workers Node.js runtime. Next.js 16 is supported. **Deploy via Workers only** (`opennextjs-cloudflare deploy` / Workers Builds) — Cloudflare Pages Git builds pin an outdated wrangler that miscompiles OpenNext workers into boot-time 500s.
+
+**Steps (agent — scaffold):** ✅ Part A complete
+1. ✅ `npm i -D @opennextjs/cloudflare wrangler` (wrangler 4.106.0).
+2. ✅ Add `open-next.config.ts`: `defineCloudflareConfig()`.
+3. ✅ Add `wrangler.jsonc` (`name: "nomi"`, `compatibility_date: "2026-07-02"`, `nodejs_compat`, assets + self-reference service).
+4. ✅ `next.config.ts`: `initOpenNextCloudflareForDev()` (keeps `allowedDevOrigins` + `turbopack.root`).
+5. ✅ `package.json` scripts: `preview`, `deploy`, `upload`, `cf-typegen`.
+6. ✅ `.gitignore`: `.open-next/`, `.wrangler/`.
+7. ✅ Verified `npm run build` + `opennextjs-cloudflare build` + local preview (`http://localhost:8787` → 200 on `/` and `/api/health/supabase`).
+
+**Steps (human — 👤 MANUAL, see whiteboard):**
+8. Create a Cloudflare account; `npx wrangler login`.
+9. `npm run deploy` (or connect the GitHub repo as a Cloudflare **Workers** build — not Pages).
+10. Set production env as Worker vars: `NEXT_PUBLIC_ROOT_DOMAIN=<your-domain>`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. **Domain can be chosen later** — defer until pre-launch (see Notes).
+11. When domain is purchased: add zone in Cloudflare DNS; attach Worker Custom Domains for apex, `app.`, and `*.` wildcard.
+12. Add Supabase production auth URLs for `https://app.<your-domain>/auth/callback` (keep local lvh.me URLs for dev).
+13. Verify all three surfaces + Google login in production.
 
 **Definition of Done:**
-- `nomi.store`, `app.nomi.store`, and `anything.nomi.store` all load the correct surface
+- Worker deploys successfully to Cloudflare (smoke test on `*.workers.dev` OK before custom domain)
+- When domain is attached: apex, `app.`, and `*.` subdomains load the correct surface
 - Google login works in production
+- `/api/health/supabase` returns `"schema":true`
 
 **Files Changed:**
-- `.env.example` — documented production Vercel env vars (`NEXT_PUBLIC_ROOT_DOMAIN=nomi.store`)
-- `next.config.ts` — already has `allowedDevOrigins` + `turbopack.root` (from Task 1.7 fixes)
-- No code changes required for Vercel; multi-tenant routing is env-driven via `NEXT_PUBLIC_ROOT_DOMAIN`
+- `open-next.config.ts`, `wrangler.jsonc` (new)
+- `next.config.ts` (add `initOpenNextCloudflareForDev`)
+- `package.json` (preview/deploy/upload/cf-typegen scripts; `@opennextjs/cloudflare`, `wrangler` devDeps)
+- `.gitignore`, `.env.example`, `package-lock.json`
 
-**Notes:** `npm run build` passes. Deploy + domain DNS are manual (see whiteboard). Without `nomi.store`, Vercel preview URL (`*.vercel.app`) only shows marketing — wildcard subdomains need custom domain. After deploy, add Supabase production URLs: Site URL `https://app.nomi.store`, redirect `https://app.nomi.store/auth/callback`. Keep local lvh.me URLs for dev.
+**Notes:** No Next.js app/route code changes — multi-tenant routing stays env-driven via `NEXT_PUBLIC_ROOT_DOMAIN`. **Domain purchase is not blocking:** keep building locally on `lvh.me`; deploy to `*.workers.dev` anytime for a deploy smoke test (single host → marketing only). Buy + attach a custom domain with wildcard only when ready to go live. `nomi.store` in docs is a working placeholder, not a locked-in choice — any domain works; set `NEXT_PUBLIC_ROOT_DOMAIN` to match.
 
 ---
 
-**🏁 Phase 1 Checkpoint:** Multi-tenant shell live on Vercel. Hostname routing works. Google login works. Database with RLS ready.
+**🏁 Phase 1 Checkpoint:** Multi-tenant shell live on Cloudflare Workers (OpenNext). Hostname routing works. Google login works. Database with RLS ready.
 
 ---
 
@@ -1093,6 +1112,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 |---|---|---|
 | 2026-07-02 | Plan created | Initial creation based on PRD |
 | 2026-07-02 | Vercel instead of Cloudflare Pages/Workers | Simpler wildcard subdomains + Next.js hosting for first-time builder |
+| 2026-07-02 | **Reversed: Cloudflare Workers (OpenNext) instead of Vercel** | New deployment direction. OpenNext supports Next.js 16; keeps all existing app code. Deploy via Workers (not Pages). Cloudflare DNS for wildcard `*.nomi.store`. |
 | 2026-07-02 | PayNow spike moved to Phase 2 (before feature build) | De-risk core USP as early as possible |
 | 2026-07-02 | Industrial vibe built first; other 3 refined in Phase 7 | Industrial has a full design reference (JigWave); quality bar |
 

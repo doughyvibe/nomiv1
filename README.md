@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nomi
+
+Mobile-first, PayNow-ready storefront platform for Singapore social sellers.
+
+One Next.js app serves three surfaces by hostname (see `docs/Implementation.md`):
+
+| Hostname | Surface |
+|---|---|
+| `nomi.store` | Marketing site |
+| `app.nomi.store` | Seller dashboard |
+| `{slug}.nomi.store` | Public storefront |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Multi-tenant routing needs a wildcard-friendly local host, so use **`lvh.me`** (resolves to 127.0.0.1), not `localhost`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Marketing: http://lvh.me:3000
+- Dashboard: http://app.lvh.me:3000
+- Storefront: http://demo.lvh.me:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local` and fill in the Supabase values.
 
-## Learn More
+## Docs
 
-To learn more about Next.js, take a look at the following resources:
+- `docs/PRD.md` — product requirements
+- `docs/Implementation.md` — living task-by-task plan (source of truth)
+- `docs/whiteboard.md` — current state, decisions, manual checklists
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Nomi deploys to **Cloudflare Workers** via the OpenNext adapter (`@opennextjs/cloudflare`):
 
-## Deploy on Vercel
+```bash
+npm run preview   # build with OpenNext + run the Worker locally
+npm run deploy    # build + upload to Cloudflare Workers
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy via **Workers** only — not Cloudflare Pages Git builds (they pin an old wrangler that miscompiles OpenNext). See Task 1.8 in `docs/Implementation.md` and the manual checklist in `docs/whiteboard.md`.
