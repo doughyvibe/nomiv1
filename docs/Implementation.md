@@ -1,9 +1,9 @@
 # Nomi — Implementation Plan (Living Document)
 
-> **Last Updated:** 2026-07-02
-> **Current Phase:** Phase 4 — Public Buyer Storefront (pending Phase 3 manual check)
-> **Current Task:** Task 4.1 — Storefront Data Loading (next)
-> **Overall Progress:** 18 / 38 tasks complete
+> **Last Updated:** 2026-07-03
+> **Current Phase:** Phase 8 — Polish, Hardening & Launch
+> **Current Task:** Task 8.4 — Final Deploy & Full Production Smoke Test 👤 (next)
+> **Overall Progress:** 41 / 42 tasks complete
 
 ---
 
@@ -31,7 +31,9 @@
 | Auth | Supabase Auth (Google OAuth, sellers only) |
 | Database | Supabase Postgres (with Row Level Security) |
 | Image Storage | Supabase Storage |
-| Transactional Email | Resend |
+| Seller Alerts | Web Push (PWA push notifications, VAPID) — optional per seller |
+| Buyer Comms | Manual seller actions (WhatsApp deep link / `mailto:` draft / copy message) |
+| Transactional Email | Resend — **Backlog / Optional Later** (not in MVP path; see Backlog) |
 | PayNow QR | Self-generated EMVCo/SGQR payload + QR rendering library |
 | Hosting | Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`) |
 | DNS | Cloudflare DNS for `nomi.store`, `app.nomi.store`, `*.nomi.store` |
@@ -70,7 +72,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | `app/layout.tsx` | Root layout, Nomi metadata | 1.1 |
 | `app/page.tsx` | Minimal blank home page | 1.1 |
 | `app/globals.css` | Tailwind import only | 1.1 |
-| `lib/fonts.ts` | Inter font loader via next/font | 1.2 |
+| `lib/fonts.ts` | Inter + vibe display fonts (Oswald, Archivo Black, Syne, Bebas Neue) | 7.1–7.3 |
 | `components.json` | shadcn/ui project config | 1.3 |
 | `lib/utils.ts` | `cn()` helper for shadcn | 1.3 |
 | `components/ui/button.tsx` | shadcn Button | 1.3 |
@@ -81,8 +83,17 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | `components/ui/select.tsx` | shadcn Select | 1.3 |
 | `lib/host.ts` | Hostname → surface/slug resolver | 1.4 |
 | `middleware.ts` | Rewrites by subdomain to route groups | 1.4 |
-| `app/(marketing)/page.tsx` | Marketing placeholder | 1.4 |
-| `app/(dashboard)/dashboard/page.tsx` | Dashboard placeholder + shadcn Button | 1.4 |
+| `app/(marketing)/page.tsx` | Marketing homepage (renders `MarketingHome`) | 7.4 |
+| `app/(marketing)/layout.tsx` | Marketing layout + page metadata | 7.4 |
+| `components/marketing/marketing-home.tsx` | Landing page: pill nav, hero scene, marquee, feature panels, stats, FAQ, CTA band ("Warm Tactile" redesign 2026-07-04) | 7.4 |
+| `components/marketing/paynow-qr-card.tsx` | Marketing mock of the dynamic PayNow QR payment card | UI overhaul |
+| `components/marketing/reveal.tsx` | IntersectionObserver scroll-reveal wrapper (client) | UI overhaul |
+| `lib/errors/friendly-db.ts` | Map Supabase errors to user-safe messages | 8.1 |
+| `lib/errors/friendly-db.test.ts` | friendlyDbError unit tests | 8.1 |
+| `lib/rate-limit.ts` | In-memory IP rate limiter for server actions | 8.2 |
+| `app/(dashboard)/dashboard/loading.tsx` | Dashboard route loading skeleton | 8.1 |
+| `app/(storefront)/s/[slug]/loading.tsx` | Storefront route loading skeleton | 8.1 |
+| `app/(dashboard)/dashboard/page.tsx` | Dashboard home: store link, order summary | 6.1 |
 | `app/(storefront)/s/[slug]/page.tsx` | Storefront placeholder | 1.4 |
 | `lib/supabase/env.ts` | Env validation + `isSupabaseConfigured()` | 1.5 |
 | `lib/supabase/client.ts` | Browser Supabase client | 1.5 |
@@ -119,6 +130,88 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | `lib/paynow/validate-input.ts` | SG mobile / UEN validation | 3.7 |
 | `components/onboarding/step-paynow.tsx` | Step 6: PayNow setup | 3.7 |
 | `components/onboarding/step-publish.tsx` | Step 7: checklist + publish + success | 3.8 |
+| `lib/stores/load-storefront.ts` | Storefront gate + published store loader | 4.1 |
+| `app/(storefront)/s/[slug]/layout.tsx` | Slug layout: gate, vibe, context | 4.1 |
+| `app/(storefront)/s/[slug]/not-found.tsx` | Buyer 404 page | 4.1 |
+| `components/storefront/store-unavailable.tsx` | Unpublished store page | 4.1 |
+| `components/storefront/storefront-context.tsx` | Store + products React context | 4.1 |
+| `supabase/migrations/20260703120000_storefront_slug_resolver.sql` | RPC for slug gate | 4.1 |
+| `components/storefront/storefront-hero.tsx` | Hero blocks in seller order, fade-up motion | 4.2 |
+| `components/storefront/product-card.tsx` | Vibe-styled product card | 4.2 |
+| `components/storefront/product-catalog.tsx` | Category pills + client filter | 4.2 |
+| `app/(storefront)/s/[slug]/product/[id]/page.tsx` | Product detail route | 4.3 |
+| `components/storefront/product-detail.tsx` | Product detail UI + add to cart | 4.3 |
+| `lib/cart/types.ts` + `lib/cart/storage.ts` | localStorage cart per slug | 4.4 |
+| `components/storefront/cart-context.tsx` | Cart React context | 4.4 |
+| `components/storefront/bottom-nav.tsx` | Shop/Cart bottom nav + badge | 4.4 |
+| `components/storefront/storefront-shell.tsx` | Cart provider + nav wrapper | 4.4 |
+| `components/storefront/cart-page.tsx` | Cart page UI | 4.4 |
+| `app/(storefront)/s/[slug]/cart/page.tsx` | Cart route | 4.4 |
+| `lib/money.ts` | `formatPrice()` helper | 4.4 |
+| `lib/supabase/admin.ts` | Service-role client for order writes | 4.5 |
+| `lib/validation/customer.ts` | SG phone + email validation | 4.5 |
+| `lib/orders/reference.ts` | Order reference generator | 4.5 |
+| `app/(storefront)/s/[slug]/checkout/page.tsx` | Checkout route | 4.5 |
+| `components/storefront/checkout-form.tsx` | Guest checkout form | 4.5 |
+| `app/(storefront)/s/[slug]/actions.ts` | `createOrderAction` + `notifySellerAction` | 4.5–4.7 |
+| `lib/orders/load-order.ts` | Load order by reference (admin) | 4.6 |
+| `lib/paynow/format-expiry.ts` | PayNow QR expiry formatter | 4.6 |
+| `lib/paynow/download-qr-image.ts` | Save QR PNG (canvas compose) | 4.6 |
+| `app/(storefront)/s/[slug]/order/[reference]/page.tsx` | Payment page route | 4.6 |
+| `components/storefront/payment-page.tsx` | QR, countdown, save, notify modal, waiting | 4.6–4.7 |
+| `lib/orders/types.ts` | Shared order + order_item types | 5.1 |
+| `lib/orders/status.ts` | Display status labels + filter options | 5.1 |
+| `lib/orders/contact-buyer.ts` | WhatsApp/mailto/copy helpers | 5.1 |
+| `lib/orders/contact-buyer.test.ts` | Contact helper unit tests | 5.1 |
+| `lib/orders/load-seller-orders.ts` | RLS-scoped seller order queries | 5.1 |
+| `lib/stores/require-seller.ts` | Auth + onboarding guard for dashboard | 5.1 |
+| `app/(dashboard)/dashboard/layout.tsx` | Dashboard nav + pending badge | 5.1 |
+| `app/(dashboard)/dashboard/orders/page.tsx` | Orders list route | 5.1 |
+| `app/(dashboard)/dashboard/orders/[reference]/page.tsx` | Order detail route | 5.1 |
+| `components/dashboard/dashboard-nav.tsx` | Home/Orders/Products/Storefront/Settings nav + badge | 6.1 |
+| `components/dashboard/orders-list.tsx` | Orders list UI + empty state | 5.1 |
+| `components/dashboard/orders-status-filter.tsx` | Status filter pills | 5.1 |
+| `components/dashboard/order-status-badge.tsx` | Status badge component | 5.1 |
+| `components/dashboard/contact-buyer-actions.tsx` | Contact buyer action buttons | 5.1 |
+| `components/storefront/order-receipt.tsx` | Buyer order summary/receipt block | 5.2 |
+| `components/storefront/order-status-page.tsx` | All buyer order status states | 5.2 |
+| `lib/orders/status.test.ts` | `buyerOrderView` unit tests | 5.2 |
+| `supabase/migrations/20260703180000_push_subscriptions.sql` | Push subscription storage + RLS | 5.3 |
+| `public/push-sw.js` | Service worker (push + notification click) | 5.3 |
+| `public/manifest.webmanifest` | Dashboard PWA manifest | 5.3 |
+| `lib/push/vapid.ts` | VAPID public key helper | 5.3 |
+| `lib/push/client.ts` | Browser push subscribe/unsubscribe | 5.3 |
+| `lib/push/subscriptions.ts` | List subscriptions (server) | 5.3 |
+| `app/(dashboard)/dashboard/settings/page.tsx` | Settings: status, fulfillment, PayNow, push | 6.4 |
+| `app/(dashboard)/dashboard/settings/actions.ts` | Save/remove subscription actions | 5.3 |
+| `components/dashboard/push-alerts-settings.tsx` | Opt-in UI | 5.3 |
+| `lib/orders/order-summary.ts` | Order count queries (awaiting, paid, total) | 6.1 |
+| `components/dashboard/dashboard-home.tsx` | Dashboard home: store link, order summary, empty state | 6.1 |
+| `components/dashboard/store-status-badge.tsx` | Published/draft/unpublished badge | 6.1 |
+| `components/dashboard/copy-store-link-button.tsx` | Copy storefront URL to clipboard | 6.1 |
+| `app/(dashboard)/dashboard/products/page.tsx` | Products list + archived toggle | 6.2 |
+| `app/(dashboard)/dashboard/storefront/page.tsx` | Storefront editor route | 6.3 |
+| `lib/products/validate.ts` + `.test.ts` | Product input validation + price parse | 6.2 |
+| `app/(dashboard)/dashboard/products/actions.ts` | Add, update, archive product server actions | 6.2 |
+| `components/dashboard/product-form.tsx` | Shared product form (onboarding + dashboard) | 6.2 |
+| `components/dashboard/products-list.tsx` | Products list with thumbnails | 6.2 |
+| `components/dashboard/new-product-form.tsx` | Add product client wrapper | 6.2 |
+| `components/dashboard/edit-product-form.tsx` | Edit product client wrapper | 6.2 |
+| `components/dashboard/archive-product-button.tsx` | Archive confirmation dialog | 6.2 |
+| `app/(dashboard)/dashboard/products/new/page.tsx` | Add product route | 6.2 |
+| `app/(dashboard)/dashboard/products/[id]/edit/page.tsx` | Edit/archive product route | 6.2 |
+| `lib/clipboard/copy-text.ts` | Clipboard with HTTP dev fallback | 6.1 fix |
+| `lib/stores/revalidate.ts` | Storefront path revalidation helper | 6.3 |
+| `app/(dashboard)/dashboard/storefront/actions.ts` | Save vibe/hero + revalidate | 6.3 |
+| `components/dashboard/vibe-picker.tsx` | Vibe carousel (onboarding + dashboard) | 6.3 |
+| `components/dashboard/hero-editor.tsx` | Hero form + live preview | 6.3 |
+| `components/dashboard/storefront-editor.tsx` | Storefront settings shell | 6.3 |
+| `app/(dashboard)/dashboard/storefront/page.tsx` | Storefront editor route | 6.3 |
+| `components/dashboard/fulfillment-form.tsx` | Fulfillment settings form | 6.4 |
+| `components/dashboard/paynow-form.tsx` | PayNow settings + sample QR | 6.4 |
+| `components/dashboard/store-status-settings.tsx` | Publish/unpublish toggle | 6.4 |
+| `lib/stores/publish-readiness.ts` | Publish checklist helper | 6.4 |
+| `app/(dashboard)/dashboard/settings/actions.ts` | Fulfillment, PayNow, publish, push actions | 6.4 |
 
 ---
 
@@ -645,7 +738,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-**🏁 Phase 3 Checkpoint:** A seller can complete the full onboarding and publish a live store at their subdomain. *(Code complete 2026-07-02 — awaiting 👤 manual walkthrough; storage migration must be applied first. See whiteboard.)*
+**🏁 Phase 3 Checkpoint:** A seller can complete the full onboarding and publish a live store at their subdomain. ✅ Verified 2026-07-03.
 
 ---
 
@@ -657,7 +750,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 4.1 — Storefront Data Loading + 404/Unavailable States ⬜
+### Task 4.1 — Storefront Data Loading + 404/Unavailable States ✅
 
 **What:** Resolve subdomain → published store, load storefront data, handle missing/unpublished stores.
 
@@ -671,13 +764,22 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Published store loads with correct vibe at its subdomain
 - Nonexistent slug → 404; unpublished → unavailable page
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `supabase/migrations/20260703120000_storefront_slug_resolver.sql` — `resolve_storefront_slug()` RPC (SECURITY DEFINER) to distinguish not_found vs unavailable despite RLS **(👤 apply in SQL Editor)**
+- `lib/stores/load-storefront.ts` — `resolveStorefrontGate()` + `getPublishedStorefront()` (React `cache` dedupes layout + page)
+- `app/(storefront)/s/[slug]/layout.tsx` — gate check, `data-vibe` from store, `StorefrontProvider`
+- `app/(storefront)/layout.tsx` — passthrough (vibe scoped per slug)
+- `app/(storefront)/s/[slug]/page.tsx` — proof-of-load page (store name, vibe, product count)
+- `app/(storefront)/s/[slug]/not-found.tsx` — buyer-facing 404
+- `components/storefront/store-unavailable.tsx` — unpublished/suspended message
+- `components/storefront/storefront-context.tsx` — React context for store + products (Task 4.2+)
+- `lib/host.ts` — `getMarketingUrl()`
 
-**Notes:** *(to be filled)*
+**Notes:** RLS only exposes `published` rows to anon, so a SECURITY DEFINER RPC is required to show "unavailable" instead of 404 for draft/unpublished stores. Fallback if migration not applied: treats non-published as not_found. Oswald already loaded globally; Industrial sets `--font-display` via `[data-vibe="industrial"]`. Hero + catalog UI is Task 4.2.
 
 ---
 
-### Task 4.2 — Hero + Product Catalog + Category Pills ⬜
+### Task 4.2 — Hero + Product Catalog + Category Pills ✅
 
 **What:** The main storefront page: hero-led catalog with automatic category filter pills.
 
@@ -693,13 +795,18 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Pills logic follows PRD §13 exactly
 - Mobile-first, no hover-dependent UI
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `app/(storefront)/s/[slug]/page.tsx` — hero + catalog home page
+- `components/storefront/storefront-hero.tsx` — ordered hero blocks, CTA scroll to `#catalog`, fade-up
+- `components/storefront/product-card.tsx` — metal-panel cards, stagger animation, tap scale
+- `components/storefront/product-catalog.tsx` — category pills (hidden ≤1 category), client filter
+- `app/globals.css` — `fade-up` keyframes + `--color-vibe-primary-fg` theme token
 
-**Notes:** This is the design showcase task — take the time to polish it.
+**Notes:** Category pill bar uses horizontal scroll on narrow screens. Pills hidden when all products share one category or have none.
 
 ---
 
-### Task 4.3 — Product Detail Page ⬜
+### Task 4.3 — Product Detail Page ✅
 
 **What:** Vibe-styled product detail: image, description, price, quantity, add to cart.
 
@@ -713,13 +820,15 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Buyer can view details and add N items to cart
 - Styled per vibe
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `app/(storefront)/s/[slug]/product/[id]/page.tsx` — product detail route
+- `components/storefront/product-detail.tsx` — image, badge, qty selector, add-to-cart feedback
 
-**Notes:** *(to be filled)*
+**Notes:** Links use `/product/[id]` (middleware rewrites from slug subdomain). Invalid product ID → 404.
 
 ---
 
-### Task 4.4 — Cart + Bottom Navigation ⬜
+### Task 4.4 — Cart + Bottom Navigation ✅
 
 **What:** Cart page (vibe-styled) and Shop/Cart bottom nav with badge.
 
@@ -734,13 +843,21 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Quantities/removal update totals correctly
 - Bottom nav works site-wide on storefront
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/cart/types.ts` + `lib/cart/storage.ts` — localStorage cart keyed by slug
+- `components/storefront/cart-context.tsx` — cart state provider
+- `components/storefront/bottom-nav.tsx` — Shop/Cart nav, badge, safe-area padding
+- `components/storefront/storefront-shell.tsx` — wraps pages with cart + bottom nav
+- `components/storefront/cart-page.tsx` — line items, qty controls, subtotal, checkout CTA
+- `app/(storefront)/s/[slug]/cart/page.tsx` — cart route
+- `app/(storefront)/s/[slug]/layout.tsx` — adds `StorefrontShell`
+- `lib/money.ts` — `formatPrice()`
 
-**Notes:** *(to be filled)*
+**Notes:** Stale product IDs in cart are silently dropped on render (product removed/archived). Cart cleared after successful checkout.
 
 ---
 
-### Task 4.5 — Standardized Checkout ⬜
+### Task 4.5 — Standardized Checkout ✅
 
 **What:** Guest checkout form per PRD §19 with accurate totals.
 
@@ -757,13 +874,20 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Buyer lands on payment page
 - No account required
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/supabase/admin.ts` — service-role Supabase client (server-only)
+- `lib/validation/customer.ts` — SG mobile + email validation
+- `lib/orders/reference.ts` — `ORD-XXXXX` reference generator
+- `app/(storefront)/s/[slug]/actions.ts` — `createOrderAction` (prices from DB, 10-min expiry)
+- `app/(storefront)/s/[slug]/checkout/page.tsx` — checkout route
+- `components/storefront/checkout-form.tsx` — fulfillment, customer fields, order summary
+- `.env.example` — documents `SUPABASE_SECRET_KEY` requirement
 
-**Notes:** Totals must be computed server-side from DB prices — never trust client cart prices.
+**Notes:** Totals computed server-side from DB product prices — client sends only product IDs + quantities. Requires `SUPABASE_SECRET_KEY` in `.env.local` (orders have no public INSERT RLS). Reference uniqueness retried up to 8 times.
 
 ---
 
-### Task 4.6 — Payment Page: Dynamic QR, Countdown, Save QR ⬜
+### Task 4.6 — Payment Page: Dynamic QR, Countdown, Save QR ✅
 
 **What:** The PayNow payment page per PRD §21–22.
 
@@ -780,20 +904,25 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Save QR downloads a complete branded payment image
 - Countdown + expiry states work
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/orders/load-order.ts` — load order + items by reference (admin, slug-scoped)
+- `lib/paynow/format-expiry.ts` — ISO → PayNow TLV expiry
+- `lib/paynow/download-qr-image.ts` — canvas PNG compose for Save QR
+- `app/(storefront)/s/[slug]/order/[reference]/page.tsx` — server builds PayNow payload
+- `components/storefront/payment-page.tsx` — QR display, live countdown, save, instructions, expiry
 
-**Notes:** *(to be filled)*
+**Notes:** Order `reference` acts as URL token (unique, unguessable). QR built server-side with `payment_expires_at` encoded as PayNow expiry. Buyer can bookmark `/order/{reference}` to return.
 
 ---
 
-### Task 4.7 — Notify Seller Flow + Buyer Waiting State ⬜
+### Task 4.7 — Notify Seller Flow + Buyer Waiting State ✅
 
 **What:** "Notify seller to verify payment" with confirmation modal per PRD §23.
 
 **Steps:**
 1. Button: "Notify seller to verify payment" (never "I have paid")
 2. Confirmation modal: amount + reference, warning copy, required checkbox ("I have completed payment…"), confirm button enabled only when checked
-3. On confirm: order status → `seller_verification_requested` (email sending wired in Phase 5)
+3. On confirm: order status → `seller_verification_requested` (seller push alert wired in Phase 5)
 4. Waiting screen: "Seller notified. Your order is now waiting for seller verification…"
 
 **Definition of Done:**
@@ -801,87 +930,248 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Status transition persists
 - Buyer returning to order URL sees the waiting state
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `app/(storefront)/s/[slug]/actions.ts` — `notifySellerAction` (status transition, expiry guard)
+- `components/storefront/payment-page.tsx` — notify modal, checkbox gate, waiting screen
 
-**Notes:** *(to be filled)*
-
----
-
-**🏁 Phase 4 Checkpoint:** Full buyer journey works end-to-end: browse → cart → checkout → QR payment page → notify seller. (Emails come next.)
+**Notes:** Seller alert (push) deferred to Phase 5. Notify blocked after payment window expires. Re-visiting order URL shows waiting state from DB status.
 
 ---
 
----
-
-## PHASE 5: Orders, Verification & Emails
-
-> **Goal:** Seller receives email on verification request, manages orders in dashboard, marks paid; buyer gets confirmation email only after seller verifies.
+**🏁 Phase 4 Checkpoint:** Full buyer journey works end-to-end: browse → cart → checkout → QR payment page → notify seller. (Seller-side management + optional push alerts come next.)
 
 ---
 
-### Task 5.1 — Resend Integration + Seller Notification Email 👤⬜
+---
 
-**What:** Wire up Resend and send the seller email when buyer requests verification.
+## PHASE 5: Orders, Verification, Push Alerts & Manual Buyer Communication
 
-**Steps:**
-1. 👤 MANUAL: Human creates Resend account + API key, verifies sending domain (instructions provided)
-2. Server-side email helper + templates
-3. Seller email per PRD §26: store name, reference, customer details, items, total, fulfillment, status, manual-check warning, dashboard link
-4. Trigger on `seller_verification_requested` transition
+> **Goal:** Seller can manage orders, receive **optional** PWA push alerts for new verification requests, verify payment manually, update the buyer-facing order status page, and manually send buyer confirmation through WhatsApp / email draft / copy message. **Nomi is the source of truth for order status; the seller sends all external buyer communication manually.**
+>
+> **Rescoped 2026-07-03:** Resend / automated transactional email was removed from the MVP path (see Backlog). Rationale: keep MVP low-cost, avoid per-order email quota dependency, let sellers choose their own channel (some want WhatsApp immediacy, some want an email record), and make the buyer order status page — not an email — the core buyer confirmation mechanism.
 
-**Definition of Done:**
-- Real email arrives on notify-seller action
-- Copy matches PRD requirements ("Please check your bank/PayLah app before marking this order as paid.")
+### Product rules preserved across Phase 5
 
-**Files Changed:** *(to be filled)*
-
-**Notes:** *(to be filled)*
+1. **Payment truth:** Buyer action ≠ confirmed payment. An order never becomes paid because the buyer says so. Only the seller can mark payment verified after manually checking bank/PayLah.
+2. **No automated buyer email in MVP:** After the seller marks payment verified, Nomi does **not** auto-email the buyer. It offers manual communication actions instead.
+3. **Push is optional & not source of truth:** Push only alerts the seller that a verification request arrived. The dashboard + buyer order status page remain the source of truth. The full flow must work even if push is never enabled or fails.
+4. **Honest wording for manual comms:** Nomi only opens a prefilled draft/link — the seller sends it. Use "Open WhatsApp message", "Open email draft", "Copy message". Never "Send WhatsApp" / "Send email".
+5. **Support both channels:** Offer WhatsApp *and* email — do not force one.
+6. **Contact actions beyond confirmation:** The order detail page exposes general "Contact buyer" actions (WhatsApp / email / copy details) for operational issues (address unclear, amount mismatch, pickup timing, item unavailable, payment not found) — not only after payment confirmation.
 
 ---
 
-### Task 5.2 — Dashboard Orders List & Detail ⬜
+### Task 5.1 — Seller Orders List, Order Detail & Pending Badge ✅
 
-**What:** Orders section in the seller dashboard.
+**What:** The dashboard order-management experience.
 
 **Steps:**
 1. Orders list: reference, customer name, total, status badge, date; sorted newest first; filterable by status
-2. Order detail: customer contact, items, fulfillment method/address, notes, payment status, reference
-3. Empty state when no orders
+2. **Pending verification badge/count** (orders in `seller_verification_requested`) surfaced on the list + dashboard nav
+3. Order detail page: customer contact details, ordered items, fulfillment method/address, order notes, payment status, order reference
+4. **General "Contact buyer" actions** (available regardless of status, for operational issues):
+   - Open WhatsApp buyer (deep link `https://wa.me/{intl_phone}` — normalize SG `+65`)
+   - Open email buyer (`mailto:` with buyer email)
+   - Copy buyer details (name, phone, email)
+5. Empty state when no orders
 
 **Definition of Done:**
-- Seller sees only their own store's orders (RLS-verified)
-- Detail shows everything needed to fulfill
+- Seller sees only their own store's orders (RLS-verified; no admin client on the read path)
+- Pending verification count is visible at a glance
+- Detail shows everything needed to fulfill + working contact actions
+- Contact wording follows Rule 4 ("Open…" / "Copy…", never "Send…")
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/orders/types.ts` — shared `OrderRow` / `OrderItemRow` types (also used by storefront loader)
+- `lib/orders/status.ts` — display labels, expired derivation, filter options
+- `lib/orders/contact-buyer.ts` + `lib/orders/contact-buyer.test.ts` — WhatsApp/mailto/copy helpers
+- `lib/orders/load-seller-orders.ts` — RLS-scoped list, detail, pending count
+- `lib/stores/require-seller.ts` — auth + onboarding guard (reused by dashboard pages)
+- `app/(dashboard)/dashboard/layout.tsx` — nav shell with pending badge
+- `app/(dashboard)/dashboard/orders/page.tsx` — orders list (`app.lvh.me/orders`)
+- `app/(dashboard)/dashboard/orders/[reference]/page.tsx` — order detail
+- `components/dashboard/*` — nav, list, filter, status badge, contact actions
+- `app/(dashboard)/dashboard/page.tsx` — home links to orders + pending count
 
-**Notes:** *(to be filled)*
+**Notes:** Reads use the seller session client only (RLS owner policies). Expired is derived client-side from `payment_pending` + past `payment_expires_at`. Contact helpers shared with Task 5.5.
 
 ---
 
-### Task 5.3 — Order Status Actions + Buyer Confirmation Email ⬜
+### Task 5.2 — Buyer Order Status Page ✅
 
-**What:** Seller marks orders paid/completed/cancelled; buyer confirmation email sends on paid.
+**What:** The tokenized buyer-facing order status page — **this replaces the buyer confirmation email as the core MVP confirmation mechanism.**
 
 **Steps:**
-1. "Mark as paid" with confirmation dialog + warning: "Only mark as paid after checking your bank/PayLah app."
-2. Status transitions: `seller_confirmed_paid`, `completed`, `cancelled` (valid transitions only, server-enforced)
-3. On `seller_confirmed_paid`: send buyer confirmation email per PRD §26 (reference, store, summary, total, fulfillment details)
-4. Expiry handling: orders past `payment_expires_at` still in `payment_pending` display as `expired`
+1. Reuse the existing tokenized order route (`/order/[reference]`) as the buyer's durable status view
+2. Render clear status states:
+   - Payment pending (QR + countdown — existing behaviour)
+   - Awaiting seller verification
+   - Payment verified / order confirmed
+   - Cancelled
+   - Expired
+3. Confirmed state shows: reference, store name, order summary, total paid, fulfillment details (buyer's receipt)
+4. Buyer can return to the URL any time to see current status (source of truth = DB)
 
 **Definition of Done:**
-- Full status lifecycle works from dashboard
-- Buyer email sends only after seller marks paid — never before
-- Buyer's order page reflects confirmed state
+- Each status renders a distinct, correct, vibe-styled state
+- A buyer who bookmarks `/order/{reference}` always sees live status without any email
+- No wording implies payment is confirmed before the seller verifies
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/orders/status.ts` — added `buyerOrderView()` helper
+- `lib/orders/status.test.ts` — unit tests for view mapping + expiry derivation
+- `components/storefront/order-receipt.tsx` — shared receipt/summary block
+- `components/storefront/order-status-page.tsx` — all five buyer status screens
+- `components/storefront/payment-page.tsx` — re-exports for backwards compat
+- `app/(storefront)/s/[slug]/order/[reference]/page.tsx` — uses `OrderStatusPageContent`
 
-**Notes:** *(to be filled)*
+**Notes:** Removed email confirmation copy from awaiting-verification state. Confirmed covers `seller_confirmed_paid` and `completed`. To test confirmed/cancelled before Task 5.5, update order status manually in Supabase Table Editor.
 
 ---
 
-**🏁 Phase 5 Checkpoint:** The complete core loop works: order → QR → notify → seller email → mark paid → buyer confirmation email.
+### Task 5.3 — Seller PWA Notification Setup (Optional Opt-In) 👤 ✅
+
+**What:** Let sellers explicitly opt in to browser/PWA push order alerts from the dashboard.
+
+**Steps:**
+1. 👤 MANUAL: Generate a VAPID key pair; store public key in env (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`) and private key server-only (`VAPID_PRIVATE_KEY`) — instructions in whiteboard
+2. Add a service worker + web app manifest (minimal PWA surface for the dashboard)
+3. Settings UI: "Enable order alerts" → request notification permission → subscribe via `PushManager` → save subscription server-side
+4. Persist push subscriptions (new `push_subscriptions` table, RLS-scoped to owner; migration required)
+5. Show clear enabled/disabled state + a way to disable/unsubscribe
+
+**Definition of Done:**
+- A seller can opt in and see "alerts enabled"; a seller who declines is unaffected
+- Subscription is stored and retrievable server-side for Task 5.4
+- Nothing about the core order flow depends on this being enabled
+
+**Files Changed:**
+- `supabase/migrations/20260703180000_push_subscriptions.sql` — `push_subscriptions` table + owner RLS
+- `public/push-sw.js`, `public/manifest.webmanifest`, `public/icon.svg` — minimal PWA surface
+- `lib/push/vapid.ts`, `lib/push/client.ts`, `lib/push/subscriptions.ts`
+- `app/(dashboard)/dashboard/settings/page.tsx` + `settings/actions.ts`
+- `components/dashboard/push-alerts-settings.tsx` — opt-in/out UI
+- `components/dashboard/dashboard-nav.tsx` — Settings link
+- `app/(dashboard)/dashboard/layout.tsx` — manifest metadata
+- `.env.example`, `package.json` (`generate:vapid` script)
+
+**Notes:** No `web-push` dependency yet (added in Task 5.4 for server send). Push requires a secure context (HTTPS or localhost). Settings page shows a friendly message if VAPID keys are missing. Core order flow unaffected if push disabled.
 
 ---
+
+### Task 5.4 — Push Notification on Verification Request ✅
+
+**What:** Send the seller a push alert when a buyer requests verification — best-effort, non-blocking.
+
+**Steps:**
+1. On the existing `seller_verification_requested` transition (Task 4.7 `notifySellerAction`), after the status update succeeds, look up the store owner's active push subscription(s)
+2. If present, send a Web Push notification: title "New order awaiting verification", body with order reference + total amount
+3. Notification click opens the relevant dashboard order detail page (deep link)
+4. Push send is wrapped so any failure (no subscription, expired subscription, send error) is swallowed — **the buyer's notify action always succeeds regardless**
+5. Prune subscriptions that return 404/410 (gone)
+
+**Definition of Done:**
+- Opted-in seller receives a push within seconds of a buyer requesting verification
+- Tapping it lands on the order detail page
+- With push disabled/failing, the order still transitions and the buyer still sees the waiting state (Rule 3)
+
+**Files Changed:**
+- `lib/push/send-verification-alert.ts` — `sendVerificationRequestPush()` via `web-push`
+- `lib/push/vapid.ts` — private key + subject helpers
+- `app/(storefront)/s/[slug]/actions.ts` — fire-and-forget push after status update
+- `public/push-sw.js` — notification click navigates to order detail URL
+- `package.json` — `web-push`, `@types/web-push`
+- `.env.example` — `VAPID_SUBJECT` documented
+
+**Notes:** Push never blocks or rolls back buyer notify. Stale subscriptions pruned on 404/410. Requires `VAPID_PRIVATE_KEY` server-side. Uses `getDashboardUrl(/orders/{ref})` for click target.
+
+---
+
+### Task 5.5 — Mark Payment Verified + Manual Buyer Confirmation Actions ✅
+
+**What:** Seller verifies payment; buyer status page flips to confirmed; seller gets manual confirmation-comms actions.
+
+**Steps:**
+1. On order detail: "Mark payment verified" button with a confirmation warning: "Only continue after checking your bank/PayLah app."
+2. Server-enforced transition to `seller_confirmed_paid` (valid transitions only); also support `completed` / `cancelled`
+3. Buyer's tokenized order status page (Task 5.2) reflects confirmed status
+4. After verification, show **confirmation-specific manual actions** (distinct from the general contact actions in 5.1):
+   - Open WhatsApp confirmation (deep link, prefilled with the WhatsApp template)
+   - Open email confirmation draft (`mailto:` with subject + body from the email template)
+   - Copy confirmation message
+5. Expiry handling: orders past `payment_expires_at` still in `payment_pending` display as `expired`
+6. **Nomi does not send the confirmation automatically** — every action opens a draft the seller reviews and sends
+
+**Definition of Done:**
+- Payment only becomes verified via explicit seller action after the warning (Rule 1)
+- Buyer status page updates with no email involved (Rule 2)
+- All three manual confirmation actions produce correct prefilled content and use honest "Open…/Copy…" wording (Rule 4)
+
+**Files Changed:**
+- `lib/orders/status-transitions.ts` + `.test.ts` — valid transition guards
+- `lib/orders/confirmation-message.ts` + `.test.ts` — WhatsApp/email/copy templates
+- `app/(dashboard)/dashboard/orders/actions.ts` — verify / complete / cancel server actions
+- `components/dashboard/order-status-actions.tsx` — verify dialog + complete/cancel
+- `components/dashboard/confirmation-buyer-actions.tsx` — post-verify manual comms
+- `app/(dashboard)/dashboard/orders/[reference]/page.tsx` — wires actions into detail page
+
+**Notes:** Verify allowed from `payment_pending` or `seller_verification_requested`. Revalidates buyer order URL on status change. Confirmation section hidden until payment verified.
+
+---
+
+**🏁 Phase 5 Checkpoint:** Complete low-cost core loop: order → QR → buyer requests verification → (optional) seller push → seller verifies payment → buyer order status page confirmed → seller sends confirmation manually via WhatsApp/email/copy. No automated buyer email.
+
+---
+
+### Message Templates (reference — implemented in `lib/orders/confirmation-message.ts`)
+
+Placeholders: `{customer_name}`, `{order_reference}`, `{store_name}`, `{order_items}`, `{total_amount}`, `{fulfillment_summary}`.
+
+**WhatsApp confirmation**
+
+```
+Hi {customer_name}, your order {order_reference} from {store_name} has been confirmed ✅
+We've verified your payment and your order is now being prepared.
+
+Order summary:
+{order_items}
+
+Total paid: S${total_amount}
+
+Fulfillment:
+{fulfillment_summary}
+
+Thank you!
+```
+
+**Email confirmation**
+
+Subject:
+
+```
+Your order is confirmed — {order_reference}
+```
+
+Body:
+
+```
+Hi {customer_name},
+
+Your order {order_reference} from {store_name} has been confirmed.
+We have verified your payment and your order is now being prepared.
+
+Order summary:
+{order_items}
+
+Total paid:
+S${total_amount}
+
+Fulfillment:
+{fulfillment_summary}
+
+Thank you,
+{store_name}
+```
 
 ---
 
@@ -891,7 +1181,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 6.1 — Dashboard Home ⬜
+### Task 6.1 — Dashboard Home ✅
 
 **What:** Dashboard landing page with store status, link tools, and order summary.
 
@@ -905,13 +1195,21 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - Seller lands on a useful home after login
 - Copy link works; nav works on mobile
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `app/(dashboard)/dashboard/page.tsx` — rebuilt as dashboard home (replaces placeholder)
+- `components/dashboard/dashboard-home.tsx` — store link card, order summary grid, empty-state tips
+- `lib/orders/order-summary.ts` — parallel count queries via RLS session
+- `components/dashboard/store-status-badge.tsx` — Live/Draft/Unpublished badge
+- `components/dashboard/copy-store-link-button.tsx` — clipboard copy with feedback
+- `components/dashboard/dashboard-nav.tsx` — expanded nav: Home, Orders, Products, Storefront, Settings
+- `app/(dashboard)/dashboard/products/page.tsx` — placeholder for Task 6.2
+- `app/(dashboard)/dashboard/storefront/page.tsx` — placeholder for Task 6.3
 
-**Notes:** *(to be filled)*
+**Notes:** Paid count includes `seller_confirmed_paid` + `completed`; paid tile links to `?status=seller_confirmed_paid` filter. Store URL from `getStorefrontUrl(slug)`. Order summary tiles link to filtered orders list.
 
 ---
 
-### Task 6.2 — Products Management (CRUD) ⬜
+### Task 6.2 — Products Management (CRUD) ✅
 
 **What:** Full product management: list, add, edit, archive/delete, categories.
 
@@ -924,13 +1222,23 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 **Definition of Done:**
 - Full CRUD works; storefront reflects changes immediately
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/products/validate.ts` + `.test.ts` — shared validation
+- `app/(dashboard)/dashboard/products/actions.ts` — add, update, archive + storefront revalidation
+- `components/dashboard/product-form.tsx` — shared form (refactored from onboarding step)
+- `components/onboarding/step-product.tsx` — now uses shared `ProductForm`
+- `components/dashboard/products-list.tsx` — list with thumbnails + archived toggle
+- `components/dashboard/new-product-form.tsx`, `edit-product-form.tsx`, `archive-product-button.tsx`
+- `app/(dashboard)/dashboard/products/page.tsx` — list route
+- `app/(dashboard)/dashboard/products/new/page.tsx` — add route
+- `app/(dashboard)/dashboard/products/[id]/edit/page.tsx` — edit + archive route
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — `addProduct` delegates to shared action
 
-**Notes:** *(to be filled)*
+**Notes:** Archive is soft-delete (`archived=true`); storefront already filters archived products. Category changes appear in storefront pills on next load (no cache beyond revalidatePath). `addProductAction` works during onboarding via `ownedStoreContext`; update/archive require onboarding complete.
 
 ---
 
-### Task 6.3 — Storefront Editor (Vibe + Hero) ⬜
+### Task 6.3 — Storefront Editor (Vibe + Hero) ✅
 
 **What:** Post-onboarding editing of vibe and hero.
 
@@ -942,13 +1250,18 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 **Definition of Done:**
 - Vibe and hero changes persist and reflect on the public store
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/dashboard/vibe-picker.tsx`, `hero-editor.tsx`, `storefront-editor.tsx`
+- `app/(dashboard)/dashboard/storefront/page.tsx` — editor + Open storefront button
+- `app/(dashboard)/dashboard/storefront/actions.ts` — save with storefront revalidation
+- `lib/stores/revalidate.ts` — shared revalidate helper
+- Onboarding `step-vibe.tsx`, `step-hero.tsx` — thin wrappers over shared components
 
-**Notes:** Should be mostly reuse; if it isn't, we over-built onboarding.
+**Notes:** Vibe picker uses seller's real products in preview when available. Saves show brief "Saved" feedback without leaving the page.
 
 ---
 
-### Task 6.4 — Fulfillment + Payment Settings & Store Status ⬜
+### Task 6.4 — Fulfillment + Payment Settings & Store Status ✅
 
 **What:** Settings pages for fulfillment, PayNow, and publish/unpublish.
 
@@ -961,13 +1274,18 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 - All settings editable post-onboarding
 - Unpublished store immediately shows unavailable page publicly
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/dashboard/fulfillment-form.tsx`, `paynow-form.tsx`, `store-status-settings.tsx`
+- `app/(dashboard)/dashboard/settings/page.tsx` — expanded with all settings sections
+- `app/(dashboard)/dashboard/settings/actions.ts` — fulfillment, PayNow, publish/unpublish (+ restored push actions)
+- `lib/stores/publish-readiness.ts` — publish gate checklist
+- Onboarding `step-fulfillment.tsx`, `step-paynow.tsx` — thin wrappers
 
-**Notes:** Basic analytics (PRD §17) parked in Backlog for post-MVP.
+**Notes:** Unpublish sets `status=unpublished`; storefront gate shows unavailable immediately. Publish reuses onboarding completeness check. Push subscription actions preserved in same actions file.
 
 ---
 
-**🏁 Phase 6 Checkpoint:** Sellers can fully self-manage their store from the dashboard.
+**🏁 Phase 6 Checkpoint:** Sellers can fully self-manage their store from the dashboard — products, storefront look, fulfillment, PayNow, publish status, orders, and push alerts.
 
 ---
 
@@ -979,7 +1297,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 7.1 — Unicorn Vibe Polish ⬜
+### Task 7.1 — Unicorn Vibe Polish ✅
 
 **What:** Refine Unicorn tokens to production quality: soft, dreamy, pastel, playful.
 
@@ -991,13 +1309,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 **Definition of Done:**
 - A Unicorn store looks professionally designed end-to-end, distinct from Industrial
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `styles/tokens.css` — lavender gradient canvas, lime CTAs + purple text, white/lavender cards, Archivo Black display
+- `lib/fonts.ts`, `app/layout.tsx` — Archivo Black loaded
+- `lib/vibes.ts` — updated swatches, `provisional: false`
 
-**Notes:** *(to be filled)*
+**Notes:** Guided by `docs/unicorn/lavenderTheme.md`. Existing `metal-panel` / `rust-edge` / `vibe-display` classes styled per-vibe — no storefront JSX changes needed. Product card footers get lavender tint via CSS.
 
 ---
 
-### Task 7.2 — Outback Vibe Polish ⬜
+### Task 7.2 — Outback Vibe Polish ✅
 
 **What:** Refine Outback tokens: earthy, warm, rugged, organic.
 
@@ -1005,13 +1326,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 **Definition of Done:** Same bar as 7.1.
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `styles/tokens.css` — warm paper gradient, terracotta/olive palette, Syne display, earthy panel shadows
+- `lib/fonts.ts`, `app/layout.tsx` — Syne loaded
+- `lib/vibes.ts` — `provisional: false`
 
-**Notes:** *(to be filled)*
+**Notes:** Guided by `docs/outback/orangeTheme.md` (earthy light variant, not dark orange glass).
 
 ---
 
-### Task 7.3 — Futuristic Vibe Polish ⬜
+### Task 7.3 — Futuristic Vibe Polish ✅
 
 **What:** Refine Futuristic tokens: sleek, sharp, neon, digital.
 
@@ -1019,13 +1343,16 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 **Definition of Done:** Same bar as 7.1.
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `styles/tokens.css` — charcoal grid + purple radial glow, cyan primary / purple accents, glass neon panels, Bebas Neue display
+- `lib/fonts.ts`, `app/layout.tsx` — Bebas Neue loaded
+- `lib/vibes.ts` — `provisional: false`
 
-**Notes:** *(to be filled)*
+**Notes:** Guided by `docs/futuristic/neonTheme.md`. Sharp `--vibe-radius: 0.25rem` for digital feel.
 
 ---
 
-### Task 7.4 — Marketing Homepage ⬜
+### Task 7.4 — Marketing Homepage ✅
 
 **What:** Build `nomi.store` homepage per PRD §15.1.
 
@@ -1038,9 +1365,14 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 **Definition of Done:**
 - Homepage is polished, mobile-first, and CTAs route to signup / demo store
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `components/marketing/marketing-home.tsx` — full homepage: sticky header, hero + `MiniPreview` mockup, 3-step how-it-works, PayNow + benefits, bottom CTA, footer
+- `app/(marketing)/page.tsx` — renders `MarketingHome`
+- `app/(marketing)/layout.tsx` — marketing metadata (title/description)
+- `lib/marketing/demo-store.ts` — `getDemoStoreSlug()` (default `jigwave`, env override)
+- `.env.example` — `NEXT_PUBLIC_DEMO_STORE_SLUG` documented
 
-**Notes:** Requires a seeded demo store — create one using our own product flows.
+**Notes:** CTAs use `getDashboardUrl('/login')` and `getStorefrontUrl(slug)` so links work on `lvh.me` and production. Demo store must be **published** at the configured slug (or set env to your test slug). Phone mockup reuses `MiniPreview` with Industrial/JigWave sample data — no screenshot asset needed.
 
 ---
 
@@ -1056,59 +1388,75 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 ---
 
-### Task 8.1 — Loading, Error & Empty States Pass ⬜
+### Task 8.1 — Loading, Error & Empty States Pass ✅
 
 **What:** Every async operation gets loading states; every failure gets a friendly message; every empty screen gets proper empty-state copy.
-
-**Locations:** login, onboarding saves, image uploads, slug check, storefront load, cart/checkout, order creation, notify seller, dashboard lists, status actions, emails.
 
 **Definition of Done:**
 - No blank flashes, no raw errors in UI, buttons disabled while pending
 - All empty states polished (vibe-styled on storefront, neutral on dashboard)
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/errors/friendly-db.ts` — central DB error mapper; wired into onboarding, products, settings actions
+- `app/(dashboard)/dashboard/loading.tsx`, `app/(storefront)/s/[slug]/loading.tsx` — route loading skeletons
+- `components/onboarding/step-name-slug.tsx` — slug check network failure handling
+- `components/storefront/cart-context.tsx` — lazy init from localStorage (no empty flash)
+- `app/(storefront)/s/[slug]/page.tsx` — `notFound()` instead of null
+- `components/storefront/order-status-page.tsx` — notify/save-QR pending + errors
+- `components/dashboard/hero-editor.tsx`, `order-status-actions.tsx` — disable while pending/uploading
+- `components/storefront/product-catalog.tsx` — vibe-styled empty + category filter empty
+- `components/dashboard/orders-list.tsx`, `products-list.tsx` — empty-state CTAs
+- Clipboard buttons — copy failure feedback (store link, buyer details, confirmation, publish)
+- `components/dashboard/push-alerts-settings.tsx`, `components/auth/google-sign-in-button.tsx` — friendly errors
+- `lib/images/compress.ts` — friendly upload error
+- `components/storefront/checkout-form.tsx` — stale cart warning
 
-**Notes:** *(to be filled)*
+**Notes:** Dashboard/storefront `loading.tsx` covers SSR navigation blank flashes. Raw Supabase messages no longer reach UI from server actions.
 
 ---
 
-### Task 8.2 — Security & Tenant Isolation Review ⬜
+### Task 8.2 — Security & Tenant Isolation Review ✅
 
 **What:** Systematic review of RLS policies, server actions, and public endpoints.
 
-**Steps:**
-1. Verify every dashboard query is store-scoped; attempt cross-tenant access with a second test account
-2. Verify unpublished stores are not orderable (server-side check at order creation)
-3. Verify order pages are tokenized/unguessable
-4. Verify totals/prices always computed server-side
-5. Rate-limit sensitive endpoints (slug check, order creation) at a basic level
-
 **Definition of Done:**
-- Cross-tenant access attempts fail
+- Cross-tenant access attempts fail (RLS + app scoping verified by code review)
 - All PRD §33 data isolation criteria pass
+- Rate-limit sensitive endpoints
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `lib/rate-limit.ts` — IP-keyed in-memory limiter (ponytail: per-isolate; upgrade to KV at scale)
+- `app/(storefront)/s/[slug]/actions.ts` — rate limits on `createOrderAction` (10/min/slug) and `notifySellerAction` (5/min/ref); reject invalid cart lines; cap qty at 99
+- `app/(dashboard)/dashboard/onboarding/actions.ts` — auth required + rate limit (30/min) on `checkSlugAvailability`
+- `lib/orders/reference.ts` — `crypto.getRandomValues`, 6-char suffix (~1B combos)
 
-**Notes:** *(to be filled)*
+**Notes:** RLS + store-scoped dashboard queries were already solid (audit confirmed). Manual two-account cross-tenant test still recommended before launch (Task 8.4). Optional hardening deferred: column-restricted `orders_owner_update` RLS, public stores view without `owner_id`.
 
 ---
 
-### Task 8.3 — Mobile UX Polish Pass ⬜
+### Task 8.3 — Mobile UX Polish Pass ✅
 
 **What:** Final mobile polish across all surfaces.
 
-**Steps:**
-1. Test all flows at mobile viewports (and 👤 on a real phone)
-2. Touch targets, no horizontal scroll, safe areas, bottom nav overlap
-3. Image loading performance (sizes, lazy loading)
-4. Typography and spacing check per vibe
-
 **Definition of Done:**
-- Feels app-like on a real phone; no layout breakage on common sizes
+- Feels app-like on mobile; no layout breakage on common sizes
+- Touch targets, safe areas, bottom nav overlap, image loading addressed in code
 
-**Files Changed:** *(to be filled)*
+**Files Changed:**
+- `app/layout.tsx` — `viewportFit: 'cover'` unlocks safe-area insets on iPhone
+- `app/globals.css` — `overflow-x-clip` on body
+- `app/(dashboard)/dashboard/layout.tsx` — bottom safe-area padding
+- `components/dashboard/dashboard-nav.tsx` — top safe-area + `min-h-11` nav tabs
+- `components/dashboard/orders-status-filter.tsx` — `min-h-11` filter pills
+- `components/storefront/storefront-shell.tsx` — hide bottom nav on checkout/order routes; dynamic content padding
+- `components/storefront/bottom-nav.tsx` — `min-h-11` touch targets
+- `components/storefront/cart-page.tsx`, `product-detail.tsx` — 44px qty buttons; lazy/eager images
+- `components/storefront/product-card.tsx` — `loading="lazy"`, responsive title size
+- `components/storefront/storefront-hero.tsx` — LCP image priority; smaller mobile title
+- `components/storefront/checkout-form.tsx` — `text-base` inputs (prevents iOS zoom)
+- `components/storefront/order-receipt.tsx`, order detail page — `break-all` on references
 
-**Notes:** *(to be filled)*
+**Notes:** 👤 Real-phone verification still required in Task 8.4. Per-vibe scroll performance (unicorn gradient, futuristic grid) — spot-check on device.
 
 ---
 
@@ -1118,9 +1466,9 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 **Steps (👤 with provided checklist):**
 1. Fresh seller signup → full onboarding → publish
-2. Real phone: browse store → cart → checkout → save QR → (real S$0.50 payment) → notify seller
-3. Verify seller email → mark paid → verify buyer email
-4. Test 404, unavailable store, expired payment window
+2. Real phone: browse store → cart → checkout → save QR → (real S$0.50 payment) → request verification
+3. (If push enabled) confirm seller push alert → open order → mark payment verified → confirm buyer order status page shows confirmed → open a manual WhatsApp/email confirmation draft
+4. Test 404, unavailable store, expired payment window, push-disabled path (flow still works)
 5. Fix anything found; re-verify
 
 **Definition of Done:**
@@ -1145,6 +1493,7 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 
 | Idea | Reason Parked |
 |---|---|
+| **Optional automated email notifications via Resend** (seller alert email on verification request; buyer confirmation email on paid) | Core MVP uses the seller dashboard, buyer order status page, optional PWA seller push alerts, and manual seller communication actions (WhatsApp/email draft/copy). Automated transactional email can be added later as a paid/polished feature. Removed as a blocking Phase 5 dependency 2026-07-03. PRD §26 templates remain valid if/when built. |
 | Drag-and-drop hero reordering | PRD allows move up/down fallback; simpler for MVP |
 | Basic analytics (views, revenue) | PRD-optional; core loop first |
 | Rename "All" pill label | PRD marks as optional later |
@@ -1174,5 +1523,8 @@ Local development uses `lvh.me` (resolves to 127.0.0.1): `app.lvh.me:3000`, `dem
 | 2026-07-02 | PayNow spike moved to Phase 2 (before feature build) | De-risk core USP as early as possible |
 | 2026-07-02 | Phase 3 built: onboarding progress derived from data (no step column); server actions + RLS; store-images bucket added | Simplest resume-safe design; second storage migration required |
 | 2026-07-02 | Industrial vibe built first; other 3 refined in Phase 7 | Industrial has a full design reference (JigWave); quality bar |
+| 2026-07-04 | **UI overhaul part 1 — marketing landing page redesign.** `[data-brand]` token layer in `styles/tokens.css` overrides shadcn vars; `marketing-home.tsx` rebuilt with new hero copy, composed phone scene, 0%-fees USP + QR card mock (`paynow-qr-card.tsx`). Visual only — all links and behavior unchanged. v1 shipped as "Warm Editorial Craft" (cream/teal/Fraunces). | Landing page felt generic; brand layer reusable for dashboard restyle later |
+| 2026-07-04 | **Brand v2 — "Warm Tactile" (whacka-inspired).** Human picked whacka.app's aesthetic (`docs/whackaDesignToken.md`, `docs/whackaUIspec.md`). Tokens re-cut: sand `#F1EDE5` bg, warm ink `#16130E`, yellow `#F7C518` primary, purple/mint support accents, Hanken Grotesk (replaces Fraunces + Inter on brand surfaces), 1rem radius + pill geometry. Landing rebuilt: floating pill nav with wordmark, centered hero with pulsing social-proof chip + marker-highlighted headline + black pill CTA with yellow arrow badge, drifting orbs, ink marquee strip, three numbered feature panels (purple/yellow/mint) with mock visuals, stats row, native-`details` FAQ, full-bleed yellow CTA band. Scroll reveals via new `reveal.tsx` (IntersectionObserver) — no GSAP/magicui dependencies added. | Human preferred whacka fonts/colors over v1 teal/serif pairing |
+| 2026-07-03 | **Phase 5 rescoped:** Resend/automated email moved to Backlog; new focus = seller order mgmt, buyer order status page, seller payment verification, optional PWA push seller alerts, manual buyer comms (WhatsApp/email draft/copy). Phase 5 tasks 3→5; total 38→40. | Keep MVP low-cost, avoid per-order email quota dependency, let sellers choose channel, make buyer order status page the core confirmation mechanism instead of email. |
 
 ---

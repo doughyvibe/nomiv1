@@ -1,5 +1,11 @@
 "use server";
 
+import {
+  addProductAction,
+  type ProductInput,
+} from "@/app/(dashboard)/dashboard/products/actions";
+import { friendlyDbError } from "@/lib/errors/friendly-db";
+import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { isValidSgMobile, isValidUen } from "@/lib/paynow";
 import { suggestAlternatives, validateSlugFormat } from "@/lib/slug";
 import {
@@ -49,10 +55,18 @@ export type SlugCheckResult = {
 export async function checkSlugAvailability(
   slug: string,
 ): Promise<SlugCheckResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { available: false, error: "Sign in to check availability" };
+
+  if (await isRateLimited("slug-check", 30, 60_000)) {
+    return { available: false, error: RATE_LIMIT_MESSAGE };
+  }
+
   const formatError = validateSlugFormat(slug);
   if (formatError) return { available: false, error: formatError };
-
-  const supabase = await createClient();
 
   const [{ data: reserved }, { data: existing }] = await Promise.all([
     supabase.from("reserved_slugs").select("slug").eq("slug", slug).maybeSingle(),
@@ -101,7 +115,7 @@ export async function createStore(
     if (error.code === "23505") {
       return { ok: false, error: "Already taken" };
     }
-    return { ok: false, error: error.message };
+    return { ok: false, error: friendlyDbError(error) };
   }
   return { ok: true };
 }
@@ -123,7 +137,7 @@ export async function saveVibe(vibe: Vibe): Promise<ActionResult> {
     .update({ vibe })
     .eq("id", store.id);
 
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -160,45 +174,21 @@ export async function saveHero(hero: HeroConfig): Promise<ActionResult> {
     .update({ hero: clean })
     .eq("id", store.id);
 
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
 }
 
 // ---------------------------------------------------------------------------
-// Step 4 — products
+// Step 4 — products (addProduct lives in dashboard/products/actions.ts)
 // ---------------------------------------------------------------------------
 
-export type NewProduct = {
-  name: string;
-  price_cents: number;
-  description: string;
-  image_url?: string;
-  category?: string;
-};
+export type NewProduct = ProductInput;
 
-export async function addProduct(product: NewProduct): Promise<ActionResult> {
-  const name = product.name.trim();
-  if (!name) return { ok: false, error: "Product name is required" };
-  if (
-    !Number.isInteger(product.price_cents) ||
-    product.price_cents < 0 ||
-    product.price_cents > 100_000_00
-  ) {
-    return { ok: false, error: "Enter a valid price" };
-  }
-
-  const { supabase, store } = await getOwnedStore();
-  if (!store) return { ok: false, error: "No store yet" };
-
-  const { error } = await supabase.from("products").insert({
-    store_id: store.id,
-    name,
-    price_cents: product.price_cents,
-    description: product.description.trim(),
-    image_url: product.image_url || null,
-    category: product.category?.trim() || null,
-  });
-
-  return error ? { ok: false, error: error.message } : { ok: true };
+export async function addProduct(
+  product: NewProduct,
+): Promise<ActionResult> {
+  const result = await addProductAction(product);
+  if ("error" in result) return { ok: false, error: result.error };
+  return { ok: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -240,7 +230,7 @@ export async function saveFulfillment(
     .update({ fulfillment: clean })
     .eq("id", store.id);
 
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -278,7 +268,7 @@ export async function savePayNow(config: PayNowConfig): Promise<ActionResult> {
     .update({ paynow: clean })
     .eq("id", store.id);
 
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -311,5 +301,5 @@ export async function publishStore(): Promise<ActionResult> {
     .update({ status: "published" })
     .eq("id", store.id);
 
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
 }

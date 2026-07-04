@@ -7,52 +7,75 @@
 
 ## Phase Status
 
-**Phase 1 — Foundation:** ✅ COMPLETE (8/8)
-**Phase 2 — PayNow QR Spike:** ✅ COMPLETE (2/2)
-**Phase 3 — Seller Onboarding:** ✅ CODE COMPLETE (8/8) — 👤 **awaiting your manual walkthrough below**
-**Next up:** Phase 4, Task 4.1 — public buyer storefront (data loading + vibe rendering).
+**Phase 7 — Vibes + Marketing:** ✅ COMPLETE (4/4)
+**Phase 8 — Polish, Hardening & Launch:** in progress (3/4)
+**Just finished:** UI overhaul part 1 (v2) — marketing landing page rebuilt in "Warm Tactile" brand (whacka-inspired)
+**Next up:** Task 8.4 — Final Deploy & Full Production Smoke Test 👤
 
 ---
 
-## 👉 YOUR MANUAL CHECK — Phase 3: full onboarding walkthrough
+## 👉 YOUR MANUAL CHECK — Landing page redesign (v2, whacka aesthetic)
 
-### Part A — Apply the storage migration (REQUIRED before testing image uploads)
+Visual-only change; no functionality touched. Open `http://lvh.me:3000` and check:
 
-1. Open Supabase Dashboard → **SQL Editor**.
-2. Paste and run the contents of:
-   `supabase/migrations/20260702120000_storage_store_images.sql`
-3. Expect "Success". This creates the public `store-images` bucket (hero + product photos) with per-user upload permissions.
+1. Desktop (1440px+): floating pill nav, centered hero with marker-highlighted "real store", phone scene with floating cards below — no overlap
+2. Mobile (320–375px): everything stacks, floating cards/chips stay inside the viewport, no horizontal scroll
+3. Fonts: everything renders in Hanken Grotesk (extrabold headings); sand `#F1EDE5` background, yellow `#F7C518` CTAs
+4. Ink marquee strip scrolls seamlessly; pauses under `prefers-reduced-motion`
+5. Three numbered feature panels (purple / yellow / mint) — visuals fit at all widths; scroll reveals fire once
+6. All CTAs link correctly (Create my store → login, View demo store → demo storefront); FAQ accordions open/close
+7. Yellow CTA band: black pill button with yellow arrow badge hover-shifts right
 
-### Part B — Walk through onboarding as a new seller
-
-4. `npm run dev`, then open **http://app.lvh.me:3000** and sign in with Google.
-5. You should be **redirected to `/onboarding` automatically** (your account has no store yet).
-6. **Step 1 — Store name:** type a name (e.g. `Sarah Bakes`) → watch the slug auto-generate → confirm "✓ available". Try `nomi` or `admin` → should show "reserved". Try editing the slug to `Bad--Slug` → format error. Continue.
-7. **Step 2 — Vibe:** swipe/scroll the 4 phone previews. Industrial should look dark teal/rust with condensed uppercase type. Pick any vibe.
-8. **Step 3 — Hero:** fill in title/subheading/CTA, upload a photo (any image — it's compressed client-side), reorder blocks with ↑/↓ and watch the live preview update. Continue.
-9. **Step 4 — Product:** add one product with price + image. Try "Add another product", then "Continue setup".
-10. **Step 5 — Fulfillment:** enable pickup and/or delivery. Confirm "Continue" stays disabled until required fields are filled.
-11. **Step 6 — PayNow:** enter your real PayNow mobile (or UEN) + recipient name. A **sample QR** should render — optionally scan it with your banking app to confirm recipient. Continue.
-12. **Step 7 — Publish:** all 7 checklist items should be ✓. Hit **Publish Store** → success screen. Test **Copy Link** and **Open Store** (opens `{slug}.lvh.me:3000` — currently the Phase 1 placeholder page; the real storefront is Phase 4).
-13. **Resume check:** sign out mid-onboarding at any earlier step (or refresh) → sign back in → you should land on the same incomplete step.
-14. **Dashboard check:** after publishing, `app.lvh.me:3000` should show your store card (not the wizard).
-
-**Reply with:** `phase 3 ✅` or paste what broke (step + error).
+The `[data-brand]` token layer is the design system — apply the same attribute to dashboard/login later for a cohesive restyle (future overhaul sections). Reference: `docs/whackaDesignToken.md`, `docs/whackaUIspec.md`.
 
 ---
 
-## Known limitations (by design, not bugs)
+## 👉 YOUR MANUAL CHECK — Tasks 8.1–8.3
 
-- Published storefront subdomain still shows the **Phase 1 placeholder** — real buyer storefront is Phase 4 (Tasks 4.1–4.2).
-- Unicorn/Outback/Futuristic vibes use **provisional tokens** — refined in Phase 7. Industrial is the reference.
-- Hero block **drag-and-drop** parked in Backlog (move up/down buttons per PRD fallback).
-- One store per seller (enforced in `createStore`).
+### 8.1 Loading & errors (quick smoke)
+
+1. Navigate dashboard tabs — brief skeleton on load (no blank flash)
+2. Onboarding slug check — disconnect network mid-check → friendly error (not spinner forever)
+3. Copy store link on HTTP (`app.lvh.me`) → works or shows "Copy failed"
+4. Checkout with removed product in cart → stale item warning
+5. Notify seller → button shows "Notifying…" while pending
+6. Push settings → success/error messages use green/red styling
+
+### 8.2 Security (optional two-account test)
+
+1. Sign in as Seller A; note a product UUID from URL
+2. Sign in as Seller B; try editing Seller A's product UUID → should 404 / not found
+3. Try Seller B's dashboard with Seller A's order reference → not found
+4. Spam checkout rapidly → should eventually hit "Too many requests"
+
+### 8.3 Mobile (real phone recommended)
+
+1. iPhone Safari: checkout inputs don't zoom on focus
+2. Bottom nav hidden on checkout + payment pages (no overlap with CTAs)
+3. Cart +/- buttons easy to tap (44px)
+4. No horizontal page scroll on storefront
+5. Safe area: content not under notch/home indicator (especially PWA)
+6. Spot-check all 4 vibes on 320px width
+
+Reply **`8.1–8.3 ✅`** or paste issues. Then **Task 8.4** (production deploy + full loop).
+
+---
+
+## 👉 YOUR MANUAL CHECK — Task 8.4 (when ready)
+
+Full production smoke per `docs/Implementation.md` Task 8.4:
+
+1. Fresh seller signup → onboarding → publish
+2. Real phone: browse → cart → checkout → save QR → pay S$0.50 → notify seller
+3. Seller: verify payment → buyer status page shows confirmed
+4. Test 404, unavailable store, expired payment window
+5. Fix anything found; re-verify
 
 ---
 
 ## Suggested Next Step
 
-**Phase 4, Task 4.1 — Storefront data loading + 404/unavailable states.** Say "start task 4.1" (or "start phase 4") after the walkthrough passes.
+**Task 8.4** — deploy to production domain and run the full end-to-end checklist with a real payment.
 
 ---
 
@@ -60,14 +83,17 @@
 
 | Date | Decision | Why |
 |---|---|---|
-| 2026-07-02 | Deploy to Cloudflare Workers (OpenNext), not Vercel | OpenNext supports Next 16; keeps all app code |
-| 2026-07-02 | Domain purchase deferred until pre-launch | `NEXT_PUBLIC_ROOT_DOMAIN` env-driven; lvh.me for dev |
-| 2026-07-02 | PayNow payload built in-house (`lib/paynow/`) | No maintained npm lib; validated in real banking apps (Task 2.2 ✅) |
-| 2026-07-02 | Onboarding progress **derived from store data**, no step counter column | Zero schema change; resume correct by construction |
-| 2026-07-02 | Server actions for all onboarding mutations, RLS as enforcement layer | No API routes needed; owner checks in DB policies |
-| 2026-07-02 | Images: client-side webp compression → `store-images/{user_id}/` | 5 MB bucket cap; per-user folder RLS; public read |
-| 2026-07-02 | Vibe tokens on `[data-vibe]` attribute; Industrial fully designed, other 3 provisional | One preview component renders all vibes; Phase 7 refines |
-| 2026-07-02 | Publish gated client-side (checklist) + server-side (`publishStore` re-checks) | Never trust the client on the money path |
+| 2026-07-03 | Per-vibe CSS on shared classes | One storefront codebase; `[data-vibe]` drives look |
+| 2026-07-03 | Theme docs as rough guides only | Adapted to Nomi token system, not 1:1 port |
+| 2026-07-03 | `MiniPreview` for marketing mockup | Reuses live vibe preview; no static screenshot asset |
+| 2026-07-03 | Demo slug via env, default `jigwave` | PRD example; override without code change |
+| 2026-07-03 | In-memory rate limit (MVP) | Task 8.2 basic protection; upgrade to Cloudflare KV at scale |
+| 2026-07-03 | Hide bottom nav on checkout/order | Prevents CTA overlap on payment flow |
+| 2026-07-03 | `friendlyDbError` helper | One place to sanitize Supabase errors for UI |
+| 2026-07-04 | `[data-brand]` token layer overrides shadcn vars | One attribute restyles any surface (marketing now, dashboard later) without touching components |
+| 2026-07-04 | All landing visuals code-drawn (MiniPreview, react-qr-code, CSS mocks) | Crisp at any DPI, zero image assets, always on-brand |
+| 2026-07-04 | **Brand v2: "Warm Tactile"** (sand `#F1EDE5` / warm ink / yellow `#F7C518`, Hanken Grotesk, pill geometry, marker highlights) replaces v1 teal/Fraunces | Human chose whacka.app aesthetic direction; tokens in `docs/whackaDesignToken.md` |
+| 2026-07-04 | Scroll reveals via tiny `Reveal` (IntersectionObserver) + CSS keyframes, no GSAP/magicui deps | Same effect, zero new dependencies |
 
 ---
 
@@ -75,8 +101,8 @@
 
 | Item | Status |
 |---|---|
-| Storage migration applied? | ⏳ **Part A — required for image uploads** |
-| Phase 3 manual walkthrough | ⏳ Part B — awaiting human |
-| Custom domain for production | ⏸️ Deferred until pre-launch |
+| Real-phone mobile verification (8.3) | 👤 Checklist above |
+| Two-account cross-tenant test (8.2) | 👤 Optional before launch |
+| Production deploy + real payment (8.4) | 👤 Next milestone |
 
 ---

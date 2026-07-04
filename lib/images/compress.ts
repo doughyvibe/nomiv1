@@ -43,7 +43,7 @@ export async function uploadStoreImage(
     .from("store-images")
     .upload(path, blob, { contentType: "image/webp", upsert: false });
 
-  if (error) throw new Error(`Upload failed: ${error.message}`);
+  if (error) throw new Error("Upload failed. Try a smaller image.");
 
   const { data } = supabase.storage.from("store-images").getPublicUrl(path);
   return data.publicUrl;

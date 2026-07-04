@@ -6,6 +6,7 @@ import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { copyText } from "@/lib/clipboard/copy-text";
 import {
   buildPayNowPayload,
   validatePayloadCrc,
@@ -150,7 +151,7 @@ export function PayNowTestForm() {
         type="button"
         variant="outline"
         onClick={() => {
-          if (payload) navigator.clipboard.writeText(payload);
+          if (payload) void copyText(payload);
         }}
         disabled={!payload}
       >

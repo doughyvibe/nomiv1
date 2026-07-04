@@ -1696,6 +1696,13 @@ Used when buyer requests verification after payment window expiry.
 
 26. Email Notification Requirements
 
+> ⚠️ RESCOPED 2026-07-03 (see Implementation.md Phase 5 + whiteboard Decision Log):
+> Automated email (Resend) is **NOT part of the MVP**. It is parked in Backlog / Optional Later.
+> In the MVP:
+> - The **seller alert** on a verification request is delivered via an **optional PWA push notification** (not email). Push is optional; the dashboard's pending-verification badge is the reliable fallback.
+> - The **buyer confirmation** is delivered via the **tokenized buyer order status page** (not an automated email). After the seller marks payment verified, the seller sends confirmation **manually** using WhatsApp / an email draft / copy-message actions.
+> The email requirements below remain the reference spec for IF/WHEN automated email is added later.
+
 Seller Email
 
 Trigger:
@@ -1966,10 +1973,10 @@ Manual Verification
 
 The app can:
 
-* Email seller after buyer requests verification
+* Alert seller after buyer requests verification (MVP: optional PWA push + dashboard pending badge; email is Backlog/Optional Later)
 * Show order as awaiting verification
 * Let seller manually mark order as paid
-* Email buyer final confirmation only after seller marks paid
+* Give buyer final confirmation only after seller marks paid (MVP: tokenized buyer order status page + seller's manual WhatsApp/email/copy message; automated buyer email is Backlog/Optional Later)
 
 Dashboard
 

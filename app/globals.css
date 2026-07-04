@@ -19,6 +19,7 @@
   /* Storefront vibes — prefixed so shadcn primary/secondary stay intact */
   --color-vibe-bg: rgb(var(--vibe-bg) / <alpha-value>);
   --color-vibe-primary: rgb(var(--vibe-primary) / <alpha-value>);
+  --color-vibe-primary-fg: rgb(var(--vibe-primary-fg) / <alpha-value>);
   --color-vibe-secondary: rgb(var(--vibe-secondary) / <alpha-value>);
   --color-vibe-surface: rgb(var(--vibe-surface) / <alpha-value>);
   --color-vibe-border: rgb(var(--vibe-border) / <alpha-value>);
@@ -143,9 +144,153 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground font-body overflow-x-clip;
   }
   html {
     @apply font-sans;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out;
+}
+
+/* --------------------------------------------------------------------------
+ * Nomi brand surface helpers (marketing + future platform restyle)
+ * Warm tactile system — dot grid, drifting orbs, floats, marquee, reveals.
+ * ------------------------------------------------------------------------ */
+
+/* Dot-grid paper texture, no image asset. Use on an overlay div. */
+.brand-grain {
+  background-image: radial-gradient(rgb(22 19 14 / 0.05) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+/* Light dot grid for saturated (yellow) panels */
+.brand-grain-light {
+  background-image: radial-gradient(rgb(22 19 14 / 0.07) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+/* Ambient blurred color orb — position with inline styles */
+.brand-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+@keyframes brand-drift-1 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -20px);
+  }
+}
+
+@keyframes brand-drift-2 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-25px, 15px);
+  }
+}
+
+.animate-brand-drift-1 {
+  animation: brand-drift-1 22s ease-in-out infinite;
+}
+
+.animate-brand-drift-2 {
+  animation: brand-drift-2 26s ease-in-out infinite;
+}
+
+@keyframes brand-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-brand-float {
+  animation: brand-float 7s ease-in-out infinite;
+}
+
+/* Pulsing status dot (social-proof chip) */
+@keyframes brand-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(46 156 104 / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgb(46 156 104 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(46 156 104 / 0);
+  }
+}
+
+.animate-brand-pulse {
+  animation: brand-pulse 3.5s ease-out infinite;
+}
+
+/* Infinite marquee — duplicate the track content once for a seamless loop */
+@keyframes brand-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-brand-marquee {
+  animation: brand-marquee 28s linear infinite;
+}
+
+/* Scroll-in reveal (driven by components/marketing/reveal.tsx) */
+.brand-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-brand-float,
+  .animate-brand-drift-1,
+  .animate-brand-drift-2,
+  .animate-brand-marquee,
+  .animate-brand-pulse,
+  .animate-fade-up {
+    animation: none;
+  }
+
+  .brand-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

@@ -45,8 +45,18 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
     if (!slug || validateSlugFormat(slug)) return;
 
     const timer = setTimeout(async () => {
-      const result = await checkSlugAvailability(slug);
-      setServerCheck({ slug, result });
+      try {
+        const result = await checkSlugAvailability(slug);
+        setServerCheck({ slug, result });
+      } catch {
+        setServerCheck({
+          slug,
+          result: {
+            available: false,
+            error: "Couldn't check availability. Try again.",
+          },
+        });
+      }
     }, 400);
 
     return () => clearTimeout(timer);

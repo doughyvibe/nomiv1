@@ -29,11 +29,11 @@ export const VIBES: VibeMeta[] = [
     tagline: "Soft, dreamy, playful pastels.",
     suitableFor: "Bakes, gifts, crafts, florals, handmade",
     swatch: {
-      bg: "rgb(253 246 252)",
-      primary: "rgb(217 70 160)",
+      bg: "linear-gradient(180deg, #f5e6ff, #dbc9f0)",
+      primary: "rgb(223 255 0)",
       secondary: "rgb(147 118 224)",
     },
-    provisional: true,
+    provisional: false,
   },
   {
     id: "outback",
@@ -45,7 +45,7 @@ export const VIBES: VibeMeta[] = [
       primary: "rgb(154 84 41)",
       secondary: "rgb(94 111 71)",
     },
-    provisional: true,
+    provisional: false,
   },
   {
     id: "futuristic",
@@ -53,11 +53,11 @@ export const VIBES: VibeMeta[] = [
     tagline: "Sleek, sharp, digital neon.",
     suitableFor: "Tech, streetwear, gaming, modern accessories",
     swatch: {
-      bg: "rgb(6 8 18)",
-      primary: "rgb(94 234 212)",
-      secondary: "rgb(192 132 252)",
+      bg: "rgb(10 10 10)",
+      primary: "rgb(0 229 255)",
+      secondary: "rgb(176 38 255)",
     },
-    provisional: true,
+    provisional: false,
   },
 ];
 

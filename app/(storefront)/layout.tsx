@@ -3,9 +3,6 @@ export default function StorefrontLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div data-surface="storefront" data-vibe="industrial" className="min-h-full">
-      {children}
-    </div>
-  );
+  // Vibe tokens applied per-slug in app/(storefront)/s/[slug]/layout.tsx
+  return children;
 }

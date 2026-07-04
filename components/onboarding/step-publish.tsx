@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { publishStore } from "@/app/(dashboard)/dashboard/onboarding/actions";
 import { MiniPreview } from "@/components/storefront/mini-preview";
 import { Button } from "@/components/ui/button";
+import { copyText } from "@/lib/clipboard/copy-text";
 import { getStorefrontUrl } from "@/lib/host";
 import {
   fulfillmentIsComplete,
@@ -24,6 +25,7 @@ export function StepPublish({
 }) {
   const [published, setPublished] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -51,7 +53,12 @@ export function StepPublish({
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(storeUrl);
+    const ok = await copyText(storeUrl);
+    if (!ok) {
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 2500);
+      return;
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -75,6 +82,9 @@ export function StepPublish({
           <Button onClick={handleCopy} variant="outline">
             {copied ? "Copied!" : "Copy Link"}
           </Button>
+          {copyError && (
+            <p className="text-destructive text-xs">Copy failed — select and copy manually.</p>
+          )}
           <Button
             variant="outline"
             render={<a href={storeUrl} target="_blank" rel="noreferrer" />}

@@ -11,6 +11,17 @@ function getDashboardOrigin(): string {
   return `${window.location.protocol}//app.${root}${port}`;
 }
 
+function friendlyOAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("popup") || lower.includes("closed")) {
+    return "Sign-in was cancelled. Try again.";
+  }
+  if (lower.includes("network") || lower.includes("fetch")) {
+    return "Network error. Check your connection and try again.";
+  }
+  return "Could not start sign-in. Try again in a moment.";
+}
+
 export function GoogleSignInButton() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +41,7 @@ export function GoogleSignInButton() {
 
       if (oauthError) {
         setLoading(false);
-        setError(oauthError.message);
+        setError(friendlyOAuthError(oauthError.message));
         return;
       }
 
@@ -41,9 +52,9 @@ export function GoogleSignInButton() {
 
       setLoading(false);
       setError("No OAuth URL returned. Check Supabase Google provider settings.");
-    } catch (err) {
+    } catch {
       setLoading(false);
-      setError(err instanceof Error ? err.message : "Sign-in failed to start.");
+      setError("Could not start sign-in. Try again in a moment.");
     }
   }
 
