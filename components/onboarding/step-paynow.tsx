@@ -20,8 +20,8 @@ export function StepPayNow({
   return (
     <section className="flex flex-col gap-5">
       <div>
-        <h1 className="text-xl font-semibold">Set up PayNow payment</h1>
-        <p className="mt-1 text-sm text-dashboard-muted">
+        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">Set up PayNow payment</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Your store will generate a PayNow QR for each order with the exact
           amount and order reference.
         </p>

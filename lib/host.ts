@@ -15,6 +15,13 @@ export function getDashboardUrl(path = "/"): string {
   return `${protocol}://app.${root}${port}${normalizedPath}`;
 }
 
+export type LoginIntent = "create" | "login";
+
+/** Seller login with optional intent for adaptive copy on the login page. */
+export function getLoginUrl(intent: LoginIntent = "create"): string {
+  return getDashboardUrl(`/login?intent=${intent}`);
+}
+
 /** Marketing site origin (nomi.store / lvh.me:3000) */
 export function getMarketingUrl(path = "/"): string {
   const root = getRootDomain();

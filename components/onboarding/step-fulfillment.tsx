@@ -20,10 +20,10 @@ export function StepFulfillment({
   return (
     <section className="flex flex-col gap-5">
       <div>
-        <h1 className="text-xl font-semibold">
+        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">
           How will customers receive their orders?
         </h1>
-        <p className="mt-1 text-sm text-dashboard-muted">
+        <p className="mt-1 text-sm text-muted-foreground">
           Choose one or both. The delivery fee is added to the buyer&apos;s
           PayNow total.
         </p>

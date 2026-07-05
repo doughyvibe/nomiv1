@@ -77,8 +77,8 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
   return (
     <section className="flex flex-col gap-5">
       <div>
-        <h1 className="text-xl font-semibold">What is your store called?</h1>
-        <p className="mt-1 text-sm text-dashboard-muted">
+        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">What is your store called?</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Your store name and link. You can change the name later — the link is
           yours once claimed.
         </p>
@@ -109,7 +109,7 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
             placeholder="sarahbakes"
             className="flex-1"
           />
-          <span className="text-sm whitespace-nowrap text-dashboard-muted">
+          <span className="text-sm whitespace-nowrap text-muted-foreground">
             .{rootDomain}
           </span>
         </div>
@@ -117,7 +117,7 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
         {slug && (
           <p className="text-sm" aria-live="polite">
             {checking ? (
-              <span className="text-dashboard-muted">Checking…</span>
+              <span className="text-muted-foreground">Checking…</span>
             ) : check?.available ? (
               <span className="text-green-600">
                 ✓ {slug}.{rootDomain} is available
@@ -138,7 +138,7 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
                   setSlugEdited(true);
                   setSlug(s);
                 }}
-                className="rounded-full border border-dashboard-border px-3 py-1 text-xs hover:border-dashboard-primary"
+                className="rounded-full border border-border px-3 py-1 text-xs hover:border-foreground"
               >
                 {s}
               </button>

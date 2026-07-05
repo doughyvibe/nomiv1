@@ -67,12 +67,12 @@ export function StepPublish({
     return (
       <section className="flex flex-col items-center gap-6 text-center">
         <div>
-          <h1 className="text-2xl font-semibold">Your store is live 🎉</h1>
+          <h1 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Your store is live 🎉</h1>
           <a
             href={storeUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-2 block text-lg font-medium text-dashboard-primary underline"
+            className="mt-2 block text-lg font-medium text-foreground underline"
           >
             {displayUrl}
           </a>
@@ -114,10 +114,10 @@ export function StepPublish({
   return (
     <section className="flex flex-col gap-5">
       <div>
-        <h1 className="text-xl font-semibold">Preview &amp; publish</h1>
-        <p className="mt-1 text-sm text-dashboard-muted">
+        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">Preview &amp; publish</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Your store link:{" "}
-          <span className="font-medium text-dashboard-fg">{displayUrl}</span>
+          <span className="font-medium text-foreground">{displayUrl}</span>
         </p>
       </div>
 
@@ -127,7 +127,7 @@ export function StepPublish({
             {checklist.map((item) => (
               <li key={item.label} className="flex items-center gap-2 text-sm">
                 <span
-                  className={item.done ? "text-green-600" : "text-dashboard-muted"}
+                  className={item.done ? "text-green-600" : "text-muted-foreground"}
                 >
                   {item.done ? "✓" : "○"}
                 </span>
@@ -148,7 +148,7 @@ export function StepPublish({
         </div>
 
         <div className="sm:w-[240px]">
-          <p className="mb-2 text-xs font-medium text-dashboard-muted">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">
             Storefront preview
           </p>
           {store.vibe && (

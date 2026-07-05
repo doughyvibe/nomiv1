@@ -20,8 +20,8 @@ export function StepVibe({
   return (
     <section className="flex flex-col gap-5">
       <div>
-        <h1 className="text-xl font-semibold">Choose your storefront vibe</h1>
-        <p className="mt-1 text-sm text-dashboard-muted">
+        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">Choose your storefront vibe</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Swipe through styles and pick the one that matches your brand. This
           only affects your public storefront — your dashboard stays the same.
         </p>

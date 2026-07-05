@@ -6,6 +6,8 @@ Build Nomi, a mobile-first web platform that allows Singapore-based social selle
 
 Nomi is not a Shopify clone and not a full website builder. It is a lightweight, localized storefront platform for sellers who currently sell through Instagram, TikTok, WhatsApp, Telegram, or word of mouth.
 
+Nomi helps small businesses sell online without needing to build a website.
+
 The product should help sellers create a beautiful, mobile-first storefront without requiring web design skills.
 
 Core product promise:
