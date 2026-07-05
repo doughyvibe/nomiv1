@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { copyText } from "@/lib/clipboard/copy-text";
+import { cn } from "@/lib/utils";
 
-export function CopyStoreLinkButton({ url }: { url: string }) {
+export function CopyStoreLinkButton({
+  url,
+  className,
+}: {
+  url: string;
+  className?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
 
@@ -21,13 +27,19 @@ export function CopyStoreLinkButton({ url }: { url: string }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-1">
-      <Button type="button" variant="outline" onClick={handleCopy}>
-        {copied ? "Copied" : "Copy link"}
-      </Button>
-      {copyError && (
-        <p className="text-destructive text-xs">Copy failed — select and copy manually.</p>
-      )}
+    <div className={cn("flex flex-col gap-1", className)}>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="btn-brand-outline inline-flex h-11 items-center px-5"
+      >
+        {copied ? "Copied!" : "Copy link"}
+      </button>
+      {copyError ? (
+        <p className="text-destructive text-xs">
+          Copy failed — select and copy manually.
+        </p>
+      ) : null}
     </div>
   );
 }

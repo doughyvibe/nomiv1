@@ -2,17 +2,17 @@ import {
   saveFulfillmentAction,
   savePayNowAction,
 } from "@/app/(dashboard)/dashboard/settings/actions";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { FulfillmentForm } from "@/components/dashboard/fulfillment-form";
+import {
+  DashboardPageHeader,
+  DashboardPanel,
+  DashboardPanelBody,
+  DashboardPanelHeader,
+} from "@/components/dashboard/dashboard-ui";
 import { PayNowForm } from "@/components/dashboard/paynow-form";
 import { PushAlertsSettings } from "@/components/dashboard/push-alerts-settings";
 import { StoreStatusSettings } from "@/components/dashboard/store-status-settings";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { listUserPushSubscriptions } from "@/lib/push/subscriptions";
 import { getVapidPublicKey } from "@/lib/push/vapid";
 import { storePublishReadiness } from "@/lib/stores/publish-readiness";
@@ -39,60 +39,61 @@ export default async function SettingsPage() {
   );
 
   return (
-    <main className="mx-auto flex min-h-full max-w-lg flex-col gap-6 p-4 pb-8">
-      <div>
-        <h1 className="text-xl font-semibold">Settings</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Fulfillment, payments, store status, and notifications
-        </p>
+    <div className="flex flex-col gap-8">
+      <DashboardPageHeader
+        eyebrow={store.name}
+        title="Settings"
+        description="Fulfillment, PayNow, store status, and notifications."
+      />
+
+      <div className="flex flex-col gap-5">
+        <DashboardPanel>
+          <DashboardPanelHeader
+            title="Store status"
+            description="Publish or hide your storefront"
+          />
+          <DashboardPanelBody>
+            <StoreStatusSettings store={store} publishIssues={publishIssues} />
+          </DashboardPanelBody>
+        </DashboardPanel>
+
+        <DashboardPanel>
+          <DashboardPanelHeader
+            title="Fulfillment"
+            description="Pickup and delivery options for buyers"
+          />
+          <DashboardPanelBody>
+            <FulfillmentForm store={store} onSave={saveFulfillmentAction} />
+          </DashboardPanelBody>
+        </DashboardPanel>
+
+        <DashboardPanel>
+          <DashboardPanelHeader
+            title="PayNow payment"
+            description="QR details and manual verification reminder"
+          />
+          <DashboardPanelBody>
+            <PayNowForm store={store} onSave={savePayNowAction} />
+          </DashboardPanelBody>
+        </DashboardPanel>
+
+        <DashboardPanel>
+          <DashboardPanelHeader
+            title="Push notifications"
+            description="Browser alerts when buyers request payment verification"
+          />
+          <DashboardPanelBody>
+            <PushAlertsSettings
+              vapidPublicKey={getVapidPublicKey()}
+              serverSubscriptionCount={subscriptions.length}
+            />
+          </DashboardPanelBody>
+        </DashboardPanel>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Store status</CardTitle>
-          <CardDescription>Publish or hide your storefront</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <StoreStatusSettings store={store} publishIssues={publishIssues} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Fulfillment</CardTitle>
-          <CardDescription>Pickup and delivery options for buyers</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FulfillmentForm store={store} onSave={saveFulfillmentAction} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">PayNow payment</CardTitle>
-          <CardDescription>
-            QR details and manual verification reminder
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PayNowForm store={store} onSave={savePayNowAction} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Push notifications</CardTitle>
-          <CardDescription>
-            Browser alerts when buyers request payment verification
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PushAlertsSettings
-            vapidPublicKey={getVapidPublicKey()}
-            serverSubscriptionCount={subscriptions.length}
-          />
-        </CardContent>
-      </Card>
-    </main>
+      <div className="flex flex-col gap-4 border-t border-border pt-6 lg:hidden">
+        <SignOutButton className="w-full" />
+      </div>
+    </div>
   );
 }

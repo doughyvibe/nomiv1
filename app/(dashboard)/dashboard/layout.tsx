@@ -1,7 +1,7 @@
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { createClient } from "@/lib/supabase/server";
 import { countPendingVerification } from "@/lib/orders/load-seller-orders";
 
-import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -34,11 +34,6 @@ export default async function DashboardAppLayout({
   }
 
   return (
-    <>
-      <DashboardNav pendingCount={pendingCount} />
-      <div className="pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
-        {children}
-      </div>
-    </>
+    <DashboardShell pendingCount={pendingCount}>{children}</DashboardShell>
   );
 }

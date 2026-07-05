@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { ProductsListView } from "@/components/dashboard/products-list";
-import { Button } from "@/components/ui/button";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
@@ -28,28 +28,31 @@ export default async function ProductsPage({
     .eq("archived", true);
 
   return (
-    <main className="mx-auto flex min-h-full max-w-lg flex-col gap-6 p-4 pb-8">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">
-            {showArchived ? "Archived products" : "Products"}
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {showArchived
-              ? "Hidden from your storefront"
-              : "Manage what buyers see in your store"}
-          </p>
-        </div>
-        {!showArchived && (
-          <Button render={<Link href="/products/new" />}>Add product</Button>
-        )}
-      </div>
-
+    <div className="flex flex-col gap-8">
+      <DashboardPageHeader
+        eyebrow={store.name}
+        title={showArchived ? "Archived products" : "Products"}
+        description={
+          showArchived
+            ? "Hidden from your public storefront."
+            : "Manage what buyers see when they visit your store."
+        }
+        action={
+          !showArchived ? (
+            <Link
+              href="/products/new"
+              className="btn-brand-dark inline-flex h-11 items-center px-5"
+            >
+              Add product
+            </Link>
+          ) : undefined
+        }
+      />
       <ProductsListView
         products={(products as Product[]) ?? []}
         showArchived={showArchived}
         archivedCount={archivedCount ?? 0}
       />
-    </main>
+    </div>
   );
 }

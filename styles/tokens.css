@@ -94,6 +94,71 @@
   padding-inline: 0.08em;
 }
 
+/* Dashboard panels + CTAs — match login card geometry */
+[data-brand] .dashboard-panel {
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 8px 32px rgb(22 19 14 / 0.08);
+}
+
+[data-brand] .btn-brand-dark {
+  display: inline-flex;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: var(--foreground);
+  padding-inline: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+[data-brand] .btn-brand-dark:hover {
+  background: #2c2a26;
+}
+
+[data-brand] .btn-brand-dark:active {
+  transform: scale(0.99);
+}
+
+[data-brand] .btn-brand-dark:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+[data-brand] .btn-brand-outline {
+  display: inline-flex;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding-inline: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+
+[data-brand] .btn-brand-outline:hover {
+  background: var(--accent);
+}
+
+[data-brand] .btn-brand-outline:active {
+  transform: scale(0.99);
+}
+
 [data-surface="storefront"],
 [data-vibe] {
   color: rgb(var(--vibe-text));

@@ -58,8 +58,10 @@ export function OrderStatusActions({
   if (!showVerify && !showComplete && !showCancel) return null;
 
   return (
-    <section className="rounded-lg border bg-card p-4">
-      <h2 className="text-sm font-medium">Order actions</h2>
+    <section className="dashboard-panel px-6 py-5 sm:px-7 sm:py-6">
+      <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+        Order actions
+      </h2>
 
       <div className="mt-3 flex flex-wrap gap-2">
         {showVerify && (

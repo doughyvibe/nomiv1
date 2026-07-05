@@ -38,8 +38,10 @@ export function ConfirmationBuyerActions(props: ConfirmationBuyerActionsProps) {
   }
 
   return (
-    <section className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4">
-      <h2 className="text-sm font-medium">Send confirmation manually</h2>
+    <section className="dashboard-panel border-[var(--brand-mint)]/25 bg-[var(--brand-mint-soft)]/40 px-6 py-5 sm:px-7 sm:py-6">
+      <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+        Send confirmation manually
+      </h2>
       <p className="text-muted-foreground mt-1 text-xs">
         Nomi does not send this for you. Open a draft, review it, then send from
         your own app.

@@ -1,9 +1,12 @@
 import Link from "next/link";
 
 import { CopyStoreLinkButton } from "@/components/dashboard/copy-store-link-button";
+import {
+  DashboardEmptyState,
+  DashboardPanel,
+} from "@/components/dashboard/dashboard-ui";
 import { OrderStatusBadge } from "@/components/dashboard/order-status-badge";
 import { OrdersStatusFilter } from "@/components/dashboard/orders-status-filter";
-import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/money";
 import { displayOrderStatus } from "@/lib/orders/status";
 import type { OrderRow } from "@/lib/orders/types";
@@ -27,54 +30,56 @@ export function OrdersListView({
   storeUrl?: string;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       <OrdersStatusFilter current={statusFilter} />
 
       {orders.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-8 text-center">
-          <p className="font-medium">No orders yet</p>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {statusFilter === "all"
-              ? "Share your store link to get your first order."
-              : "No orders match this filter."}
-          </p>
-          {statusFilter === "all" && storeUrl && (
-            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
-              <CopyStoreLinkButton url={storeUrl} />
-              <Button
-                variant="ghost"
-                size="sm"
-                render={
-                  <a href={storeUrl} target="_blank" rel="noreferrer" />
-                }
-              >
-                View storefront
-              </Button>
-            </div>
-          )}
-        </div>
+        <DashboardPanel>
+          <DashboardEmptyState
+            title="No orders yet"
+            description={
+              statusFilter === "all"
+                ? "Share your store link to get your first order."
+                : "No orders match this filter."
+            }
+          >
+            {statusFilter === "all" && storeUrl ? (
+              <>
+                <CopyStoreLinkButton url={storeUrl} />
+                <a
+                  href={storeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-brand-outline inline-flex h-11 items-center px-5"
+                >
+                  View storefront
+                </a>
+              </>
+            ) : null}
+          </DashboardEmptyState>
+        </DashboardPanel>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {orders.map((order) => {
             const status = displayOrderStatus(order);
             return (
               <li key={order.id}>
                 <Link
                   href={`/orders/${order.reference}`}
-                  className="flex items-center justify-between gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                  className="dashboard-stat flex items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-foreground/15 hover:shadow-[0_4px_20px_rgba(22,19,14,0.06)] sm:p-5"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium">{order.customer_name}</p>
-                    <p className="text-muted-foreground truncate text-sm">
+                    <p className="font-semibold">{order.customer_name}</p>
+                    <p className="text-muted-foreground truncate font-mono text-xs">
                       {order.reference}
                     </p>
-                    <p className="text-muted-foreground mt-1 text-xs">
+                    <p className="text-muted-foreground mt-1.5 text-xs">
                       {formatOrderDate(order.created_at)}
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     <OrderStatusBadge status={status} />
-                    <span className="text-sm font-semibold">
+                    <span className="font-display text-base font-extrabold tabular-nums">
                       {formatPrice(order.total_cents)}
                     </span>
                   </div>

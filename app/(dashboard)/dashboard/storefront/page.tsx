@@ -1,5 +1,9 @@
+import { ArrowUpRight } from "lucide-react";
+
 import { StorefrontEditor } from "@/components/dashboard/storefront-editor";
-import { Button } from "@/components/ui/button";
+import {
+  DashboardPageHeader,
+} from "@/components/dashboard/dashboard-ui";
 import { getStorefrontUrl } from "@/lib/host";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
@@ -17,28 +21,33 @@ export default async function StorefrontPage() {
     .limit(4);
 
   return (
-    <main className="mx-auto flex min-h-full max-w-lg flex-col gap-6 p-4 pb-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Storefront</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Vibe and hero for your public store
-          </p>
-        </div>
-        <Button
-          render={<a href={storeUrl} target="_blank" rel="noreferrer" />}
-        >
-          Open storefront
-        </Button>
-      </div>
+    <div className="flex flex-col gap-8">
+      <DashboardPageHeader
+        eyebrow={store.name}
+        title="Storefront"
+        description="Choose your vibe and design the hero buyers see first."
+        action={
+          <a
+            href={storeUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-brand-dark inline-flex h-11 items-center gap-2 px-5"
+          >
+            Open storefront
+            <ArrowUpRight className="size-4" strokeWidth={2.5} />
+          </a>
+        }
+      />
 
       <StorefrontEditor
         store={store}
-        products={(products as Pick<
-          Product,
-          "name" | "price_cents" | "image_url" | "category"
-        >[]) ?? []}
+        products={
+          (products as Pick<
+            Product,
+            "name" | "price_cents" | "image_url" | "category"
+          >[]) ?? []
+        }
       />
-    </main>
+    </div>
   );
 }

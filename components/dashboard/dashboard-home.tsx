@@ -1,15 +1,21 @@
 import Link from "next/link";
+import {
+  ArrowUpRight,
+  ClipboardList,
+  Package,
+  Palette,
+  Share2,
+} from "lucide-react";
 
 import { CopyStoreLinkButton } from "@/components/dashboard/copy-store-link-button";
-import { StoreStatusBadge } from "@/components/dashboard/store-status-badge";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  DashboardEmptyState,
+  DashboardPanel,
+  DashboardPanelBody,
+  DashboardPanelHeader,
+  DashboardStatCard,
+} from "@/components/dashboard/dashboard-ui";
+import { StoreStatusBadge } from "@/components/dashboard/store-status-badge";
 import type { OrderSummary } from "@/lib/orders/order-summary";
 import type { Store } from "@/lib/stores/types";
 
@@ -19,117 +25,182 @@ type DashboardHomeProps = {
   summary: OrderSummary;
 };
 
+const QUICK_ACTIONS = [
+  {
+    href: "/orders",
+    label: "View orders",
+    Icon: ClipboardList,
+    tint: "bg-[var(--brand-purple-soft)] text-[var(--brand-purple)]",
+  },
+  {
+    href: "/products/new",
+    label: "Add product",
+    Icon: Package,
+    tint: "bg-primary text-foreground",
+  },
+  {
+    href: "/storefront",
+    label: "Edit storefront",
+    Icon: Palette,
+    tint: "bg-[var(--brand-mint-soft)] text-[var(--brand-mint)]",
+  },
+] as const;
+
 export function DashboardHome({
   store,
   storeUrl,
   summary,
 }: DashboardHomeProps) {
   const hasOrders = summary.total > 0;
+  const displayUrl = storeUrl.replace(/^https?:\/\//, "");
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-xl font-semibold">{store.name}</h1>
+    <div className="flex flex-col gap-8">
+      <header>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="font-display text-[1.75rem] leading-tight font-extrabold tracking-[-0.02em] sm:text-[2.125rem]">
+            {store.name}
+          </h1>
           <StoreStatusBadge status={store.status} />
         </div>
-        <p className="text-muted-foreground mt-1 text-sm">Your Nomi storefront</p>
-      </div>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Your PayNow storefront — share the link, verify payments, confirm
+          orders.
+        </p>
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Store link</CardTitle>
-          <CardDescription className="break-all">{storeUrl}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <CopyStoreLinkButton url={storeUrl} />
-          <Button
-            render={<a href={storeUrl} target="_blank" rel="noreferrer" />}
-          >
-            Open storefront
-          </Button>
-        </CardContent>
-      </Card>
+      <DashboardPanel>
+        <DashboardPanelHeader
+          title="Store link"
+          description="Drop this in your bio, Stories, or WhatsApp status."
+          action={
+            <span className="hidden items-center gap-1.5 rounded-full bg-[var(--brand-mint-soft)] px-3 py-1 text-xs font-semibold text-[var(--brand-mint)] sm:inline-flex">
+              <Share2 className="size-3.5" strokeWidth={2.5} />
+              Ready to share
+            </span>
+          }
+        />
+        <DashboardPanelBody className="space-y-4">
+          <div className="rounded-2xl border border-border bg-[var(--brand-bg-soft)] px-4 py-3.5">
+            <p className="break-all font-mono text-sm font-medium text-foreground">
+              {displayUrl}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <CopyStoreLinkButton url={storeUrl} />
+            <a
+              href={storeUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-brand-dark inline-flex h-11 items-center justify-center gap-2 px-5"
+            >
+              Open storefront
+              <ArrowUpRight className="size-4" strokeWidth={2.5} />
+            </a>
+          </div>
+        </DashboardPanelBody>
+      </DashboardPanel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Orders</CardTitle>
-          {!hasOrders && (
-            <CardDescription>
-              No orders yet. Share your Nomi store link to start receiving
-              orders.
-            </CardDescription>
-          )}
-        </CardHeader>
-        <CardContent>
+      <section className="flex flex-col gap-4">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+              Orders
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {hasOrders
+                ? "Tap a stat to filter your order list."
+                : "Your first order will show up here."}
+            </p>
+          </div>
           {hasOrders ? (
-            <dl className="grid grid-cols-3 gap-3 text-center">
-              <Link
-                href="/orders?status=seller_verification_requested"
-                className="hover:bg-muted rounded-lg border p-3 transition-colors"
+            <Link
+              href="/orders"
+              className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
+            >
+              View all
+            </Link>
+          ) : null}
+        </div>
+
+        {hasOrders ? (
+          <div className="grid gap-3 sm:grid-cols-3">
+            <DashboardStatCard
+              href="/orders?status=seller_verification_requested"
+              label="Awaiting verification"
+              value={summary.awaitingVerification}
+              tint="yellow"
+            />
+            <DashboardStatCard
+              href="/orders?status=seller_confirmed_paid"
+              label="Paid"
+              value={summary.paid}
+              tint="purple"
+            />
+            <DashboardStatCard
+              href="/orders"
+              label="Total orders"
+              value={summary.total}
+              tint="mint"
+            />
+          </div>
+        ) : (
+          <DashboardPanel>
+            <DashboardEmptyState
+              title="No orders yet"
+              description="Share your store link to start receiving PayNow orders from buyers."
+            >
+              <CopyStoreLinkButton url={storeUrl} />
+              <a
+                href={storeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-brand-outline inline-flex h-11 items-center px-5"
               >
-                <dt className="text-muted-foreground text-xs">
-                  Awaiting verification
-                </dt>
-                <dd className="mt-1 text-2xl font-semibold tabular-nums">
-                  {summary.awaitingVerification}
-                </dd>
-              </Link>
-              <Link
-                href="/orders?status=seller_confirmed_paid"
-                className="hover:bg-muted rounded-lg border p-3 transition-colors"
+                Test checkout
+              </a>
+            </DashboardEmptyState>
+          </DashboardPanel>
+        )}
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+          Quick actions
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {QUICK_ACTIONS.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className="dashboard-stat group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-foreground/15 hover:shadow-[0_4px_20px_rgba(22,19,14,0.06)] sm:p-5"
+            >
+              <span
+                className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${action.tint}`}
               >
-                <dt className="text-muted-foreground text-xs">Paid</dt>
-                <dd className="mt-1 text-2xl font-semibold tabular-nums">
-                  {summary.paid}
-                </dd>
-              </Link>
-              <Link
-                href="/orders"
-                className="hover:bg-muted rounded-lg border p-3 transition-colors"
-              >
-                <dt className="text-muted-foreground text-xs">Total</dt>
-                <dd className="mt-1 text-2xl font-semibold tabular-nums">
-                  {summary.total}
-                </dd>
-              </Link>
-            </dl>
-          ) : (
-            <ul className="text-muted-foreground space-y-2 text-sm">
-              <li>· Copy store link and add it to your Instagram bio</li>
-              <li>
-                ·{" "}
-                <Link href="/products" className="text-primary underline">
-                  Add more products
-                </Link>
-              </li>
-              <li>
-                ·{" "}
-                <a
-                  href={storeUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline"
-                >
-                  Test checkout
-                </a>{" "}
-                on your public store
-              </li>
-              <li>
-                ·{" "}
-                <a
-                  href={storeUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline"
-                >
-                  View public store
-                </a>
-              </li>
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+                <action.Icon className="size-[18px]" strokeWidth={2} />
+              </span>
+              <span className="text-sm font-semibold">{action.label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {!hasOrders ? (
+        <ul className="space-y-2 rounded-2xl border border-dashed border-border bg-card/50 px-5 py-4 text-sm text-muted-foreground">
+          <li className="flex gap-2">
+            <span className="text-foreground">·</span>
+            Copy your store link and add it to Instagram or TikTok
+          </li>
+          <li className="flex gap-2">
+            <span className="text-foreground">·</span>
+            <Link href="/products" className="font-semibold text-foreground underline-offset-2 hover:underline">
+              Add more products
+            </Link>{" "}
+            so buyers have more to browse
+          </li>
+        </ul>
+      ) : null}
     </div>
   );
 }

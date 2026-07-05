@@ -3,11 +3,13 @@ import { cn } from "@/lib/utils";
 
 const statusConfig: Record<
   StoreStatus,
-  { label: string; className: string }
+  { label: string; className: string; pulse?: boolean }
 > = {
   published: {
     label: "Live",
-    className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+    className:
+      "bg-[var(--brand-mint-soft)] text-[var(--brand-mint)] ring-1 ring-[var(--brand-mint)]/20",
+    pulse: true,
   },
   draft: {
     label: "Draft",
@@ -15,11 +17,11 @@ const statusConfig: Record<
   },
   unpublished: {
     label: "Unpublished",
-    className: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+    className: "bg-primary/20 text-foreground",
   },
   suspended: {
     label: "Suspended",
-    className: "bg-destructive/15 text-destructive",
+    className: "bg-destructive/10 text-destructive",
   },
   deleted: {
     label: "Deleted",
@@ -32,10 +34,16 @@ export function StoreStatusBadge({ status }: { status: StoreStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex rounded-md px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
         config.className,
       )}
     >
+      {config.pulse ? (
+        <span
+          className="size-1.5 shrink-0 rounded-full bg-[var(--brand-mint)] animate-brand-pulse"
+          aria-hidden
+        />
+      ) : null}
       {config.label}
     </span>
   );

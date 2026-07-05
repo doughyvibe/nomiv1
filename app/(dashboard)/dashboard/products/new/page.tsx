@@ -1,24 +1,29 @@
 import Link from "next/link";
 
 import { NewProductForm } from "@/components/dashboard/new-product-form";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
 export default async function NewProductPage() {
   await requireSellerStore();
 
   return (
-    <main className="mx-auto flex min-h-full max-w-lg flex-col gap-6 p-4 pb-8">
+    <div className="flex flex-col gap-8">
       <div>
         <Link
           href="/products"
-          className="text-primary text-sm font-medium hover:underline"
+          className="inline-flex min-h-10 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
         >
           ← Back to products
         </Link>
-        <h1 className="mt-2 text-xl font-semibold">Add product</h1>
+        <div className="mt-4">
+          <DashboardPageHeader
+            title="Add product"
+            description="Buyers will see this in your storefront catalog."
+          />
+        </div>
       </div>
-
       <NewProductForm />
-    </main>
+    </div>
   );
 }

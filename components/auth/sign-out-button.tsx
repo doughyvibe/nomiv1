@@ -5,8 +5,9 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
-export function SignOutButton() {
+export function SignOutButton({ className }: { className?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +20,12 @@ export function SignOutButton() {
   }
 
   return (
-    <Button variant="outline" disabled={loading} onClick={handleSignOut}>
+    <Button
+      variant="outline"
+      disabled={loading}
+      onClick={handleSignOut}
+      className={cn("rounded-full", className)}
+    >
       {loading ? "Signing out…" : "Sign out"}
     </Button>
   );
