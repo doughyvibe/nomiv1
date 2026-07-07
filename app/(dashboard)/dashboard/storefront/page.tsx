@@ -8,6 +8,10 @@ import { getStorefrontUrl } from "@/lib/host";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Storefront — Nomi" };
+
 export default async function StorefrontPage() {
   const { supabase, store } = await requireSellerStore();
   const storeUrl = getStorefrontUrl(store.slug);

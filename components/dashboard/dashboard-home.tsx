@@ -1,7 +1,11 @@
 import Link from "next/link";
 import {
+  ArrowRight,
   ArrowUpRight,
+  CircleCheck,
   ClipboardList,
+  Clock,
+  Hash,
   Package,
   Palette,
   Share2,
@@ -104,7 +108,7 @@ export function DashboardHome({
       <section className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+            <h2 className="font-display text-lg font-bold">
               Orders
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -129,18 +133,21 @@ export function DashboardHome({
               href="/orders?status=seller_verification_requested"
               label="Awaiting verification"
               value={summary.awaitingVerification}
+              icon={Clock}
               tint="yellow"
             />
             <DashboardStatCard
               href="/orders?status=seller_confirmed_paid"
               label="Paid"
               value={summary.paid}
+              icon={CircleCheck}
               tint="purple"
             />
             <DashboardStatCard
               href="/orders"
               label="Total orders"
               value={summary.total}
+              icon={Hash}
               tint="mint"
             />
           </div>
@@ -165,7 +172,7 @@ export function DashboardHome({
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+        <h2 className="font-display text-lg font-bold">
           Quick actions
         </h2>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -180,7 +187,8 @@ export function DashboardHome({
               >
                 <action.Icon className="size-[18px]" strokeWidth={2} />
               </span>
-              <span className="text-sm font-semibold">{action.label}</span>
+              <span className="flex-1 text-sm font-semibold">{action.label}</span>
+              <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
             </Link>
           ))}
         </div>

@@ -4,6 +4,10 @@ import { getStorefrontUrl } from "@/lib/host";
 import { loadSellerOrders } from "@/lib/orders/load-seller-orders";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Orders — Nomi" };
+
 export default async function OrdersPage({
   searchParams,
 }: {

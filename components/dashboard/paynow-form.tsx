@@ -14,6 +14,7 @@ import {
   type PayNowProxyType,
 } from "@/lib/paynow";
 import type { PayNowConfig, Store } from "@/lib/stores/types";
+import { cn } from "@/lib/utils";
 
 type PayNowFormProps = {
   store: Store;
@@ -93,13 +94,26 @@ export function PayNowForm({
         <Label>PayNow type</Label>
         <div className="flex gap-4">
           {(["mobile", "uen"] as const).map((t) => (
-            <label key={t} className="flex items-center gap-2 text-sm">
+            <label key={t} className="flex items-center gap-2 text-sm cursor-pointer">
+              <span
+                className={cn(
+                  "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                  proxyType === t
+                    ? "border-foreground"
+                    : "border-border",
+                )}
+                aria-hidden
+              >
+                {proxyType === t && (
+                  <span className="size-2.5 rounded-full bg-foreground" />
+                )}
+              </span>
               <input
                 type="radio"
                 name="paynow-type"
                 checked={proxyType === t}
                 onChange={() => setProxyType(t)}
-                className="accent-primary size-4"
+                className="sr-only"
               />
               {t === "mobile" ? "Mobile number" : "UEN"}
             </label>

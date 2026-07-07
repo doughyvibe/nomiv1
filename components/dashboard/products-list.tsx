@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Package } from "lucide-react";
 
 import {
   DashboardEmptyState,
@@ -20,9 +21,11 @@ function ProductThumbnail({ product }: { product: Product }) {
   }
   return (
     <div
-      className="size-14 shrink-0 rounded-xl border border-border bg-[var(--brand-bg-soft)]"
+      className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-border bg-[var(--brand-bg-soft)]"
       aria-hidden
-    />
+    >
+      <Package className="size-5 text-muted-foreground/50" />
+    </div>
   );
 }
 

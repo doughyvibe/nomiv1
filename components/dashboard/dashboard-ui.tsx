@@ -34,7 +34,7 @@ export function DashboardPanelHeader({
       )}
     >
       <div className="min-w-0">
-        <h2 className="font-display text-lg font-extrabold tracking-[-0.02em]">
+        <h2 className="font-display text-lg font-bold">
           {title}
         </h2>
         {description ? (
@@ -103,12 +103,14 @@ export function DashboardStatCard({
   href,
   label,
   value,
+  icon: Icon,
   tint = "yellow",
   className,
 }: {
   href?: string;
   label: string;
   value: React.ReactNode;
+  icon?: React.ComponentType<{ className?: string }>;
   tint?: keyof typeof STAT_TINTS;
   className?: string;
 }) {
@@ -137,7 +139,7 @@ export function DashboardStatCard({
           )}
           aria-hidden
         >
-          <span className="size-2 rounded-full bg-current opacity-80" />
+          {Icon ? <Icon className="size-4" /> : <span className="size-2 rounded-full bg-current opacity-80" />}
         </span>
         {inner}
       </Link>
@@ -171,7 +173,7 @@ export function DashboardEmptyState({
 }) {
   return (
     <div className="flex flex-col items-center px-4 py-10 text-center sm:py-12">
-      <p className="font-display text-lg font-extrabold tracking-[-0.02em]">
+      <p className="font-display text-lg font-bold">
         {title}
       </p>
       {description ? (

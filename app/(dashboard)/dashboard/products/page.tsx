@@ -5,6 +5,10 @@ import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Products — Nomi" };
+
 export default async function ProductsPage({
   searchParams,
 }: {

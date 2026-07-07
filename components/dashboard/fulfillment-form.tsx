@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { FulfillmentConfig, Store } from "@/lib/stores/types";
+import { cn } from "@/lib/utils";
 
 type FulfillmentFormProps = {
   store: Store;
@@ -89,12 +90,25 @@ export function FulfillmentForm({
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-md border p-4">
-        <label className="flex items-center gap-3">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <span
+            className={cn(
+              "flex size-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
+              pickupEnabled
+                ? "border-foreground bg-foreground text-white"
+                : "border-border bg-card",
+            )}
+            aria-hidden
+          >
+            {pickupEnabled && (
+              <svg className="size-3" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            )}
+          </span>
           <input
             type="checkbox"
             checked={pickupEnabled}
             onChange={(e) => setPickupEnabled(e.target.checked)}
-            className="accent-primary size-4"
+            className="sr-only"
           />
           <span className="font-medium">Self-pickup</span>
         </label>
@@ -123,12 +137,25 @@ export function FulfillmentForm({
       </div>
 
       <div className="rounded-md border p-4">
-        <label className="flex items-center gap-3">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <span
+            className={cn(
+              "flex size-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
+              deliveryEnabled
+                ? "border-foreground bg-foreground text-white"
+                : "border-border bg-card",
+            )}
+            aria-hidden
+          >
+            {deliveryEnabled && (
+              <svg className="size-3" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            )}
+          </span>
           <input
             type="checkbox"
             checked={deliveryEnabled}
             onChange={(e) => setDeliveryEnabled(e.target.checked)}
-            className="accent-primary size-4"
+            className="sr-only"
           />
           <span className="font-medium">Local delivery</span>
         </label>

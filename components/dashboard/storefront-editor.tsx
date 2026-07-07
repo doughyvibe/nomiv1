@@ -7,12 +7,10 @@ import {
 import { HeroEditor } from "@/components/dashboard/hero-editor";
 import { VibePicker } from "@/components/dashboard/vibe-picker";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  DashboardPanel,
+  DashboardPanelBody,
+  DashboardPanelHeader,
+} from "@/components/dashboard/dashboard-ui";
 import type { Product, Store } from "@/lib/stores/types";
 
 export function StorefrontEditor({
@@ -23,34 +21,30 @@ export function StorefrontEditor({
   products: Pick<Product, "name" | "price_cents" | "image_url" | "category">[];
 }) {
   return (
-    <div className="flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Vibe</CardTitle>
-          <CardDescription>
-            Styles your public storefront — dashboard stays the same
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="flex flex-col gap-5">
+      <DashboardPanel>
+        <DashboardPanelHeader
+          title="Vibe"
+          description="Styles your public storefront — dashboard stays the same"
+        />
+        <DashboardPanelBody>
           <VibePicker
             store={store}
             products={products}
             onSaveVibe={saveVibeAction}
           />
-        </CardContent>
-      </Card>
+        </DashboardPanelBody>
+      </DashboardPanel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Hero</CardTitle>
-          <CardDescription>
-            Top section of your store — words, image, and block order
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <DashboardPanel>
+        <DashboardPanelHeader
+          title="Hero"
+          description="Top section of your store — words, image, and block order"
+        />
+        <DashboardPanelBody>
           <HeroEditor store={store} submitLabel="Save hero" onSaveHero={saveHeroAction} />
-        </CardContent>
-      </Card>
+        </DashboardPanelBody>
+      </DashboardPanel>
     </div>
   );
 }

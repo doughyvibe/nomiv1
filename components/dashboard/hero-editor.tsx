@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 import { MiniPreview } from "@/components/storefront/mini-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -181,24 +183,24 @@ export function HeroEditor({
                   className="flex items-center justify-between rounded-md border px-3 py-1.5 text-sm"
                 >
                   <span>{BLOCK_LABELS[block]}</span>
-                  <span className="flex gap-1">
+                  <span className="flex gap-0.5">
                     <button
                       type="button"
                       onClick={() => move(block, -1)}
                       disabled={i === 0}
                       aria-label={`Move ${BLOCK_LABELS[block]} up`}
-                      className="text-muted-foreground hover:bg-muted rounded px-2 py-0.5 disabled:opacity-30"
+                      className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
                     >
-                      ↑
+                      <ChevronUp className="size-4" />
                     </button>
                     <button
                       type="button"
                       onClick={() => move(block, 1)}
                       disabled={i === order.length - 1}
                       aria-label={`Move ${BLOCK_LABELS[block]} down`}
-                      className="text-muted-foreground hover:bg-muted rounded px-2 py-0.5 disabled:opacity-30"
+                      className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
                     >
-                      ↓
+                      <ChevronDown className="size-4" />
                     </button>
                   </span>
                 </li>

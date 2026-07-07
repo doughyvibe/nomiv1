@@ -18,6 +18,10 @@ import { getVapidPublicKey } from "@/lib/push/vapid";
 import { storePublishReadiness } from "@/lib/stores/publish-readiness";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Settings — Nomi" };
+
 export default async function SettingsPage() {
   const { supabase, store } = await requireSellerStore();
   const {
