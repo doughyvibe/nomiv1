@@ -3,7 +3,7 @@ import {
   Bebas_Neue,
   Hanken_Grotesk,
   Inter,
-  Oswald,
+  Plus_Jakarta_Sans,
   Syne,
 } from "next/font/google";
 
@@ -20,10 +20,11 @@ export const hankenGrotesk = Hanken_Grotesk({
   display: "swap",
 });
 
-/** Industrial vibe display font (PRD §10) */
-export const oswald = Oswald({
+/** Epicurean (Noir) vibe display font — docs/sampleDESIGN.md */
+export const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-oswald",
+  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 

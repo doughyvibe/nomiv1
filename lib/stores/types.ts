@@ -1,6 +1,8 @@
 import type { PayNowProxyType } from "@/lib/paynow";
 
-export type Vibe = "unicorn" | "outback" | "futuristic" | "industrial";
+export type Vibe = "unicorn" | "outback" | "futuristic" | "epicurean";
+
+export type TradeHint = "general" | "food" | "handmade" | "services" | "plants";
 
 export type StoreStatus =
   | "draft"
@@ -9,12 +11,11 @@ export type StoreStatus =
   | "suspended"
   | "deleted";
 
+/** @deprecated Legacy hero blocks — fixed order in storefront v2 */
 export const HERO_BLOCKS = [
   "eyebrow",
-  "image",
   "title",
   "subheading",
-  "cta",
 ] as const;
 export type HeroBlock = (typeof HERO_BLOCKS)[number];
 
@@ -22,9 +23,13 @@ export type HeroConfig = {
   eyebrow?: string;
   title: string;
   subheading?: string;
+  logo_url?: string;
+  /** @deprecated */
   cta?: string;
+  /** @deprecated */
   image_url?: string;
-  order: HeroBlock[];
+  /** @deprecated */
+  order?: HeroBlock[];
 };
 
 export type FulfillmentConfig = {
@@ -57,6 +62,9 @@ export type Store = {
   hero: Partial<HeroConfig>;
   fulfillment: FulfillmentConfig;
   paynow: Partial<PayNowConfig>;
+  featured_product_id?: string | null;
+  featured_section_title?: string | null;
+  trade_hint?: TradeHint | null;
   created_at: string;
   updated_at: string;
 };

@@ -1,72 +1,112 @@
 "use client";
 
-import { HERO_BLOCKS, type HeroBlock, type HeroConfig } from "@/lib/stores/types";
+import type { HeroConfig, Vibe } from "@/lib/stores/types";
 
 type StorefrontHeroProps = {
   storeName: string;
   hero: Partial<HeroConfig>;
+  vibe?: Vibe | "industrial";
 };
 
-export function StorefrontHero({ storeName, hero }: StorefrontHeroProps) {
-  const order: HeroBlock[] = hero.order?.length
-    ? hero.order
-    : [...HERO_BLOCKS];
+function Monogram({ name }: { name: string }) {
+  const letter = name.trim().charAt(0).toUpperCase() || "?";
+  return (
+    <div
+      className="flex size-14 items-center justify-center rounded-full border border-vibe-border/30 bg-vibe-surface font-display text-xl font-bold text-vibe-primary md:size-16 md:text-2xl"
+      aria-hidden
+    >
+      {letter}
+    </div>
+  );
+}
 
-  const blocks: Record<HeroBlock, React.ReactNode> = {
-    eyebrow: hero.eyebrow ? (
-      <p className="vibe-display text-xs tracking-[0.2em] text-vibe-primary uppercase">
-        {hero.eyebrow}
-      </p>
-    ) : null,
-    image: hero.image_url ? (
-      <div className="relative -mx-4 overflow-hidden sm:mx-0 sm:rounded-lg">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={hero.image_url}
-          alt=""
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          className="h-48 w-full object-cover sm:h-56"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-vibe-bg/80 to-transparent" />
-      </div>
-    ) : null,
-    title: (
-      <h1 className="vibe-display font-display text-2xl font-bold tracking-wide uppercase sm:text-3xl lg:text-4xl">
-        {hero.title || storeName}
-      </h1>
-    ),
-    subheading: hero.subheading ? (
-      <p className="max-w-md text-base leading-relaxed text-vibe-text-muted">
-        {hero.subheading}
-      </p>
-    ) : null,
-    cta: (
-      <a
-        href="#catalog"
-        className="vibe-display inline-flex items-center justify-center rounded-[var(--vibe-radius)] bg-vibe-primary px-6 py-3 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98]"
-      >
-        {hero.cta || "Shop now"}
-      </a>
-    ),
-  };
+function isNoirVibe(vibe: Vibe | "industrial" | undefined): boolean {
+  return vibe === "epicurean" || vibe === "industrial";
+}
+
+function NoirHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
 
   return (
-    <section className="flex flex-col gap-4 px-4 pt-6 pb-8 sm:px-6">
-      {order.map((block, i) => {
-        const node = blocks[block];
-        if (!node) return null;
-        return (
-          <div
-            key={block}
-            className="animate-fade-up opacity-0"
-            style={{ animationDelay: `${i * 80}ms`, animationFillMode: "forwards" }}
-          >
-            {node}
-          </div>
-        );
-      })}
+    <section className="storefront-hero flex flex-col items-center px-5 pb-8 pt-10 text-center sm:px-6">
+      {hero.logo_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={hero.logo_url}
+          alt=""
+          className="mb-4 size-14 rounded-full object-cover md:size-16"
+        />
+      ) : null}
+
+      {eyebrow ? (
+        <p className="hero-noir-eyebrow mb-2 text-balance">{eyebrow}</p>
+      ) : null}
+
+      <h1 className="hero-noir-title text-balance">{title}</h1>
+
+      {tagline ? (
+        <p className="hero-noir-tagline mt-4 text-balance">{tagline}</p>
+      ) : null}
     </section>
   );
+}
+
+function DefaultHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  return (
+    <section className="flex flex-col items-center gap-4 px-5 pb-10 pt-8 text-center sm:px-6 md:gap-5 md:pb-12 md:pt-12">
+      {hero.logo_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={hero.logo_url}
+          alt=""
+          className="size-14 rounded-full object-cover md:size-16"
+        />
+      ) : (
+        <Monogram name={title} />
+      )}
+
+      {hero.eyebrow?.trim() ? (
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-vibe-text-muted">
+          {hero.eyebrow}
+        </p>
+      ) : null}
+
+      <h1 className="font-display text-balance text-[clamp(1.75rem,5vw,3rem)] font-bold leading-tight tracking-tight text-vibe-primary">
+        {title}
+      </h1>
+
+      {hero.subheading?.trim() ? (
+        <p className="max-w-lg text-base leading-relaxed text-vibe-text-muted md:text-lg">
+          {hero.subheading}
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
+export function StorefrontHero({
+  storeName,
+  hero,
+  vibe = "epicurean",
+}: StorefrontHeroProps) {
+  const title = hero.title?.trim() || storeName;
+
+  if (isNoirVibe(vibe)) {
+    return <NoirHero title={title} hero={hero} />;
+  }
+
+  return <DefaultHero title={title} hero={hero} />;
 }

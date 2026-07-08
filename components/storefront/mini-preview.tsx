@@ -1,85 +1,75 @@
+import { Star } from "lucide-react";
+
 import { cn } from "@/lib/utils";
-import type { HeroConfig, Product, Vibe } from "@/lib/stores/types";
-import { HERO_BLOCKS } from "@/lib/stores/types";
+import { formatPrice } from "@/lib/money";
+import { normalizeCategory } from "@/lib/products/category";
+import {
+  catalogProducts,
+  resolveFeaturedProduct,
+} from "@/lib/products/featured";
+import { resolveFeaturedSectionTitle } from "@/lib/featured-section";
+import type { HeroConfig, Product, Store, Vibe } from "@/lib/stores/types";
 
 type MiniPreviewProps = {
   vibe: Vibe;
   storeName: string;
   hero?: Partial<HeroConfig>;
   products?: Pick<Product, "name" | "price_cents" | "image_url" | "category">[];
+  store?: Pick<Store, "featured_product_id" | "featured_section_title">;
   className?: string;
 };
 
-function formatPrice(cents: number): string {
-  return `S$${(cents / 100).toFixed(2)}`;
+function isNoirVibe(vibe: Vibe): boolean {
+  return vibe === "epicurean";
 }
 
-/**
- * Phone-frame storefront preview rendered with real vibe tokens.
- * Used in the vibe picker (sample data), hero designer (live), and publish step.
- */
+function Monogram({ name }: { name: string }) {
+  return (
+    <div
+      className="mx-auto flex size-8 items-center justify-center rounded-full border text-[10px] font-bold"
+      style={{
+        borderColor: "rgb(var(--vibe-border) / 0.4)",
+        color: "rgb(var(--vibe-primary))",
+      }}
+    >
+      {name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+/** Phone-frame storefront preview rendered with real vibe tokens. */
 export function MiniPreview({
   vibe,
   storeName,
   hero,
   products = [],
+  store,
   className,
 }: MiniPreviewProps) {
-  const order = hero?.order?.length ? hero.order : [...HERO_BLOCKS];
-  const categories = [
-    ...new Set(products.map((p) => p.category).filter(Boolean)),
-  ] as string[];
+  const title = hero?.title || storeName;
+  const asProducts = products.map((p, i) => ({
+    ...p,
+    id: "id" in p && p.id ? p.id : `preview-${i}`,
+    description: "description" in p ? (p.description ?? "") : "",
+    store_id: "",
+    archived: false,
+  })) as Product[];
+  const featured = resolveFeaturedProduct(
+    { featured_product_id: store?.featured_product_id ?? null },
+    asProducts,
+  );
+  const catalog = catalogProducts(asProducts, featured);
 
-  const heroBlocks: Record<string, React.ReactNode> = {
-    eyebrow: hero?.eyebrow ? (
-      <p
-        key="eyebrow"
-        className="vibe-display text-[10px] tracking-widest uppercase"
-        style={{ color: "rgb(var(--vibe-primary))" }}
-      >
-        {hero.eyebrow}
-      </p>
-    ) : null,
-    image: hero?.image_url ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        key="image"
-        src={hero.image_url}
-        alt=""
-        className="h-20 w-full rounded object-cover"
-      />
-    ) : null,
-    title: (
-      <h2
-        key="title"
-        className="vibe-display font-display text-lg leading-tight font-bold"
-      >
-        {hero?.title || storeName}
-      </h2>
+  const categories = [
+    ...new Set(
+      products
+        .map((p) => normalizeCategory(p.category))
+        .filter(Boolean) as string[],
     ),
-    subheading: hero?.subheading ? (
-      <p
-        key="subheading"
-        className="text-[11px] leading-snug"
-        style={{ color: "rgb(var(--vibe-text-muted))" }}
-      >
-        {hero.subheading}
-      </p>
-    ) : null,
-    cta: (
-      <span
-        key="cta"
-        className="vibe-display inline-block px-3 py-1.5 text-[10px] font-semibold"
-        style={{
-          backgroundColor: "rgb(var(--vibe-primary))",
-          color: "rgb(var(--vibe-primary-fg))",
-          borderRadius: "var(--vibe-radius)",
-        }}
-      >
-        {hero?.cta || "Shop now"}
-      </span>
-    ),
-  };
+  ];
+  const noir = isNoirVibe(vibe);
+  const eyebrow = hero?.eyebrow?.trim();
+  const tagline = hero?.subheading?.trim();
 
   return (
     <div
@@ -90,74 +80,195 @@ export function MiniPreview({
     >
       <div
         data-vibe={vibe}
-        className="flex h-[420px] flex-col gap-3 overflow-hidden p-4"
+        className="flex max-h-[420px] flex-col gap-2 overflow-y-auto p-3"
       >
-        {/* Hero */}
-        <div className="flex flex-col gap-1.5">
-          {order.map((block) => heroBlocks[block])}
+        <div
+          className={
+            noir
+              ? "storefront-hero -mx-3 -mt-3 mb-1 flex flex-col items-center px-3 pb-2 pt-3 text-center"
+              : "flex flex-col items-center gap-1 text-center"
+          }
+        >
+          {hero?.logo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={hero.logo_url}
+              alt=""
+              className={
+                noir
+                  ? "mb-1 size-8 rounded-full object-cover"
+                  : "size-8 rounded-full object-cover"
+              }
+            />
+          ) : noir ? null : (
+            <Monogram name={title} />
+          )}
+          {eyebrow ? (
+            <p
+              className={
+                noir
+                  ? "mb-0.5 text-[11px] leading-[14px] font-semibold"
+                  : "text-[8px] uppercase tracking-widest"
+              }
+              style={{
+                color: noir
+                  ? "rgb(var(--vibe-text-bright))"
+                  : "rgb(var(--vibe-text-muted))",
+                fontFamily: noir ? "var(--font-display)" : undefined,
+              }}
+            >
+              {eyebrow}
+            </p>
+          ) : null}
+          <h2
+            className={
+              noir
+                ? "text-[14px] leading-[17px] font-bold tracking-tight"
+                : "font-display text-sm leading-tight font-bold"
+            }
+            style={{
+              color: noir
+                ? "rgb(var(--vibe-primary-container))"
+                : "rgb(var(--vibe-primary))",
+              fontFamily: noir ? "var(--font-display)" : undefined,
+            }}
+          >
+            {title}
+          </h2>
+          {tagline ? (
+            <p
+              className={
+                noir
+                  ? "mt-0.5 max-w-[9rem] text-[8px] leading-[12px]"
+                  : "text-[9px] leading-snug"
+              }
+              style={{
+                color: noir
+                  ? "rgb(var(--vibe-text-variant))"
+                  : "rgb(var(--vibe-text-muted))",
+              }}
+            >
+              {tagline}
+            </p>
+          ) : null}
         </div>
 
-        {/* Category pills: only when 2+ categories exist (PRD §13) */}
-        {categories.length >= 2 && (
-          <div className="flex gap-1.5 overflow-hidden">
-            {["All", ...categories].map((cat, i) => (
+        {featured ? (
+          <div
+            className={cn(
+              "vibe-card rounded-lg p-2",
+              noir && "featured-noir-card featured-noir-section",
+            )}
+            style={{ backgroundColor: "rgb(var(--vibe-surface))" }}
+          >
+            <div
+              className={cn(
+                "mb-1 flex items-center justify-between",
+                noir && "featured-noir-header",
+              )}
+            >
+              <p
+                className={cn(
+                  "text-[8px] font-semibold",
+                  noir && "featured-noir-header-title",
+                )}
+              >
+                {resolveFeaturedSectionTitle(store?.featured_section_title)}
+              </p>
+              {noir ? (
+                <Star
+                  className="featured-noir-header-star size-2 shrink-0"
+                  aria-hidden
+                />
+              ) : null}
+            </div>
+            <p
+              className={cn(
+                "truncate text-[10px] font-medium",
+                noir && "featured-noir-name",
+              )}
+            >
+              {featured.name}
+            </p>
+            <p
+              className={cn(
+                "text-[9px] font-semibold",
+                noir && "featured-noir-price",
+              )}
+              style={
+                noir
+                  ? undefined
+                  : { color: "rgb(var(--vibe-primary))" }
+              }
+            >
+              {formatPrice(featured.price_cents)}
+            </p>
+          </div>
+        ) : null}
+
+        {categories.length >= 2 ? (
+          <div className="flex gap-1 overflow-hidden">
+            {["All", ...categories.slice(0, 2)].map((cat, i) => (
               <span
                 key={cat}
-                className="vibe-display shrink-0 px-2 py-0.5 text-[9px]"
-                style={{
-                  backgroundColor:
-                    i === 0 ? "rgb(var(--vibe-primary))" : "rgb(var(--vibe-surface))",
-                  color:
-                    i === 0
-                      ? "rgb(var(--vibe-primary-fg))"
-                      : "rgb(var(--vibe-text-muted))",
-                  borderRadius: "var(--vibe-radius)",
-                  border: "1px solid rgb(var(--vibe-border) / 0.4)",
-                }}
+                className={cn(
+                  "catalog-pill shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide",
+                  noir
+                    ? i === 0
+                      ? "catalog-pill-active"
+                      : "catalog-pill-inactive"
+                    : undefined,
+                )}
+                style={
+                  noir
+                    ? undefined
+                    : {
+                        backgroundColor:
+                          i === 0
+                            ? "rgb(var(--vibe-primary))"
+                            : "rgb(var(--vibe-surface))",
+                        color:
+                          i === 0
+                            ? "rgb(var(--vibe-primary-fg))"
+                            : "rgb(var(--vibe-text-muted))",
+                      }
+                }
               >
                 {cat}
               </span>
             ))}
           </div>
-        )}
+        ) : null}
 
-        {/* Product grid */}
-        <div className="grid grid-cols-2 gap-2">
-          {(products.length
-            ? products.slice(0, 4)
+        <div className="grid grid-cols-2 gap-1.5">
+          {(catalog.length
+            ? catalog.slice(0, 4)
             : [
-                { name: "Product one", price_cents: 950, image_url: null },
-                { name: "Product two", price_cents: 1250, image_url: null },
+                { name: "Product one", price_cents: 950 },
+                { name: "Product two", price_cents: 1250 },
               ]
           ).map((p, i) => (
             <div
               key={i}
-              className="metal-panel rust-edge flex flex-col gap-1 p-2"
-              style={{
-                backgroundColor: "rgb(var(--vibe-surface))",
-                borderRadius: "var(--vibe-radius)",
-                border: "1px solid rgb(var(--vibe-border) / 0.4)",
-              }}
+              className="vibe-card flex flex-col gap-0.5 rounded p-1.5"
+              style={{ backgroundColor: "rgb(var(--vibe-surface))" }}
             >
-              {p.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={p.image_url}
-                  alt=""
-                  className="h-14 w-full rounded object-cover"
-                />
-              ) : (
-                <div
-                  className="h-14 w-full rounded"
-                  style={{ backgroundColor: "rgb(var(--vibe-border) / 0.3)" }}
-                />
-              )}
-              <p className="vibe-display truncate text-[10px] font-semibold">
+              <p
+                className={cn(
+                  "catalog-card-title line-clamp-2 text-[9px] leading-tight",
+                  noir ? "font-semibold" : "font-medium",
+                )}
+              >
                 {p.name}
               </p>
               <p
-                className="text-[10px] font-medium"
-                style={{ color: "rgb(var(--vibe-primary))" }}
+                className={cn(
+                  "catalog-card-price text-[8px] font-semibold",
+                  !noir && "text-vibe-primary",
+                )}
+                style={
+                  noir ? undefined : { color: "rgb(var(--vibe-primary))" }
+                }
               >
                 {formatPrice(p.price_cents)}
               </p>

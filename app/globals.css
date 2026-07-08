@@ -25,6 +25,9 @@
   --color-vibe-border: rgb(var(--vibe-border) / <alpha-value>);
   --color-vibe-text: rgb(var(--vibe-text) / <alpha-value>);
   --color-vibe-text-muted: rgb(var(--vibe-text-muted) / <alpha-value>);
+  --color-vibe-text-variant: rgb(var(--vibe-text-variant) / <alpha-value>);
+  --color-vibe-text-bright: rgb(var(--vibe-text-bright) / <alpha-value>);
+  --color-vibe-primary-container: rgb(var(--vibe-primary-container) / <alpha-value>);
 
   --font-body: var(--font-body);
   --font-display: var(--font-display);

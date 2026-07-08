@@ -29,6 +29,11 @@
   --vibe-border: 228 228 231;
   --vibe-text: 24 24 27;
   --vibe-text-muted: 113 113 122;
+  --vibe-text-variant: 113 113 122;
+  --vibe-text-bright: 255 255 255;
+  --vibe-primary-container: 255 122 61;
+  --vibe-surface-elevated: 22 22 22;
+  --vibe-surface-high: 40 42 43;
   --vibe-radius: 0.75rem;
 
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -167,42 +172,358 @@
 }
 
 /* --------------------------------------------------------------------------
- * Industrial — JigWave reference (PRD §10). Fully designed.
+ * Epicurean (Noir) — Epicurean Noir reference (docs/sampleDESIGN.md)
  * ------------------------------------------------------------------------ */
-[data-vibe="industrial"] {
-  --vibe-bg: 8 14 19;
-  --vibe-primary: 45 212 191;
-  --vibe-primary-fg: 8 14 19;
-  --vibe-secondary: 168 106 58;
-  --vibe-surface: 15 23 32;
-  --vibe-border: 51 65 85;
-  --vibe-text: 226 232 240;
-  --vibe-text-muted: 100 116 139;
-  --vibe-radius: 0.375rem;
-  --font-display: var(--font-oswald), var(--font-body);
+[data-vibe="epicurean"] {
+  --vibe-bg: 18 20 20;
+  --vibe-primary: 255 181 152;
+  --vibe-primary-fg: 89 29 0;
+  --vibe-secondary: 154 241 49;
+  --vibe-surface: 30 32 32;
+  --vibe-border: 51 53 53;
+  --vibe-text: 226 226 226;
+  --vibe-text-muted: 161 161 170;
+  --vibe-text-variant: 223 192 180;
+  --vibe-text-bright: 255 255 255;
+  --vibe-primary-container: 255 122 61;
+  --vibe-surface-elevated: 22 22 22;
+  --vibe-surface-high: 40 42 43;
+  --vibe-radius: 1rem;
+  --font-body: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  background-color: rgb(var(--vibe-bg));
 }
 
-/* Dark brushed-metal panel: dark gradient, subtle radial highlight, cool border */
-[data-vibe="industrial"] .metal-panel {
-  background:
-    radial-gradient(
-      120% 80% at 50% 0%,
-      rgb(255 255 255 / 0.05) 0%,
-      transparent 60%
-    ),
-    linear-gradient(180deg, rgb(21 32 43) 0%, rgb(13 20 28) 100%);
-  border: 1px solid rgb(148 163 184 / 0.15);
+[data-vibe="epicurean"] .storefront-hero,
+[data-vibe="industrial"] .storefront-hero {
+  position: relative;
+  isolation: isolate;
+  background-color: rgb(var(--vibe-bg));
 }
 
-/* Rust/bronze inset edge accent — subtle, never a large fill */
-[data-vibe="industrial"] .rust-edge {
-  box-shadow: inset 0 0 0 1px rgb(var(--vibe-secondary) / 0.35);
+[data-vibe="epicurean"] .storefront-hero::before,
+[data-vibe="industrial"] .storefront-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-[data-vibe="industrial"] .vibe-display {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+[data-vibe="epicurean"] .hero-noir-eyebrow,
+[data-vibe="industrial"] .hero-noir-eyebrow {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 2.25rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="epicurean"] .hero-noir-title,
+[data-vibe="industrial"] .hero-noir-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
   font-weight: 700;
+  line-height: 3rem;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-primary-container));
+}
+
+[data-vibe="epicurean"] .hero-noir-tagline,
+[data-vibe="industrial"] .hero-noir-tagline {
+  max-width: 20rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  color: rgb(var(--vibe-text-variant));
+}
+
+@media (min-width: 768px) {
+  [data-vibe="epicurean"] .hero-noir-eyebrow,
+  [data-vibe="industrial"] .hero-noir-eyebrow {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+
+  [data-vibe="epicurean"] .hero-noir-title,
+  [data-vibe="industrial"] .hero-noir-title {
+    font-size: 4rem;
+    line-height: 4.5rem;
+  }
+}
+
+/* Noir featured product — shared typography */
+[data-vibe="epicurean"] .featured-noir-header-title,
+[data-vibe="industrial"] .featured-noir-header-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="epicurean"] .featured-noir-name,
+[data-vibe="industrial"] .featured-noir-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 2.5rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="epicurean"] .featured-noir-desc,
+[data-vibe="industrial"] .featured-noir-desc {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  color: rgb(var(--vibe-text-variant));
+}
+
+[data-vibe="epicurean"] .featured-noir-price,
+[data-vibe="industrial"] .featured-noir-price {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 2.25rem;
+  color: rgb(var(--vibe-primary-container));
+}
+
+/* Noir featured product — layout & color by breakpoint */
+@media (max-width: 767px) {
+  [data-vibe="epicurean"] .featured-noir-header-star,
+  [data-vibe="industrial"] .featured-noir-header-star {
+    fill: rgb(var(--vibe-primary-container));
+    color: rgb(var(--vibe-primary-container));
+  }
+
+  [data-vibe="epicurean"] .featured-noir-card,
+  [data-vibe="industrial"] .featured-noir-card {
+    background-color: rgb(var(--vibe-surface-elevated));
+    border: 1px solid rgb(255 255 255 / 0.05);
+  }
+
+  [data-vibe="epicurean"] .featured-noir-image-wrap,
+  [data-vibe="industrial"] .featured-noir-image-wrap {
+    aspect-ratio: auto;
+    height: 16rem;
+  }
+
+  [data-vibe="epicurean"] .featured-noir-image-fade,
+  [data-vibe="industrial"] .featured-noir-image-fade {
+    background-image: linear-gradient(
+      to top,
+      rgb(var(--vibe-surface-elevated)),
+      transparent
+    );
+  }
+
+  [data-vibe="epicurean"] .featured-noir-body,
+  [data-vibe="industrial"] .featured-noir-body {
+    position: relative;
+    z-index: 10;
+    align-items: center;
+    padding: 1rem 1.5rem 1.5rem;
+    text-align: center;
+  }
+
+  [data-vibe="epicurean"] .featured-noir-price-row,
+  [data-vibe="industrial"] .featured-noir-price-row {
+    justify-content: center;
+    gap: 1rem;
+    padding-top: 0;
+  }
+
+  [data-vibe="epicurean"] .featured-noir-add,
+  [data-vibe="industrial"] .featured-noir-add {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-color: rgb(var(--vibe-text-variant));
+    background-color: rgb(var(--vibe-surface-high));
+    color: rgb(var(--vibe-text-variant));
+  }
+}
+
+@media (min-width: 768px) {
+  [data-vibe="epicurean"] .featured-noir-header-star,
+  [data-vibe="industrial"] .featured-noir-header-star {
+    fill: rgb(var(--vibe-primary-container));
+    color: rgb(var(--vibe-primary-container));
+  }
+
+  [data-vibe="epicurean"] .featured-noir-card,
+  [data-vibe="industrial"] .featured-noir-card {
+    background-color: rgb(var(--vibe-surface-elevated));
+    border: 1px solid rgb(255 255 255 / 0.05);
+  }
+
+  [data-vibe="epicurean"] .featured-noir-image-fade,
+  [data-vibe="industrial"] .featured-noir-image-fade {
+    background-image: linear-gradient(
+      to top,
+      rgb(var(--vibe-surface-elevated)),
+      transparent
+    );
+  }
+
+  [data-vibe="epicurean"] .featured-noir-add,
+  [data-vibe="industrial"] .featured-noir-add {
+    border-color: rgb(var(--vibe-text-variant));
+    background-color: rgb(var(--vibe-surface-high));
+    color: rgb(var(--vibe-text-variant));
+  }
+}
+
+[data-vibe="epicurean"] .vibe-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(255 255 255 / 0.05);
+}
+
+[data-vibe="epicurean"] .vibe-card:hover {
+  box-shadow: 0 0 20px rgb(var(--vibe-primary) / 0.12);
+}
+
+[data-vibe="epicurean"] .metal-panel {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(255 255 255 / 0.05);
+}
+
+[data-vibe="epicurean"] .rust-edge {
+  box-shadow: inset 0 0 0 1px rgb(var(--vibe-primary) / 0.15);
+}
+
+[data-vibe="epicurean"] .vibe-display {
+  letter-spacing: 0.02em;
+}
+
+/* Noir catalog — category pills (mobile) + product cards */
+@media (max-width: 767px) {
+  [data-vibe="epicurean"] .catalog-pill-active,
+  [data-vibe="industrial"] .catalog-pill-active {
+    border: 1px solid rgb(var(--vibe-primary-container));
+    background: transparent;
+    color: rgb(var(--vibe-text-bright));
+  }
+
+  [data-vibe="epicurean"] .catalog-pill-inactive,
+  [data-vibe="industrial"] .catalog-pill-inactive {
+    border: 1px solid transparent;
+    background: rgb(var(--vibe-surface-high));
+    color: rgb(var(--vibe-text-bright));
+  }
+}
+
+@media (min-width: 768px) {
+  [data-vibe="epicurean"] .catalog-tabs,
+  [data-vibe="industrial"] .catalog-tabs {
+    gap: 2.5rem;
+    border-bottom: none;
+    margin-bottom: 2.5rem;
+  }
+
+  [data-vibe="epicurean"] .catalog-tab,
+  [data-vibe="industrial"] .catalog-tab {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    padding-bottom: 0.625rem;
+    border-bottom-width: 3px;
+  }
+
+  [data-vibe="epicurean"] .catalog-tab-active,
+  [data-vibe="industrial"] .catalog-tab-active {
+    color: rgb(var(--vibe-primary-container));
+    border-bottom-color: rgb(var(--vibe-primary-container));
+  }
+
+  [data-vibe="epicurean"] .catalog-tab-inactive,
+  [data-vibe="industrial"] .catalog-tab-inactive {
+    color: rgb(var(--vibe-text-muted));
+  }
+
+  [data-vibe="epicurean"] .catalog-tab-inactive:hover,
+  [data-vibe="industrial"] .catalog-tab-inactive:hover {
+    color: rgb(var(--vibe-text));
+  }
+}
+
+[data-vibe="epicurean"] .catalog-card-title,
+[data-vibe="industrial"] .catalog-card-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+@media (max-width: 767px) {
+  [data-vibe="epicurean"] .catalog-card-title,
+  [data-vibe="industrial"] .catalog-card-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 768px) {
+  [data-vibe="epicurean"] .catalog-card-title,
+  [data-vibe="industrial"] .catalog-card-title {
+    font-size: 1.0625rem;
+    line-height: 1.375rem;
+  }
+}
+
+[data-vibe="epicurean"] .catalog-card-price,
+[data-vibe="industrial"] .catalog-card-price {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: rgb(var(--vibe-primary-container));
+}
+
+[data-vibe="epicurean"] .catalog-card-add,
+[data-vibe="industrial"] .catalog-card-add {
+  border-color: rgb(var(--vibe-text-variant));
+  background: transparent;
+  color: rgb(var(--vibe-text-variant));
+}
+
+[data-vibe="epicurean"] .catalog-card-add.bg-vibe-primary,
+[data-vibe="industrial"] .catalog-card-add.bg-vibe-primary,
+[data-vibe="epicurean"] .featured-noir-add.bg-vibe-primary,
+[data-vibe="industrial"] .featured-noir-add.bg-vibe-primary {
+  background: rgb(var(--vibe-text-variant));
+  color: rgb(var(--vibe-bg));
+  border-color: rgb(var(--vibe-text-variant));
+}
+
+/* Legacy alias — maps old industrial selector to epicurean during transition */
+[data-vibe="industrial"] {
+  --vibe-bg: 18 20 20;
+  --vibe-primary: 255 181 152;
+  --vibe-primary-fg: 89 29 0;
+  --vibe-secondary: 154 241 49;
+  --vibe-surface: 30 32 32;
+  --vibe-border: 51 53 53;
+  --vibe-text: 226 226 226;
+  --vibe-text-muted: 161 161 170;
+  --vibe-text-variant: 223 192 180;
+  --vibe-text-bright: 255 255 255;
+  --vibe-primary-container: 255 122 61;
+  --vibe-surface-elevated: 22 22 22;
+  --vibe-surface-high: 40 42 43;
+  --vibe-radius: 1rem;
+  --font-body: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  background-color: rgb(var(--vibe-bg));
 }
 
 /* --------------------------------------------------------------------------
@@ -242,6 +563,7 @@
   background-attachment: fixed;
 }
 
+[data-vibe="unicorn"] .vibe-card,
 [data-vibe="unicorn"] .metal-panel {
   background: rgb(var(--vibe-surface));
   border: 1px solid rgb(var(--vibe-border) / 0.55);
@@ -294,6 +616,7 @@
     linear-gradient(180deg, rgb(247 241 231) 0%, rgb(238 228 214) 100%);
 }
 
+[data-vibe="outback"] .vibe-card,
 [data-vibe="outback"] .metal-panel {
   background: linear-gradient(
     180deg,
@@ -342,6 +665,7 @@
   background-size: 48px 48px, 48px 48px, 100% 100%;
 }
 
+[data-vibe="futuristic"] .vibe-card,
 [data-vibe="futuristic"] .metal-panel {
   background: rgb(var(--vibe-surface) / 0.92);
   backdrop-filter: blur(10px);

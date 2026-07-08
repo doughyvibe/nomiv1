@@ -29,7 +29,7 @@ export default async function StorefrontPage() {
       <DashboardPageHeader
         eyebrow={store.name}
         title="Storefront"
-        description="Choose your vibe and design the hero buyers see first."
+        description="Choose your vibe, logo, and tagline buyers see first."
         action={
           <a
             href={storeUrl}

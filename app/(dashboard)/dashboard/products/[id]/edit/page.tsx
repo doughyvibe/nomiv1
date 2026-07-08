@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArchiveProductButton } from "@/components/dashboard/archive-product-button";
 import { EditProductForm } from "@/components/dashboard/edit-product-form";
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
+import { collectCategories } from "@/lib/products/category";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
@@ -15,14 +16,23 @@ export default async function EditProductPage({
   const { id } = await params;
   const { supabase, store } = await requireSellerStore();
 
-  const { data: product } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", id)
-    .eq("store_id", store.id)
-    .maybeSingle<Product>();
+  const [{ data: product }, { data: allProducts }] = await Promise.all([
+    supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .eq("store_id", store.id)
+      .maybeSingle<Product>(),
+    supabase
+      .from("products")
+      .select("category")
+      .eq("store_id", store.id)
+      .eq("archived", false),
+  ]);
 
   if (!product) notFound();
+
+  const existingCategories = collectCategories(allProducts ?? []);
 
   return (
     <div className="flex flex-col gap-8">
@@ -45,7 +55,12 @@ export default async function EditProductPage({
         </div>
       </div>
 
-      <EditProductForm product={product} />
+      <EditProductForm
+        product={product}
+        existingCategories={existingCategories}
+        tradeHint={store.trade_hint ?? null}
+        storeSlug={store.slug}
+      />
 
       {!product.archived ? (
         <div className="border-t border-border pt-6">

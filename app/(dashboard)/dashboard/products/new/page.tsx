@@ -2,10 +2,23 @@ import Link from "next/link";
 
 import { NewProductForm } from "@/components/dashboard/new-product-form";
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
+import { collectCategories } from "@/lib/products/category";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Add product — Nomi" };
+
 export default async function NewProductPage() {
-  await requireSellerStore();
+  const { supabase, store } = await requireSellerStore();
+
+  const { data: products } = await supabase
+    .from("products")
+    .select("category")
+    .eq("store_id", store.id)
+    .eq("archived", false);
+
+  const existingCategories = collectCategories(products ?? []);
 
   return (
     <div className="flex flex-col gap-8">
@@ -23,7 +36,11 @@ export default async function NewProductPage() {
           />
         </div>
       </div>
-      <NewProductForm />
+      <NewProductForm
+        existingCategories={existingCategories}
+        tradeHint={store.trade_hint ?? null}
+        storeSlug={store.slug}
+      />
     </div>
   );
 }

@@ -55,7 +55,7 @@ export function ProductDetail({ product }: { product: Product }) {
           </span>
         )}
 
-        <h1 className="vibe-display font-display text-2xl font-bold uppercase">
+        <h1 className="font-display text-2xl font-bold text-vibe-text">
           {product.name}
         </h1>
 

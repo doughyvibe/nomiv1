@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 
-import { BottomNav } from "@/components/storefront/bottom-nav";
 import { CartProvider } from "@/components/storefront/cart-context";
+import { StickyCheckoutBar } from "@/components/storefront/sticky-checkout-bar";
 
 export function StorefrontShell({
   slug,
@@ -13,22 +13,22 @@ export function StorefrontShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const hideNav =
-    pathname.includes("/checkout") || pathname.includes("/order/");
+  const isShopHome =
+    pathname === "/" || /^\/s\/[^/]+$/.test(pathname);
 
   return (
     <CartProvider slug={slug}>
       <div
-        className="mx-auto min-h-full max-w-lg"
+        className="mx-auto min-h-full w-full max-w-[1280px]"
         style={{
-          paddingBottom: hideNav
-            ? "max(1.5rem, env(safe-area-inset-bottom, 0px))"
-            : "calc(4.5rem + env(safe-area-inset-bottom, 0px))",
+          paddingBottom: isShopHome
+            ? "calc(5.5rem + env(safe-area-inset-bottom, 0px))"
+            : "max(1.5rem, env(safe-area-inset-bottom, 0px))",
         }}
       >
         {children}
       </div>
-      {!hideNav && <BottomNav />}
+      {isShopHome && <StickyCheckoutBar />}
     </CartProvider>
   );
 }

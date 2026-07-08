@@ -54,6 +54,7 @@ export default async function ProductsPage({
       />
       <ProductsListView
         products={(products as Product[]) ?? []}
+        store={store}
         showArchived={showArchived}
         archivedCount={archivedCount ?? 0}
       />

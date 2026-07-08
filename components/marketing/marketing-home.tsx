@@ -8,9 +8,9 @@ import { Wordmark } from "@/components/marketing/wordmark";
 import { MiniPreview } from "@/components/storefront/mini-preview";
 import { getLoginUrl, getStorefrontUrl } from "@/lib/host";
 import { getDemoStoreSlug } from "@/lib/marketing/demo-store";
-import { HERO_BLOCKS, type Vibe } from "@/lib/stores/types";
+import type { Vibe } from "@/lib/stores/types";
 
-const PREVIEW_VIBE: Vibe = "industrial";
+const PREVIEW_VIBE: Vibe = "epicurean";
 
 const PREVIEW_PRODUCTS = [
   {
@@ -250,11 +250,9 @@ export function MarketingHome() {
                 vibe={PREVIEW_VIBE}
                 storeName="JigWave"
                 hero={{
-                  eyebrow: "Since the Deep",
+                  eyebrow: "Est. 2024",
                   title: "JigWave",
                   subheading: "Metal jigs & assist hooks for SG anglers.",
-                  cta: "Shop now",
-                  order: [...HERO_BLOCKS],
                 }}
                 products={PREVIEW_PRODUCTS}
                 className="shadow-[0_18px_40px_-12px_rgba(0,0,0,0.35)]"

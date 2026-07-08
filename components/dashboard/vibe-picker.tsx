@@ -10,11 +10,10 @@ import { VIBES } from "@/lib/vibes";
 import { cn } from "@/lib/utils";
 
 const SAMPLE_HERO = {
-  eyebrow: "Since the Deep",
-  title: "JigWave",
-  subheading: "Realistic metal jigs & premium assist hooks.",
-  cta: "Shop now",
-  order: ["eyebrow", "image", "title", "subheading", "cta"] as const,
+  eyebrow: "Est. 2024",
+  title: "Your Store",
+  subheading: "Quality products, made with care.",
+  order: ["eyebrow", "title", "subheading"] as const,
 };
 
 const FALLBACK_PRODUCTS = [
@@ -75,6 +74,7 @@ export function VibePicker({
               storeName={store.name}
               hero={{ ...SAMPLE_HERO, title: store.name, order: [...SAMPLE_HERO.order] }}
               products={previewProducts}
+              store={store}
             />
             <div>
               <p className="font-semibold">{vibe.name}</p>

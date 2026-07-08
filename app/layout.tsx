@@ -4,7 +4,7 @@ import {
   bebasNeue,
   hankenGrotesk,
   inter,
-  oswald,
+  plusJakartaSans,
   syne,
 } from "@/lib/fonts";
 import "./globals.css";
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${hankenGrotesk.variable} ${oswald.variable} ${archivoBlack.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}
+      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${archivoBlack.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}
     >
       <body className="min-h-full font-body">{children}</body>
     </html>

@@ -12,11 +12,11 @@ import {
   fulfillmentIsComplete,
   heroIsComplete,
   paynowIsComplete,
-  HERO_BLOCKS,
   type FulfillmentConfig,
   type HeroConfig,
   type PayNowConfig,
   type Store,
+  type TradeHint,
   type Vibe,
 } from "@/lib/stores/types";
 import { createClient } from "@/lib/supabase/server";
@@ -124,7 +124,7 @@ export async function createStore(
 // Step 2 — vibe
 // ---------------------------------------------------------------------------
 
-const VALID_VIBES: Vibe[] = ["unicorn", "outback", "futuristic", "industrial"];
+const VALID_VIBES: Vibe[] = ["unicorn", "outback", "futuristic", "epicurean"];
 
 export async function saveVibe(vibe: Vibe): Promise<ActionResult> {
   if (!VALID_VIBES.includes(vibe)) return { ok: false, error: "Invalid vibe" };
@@ -140,6 +140,31 @@ export async function saveVibe(vibe: Vibe): Promise<ActionResult> {
   return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
 }
 
+export async function saveTradeHint(
+  tradeHint: TradeHint,
+): Promise<ActionResult> {
+  const valid: TradeHint[] = [
+    "general",
+    "food",
+    "handmade",
+    "services",
+    "plants",
+  ];
+  if (!valid.includes(tradeHint)) {
+    return { ok: false, error: "Invalid store type" };
+  }
+
+  const { supabase, store } = await getOwnedStore();
+  if (!store) return { ok: false, error: "No store yet" };
+
+  const { error } = await supabase
+    .from("stores")
+    .update({ trade_hint: tradeHint })
+    .eq("id", store.id);
+
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
+}
+
 // ---------------------------------------------------------------------------
 // Step 3 — hero
 // ---------------------------------------------------------------------------
@@ -149,21 +174,11 @@ export async function saveHero(hero: HeroConfig): Promise<ActionResult> {
     return { ok: false, error: "Hero title is required" };
   }
 
-  const order = hero.order?.length ? hero.order : [...HERO_BLOCKS];
-  if (
-    order.length !== HERO_BLOCKS.length ||
-    [...order].sort().join() !== [...HERO_BLOCKS].sort().join()
-  ) {
-    return { ok: false, error: "Invalid hero block order" };
-  }
-
   const clean: HeroConfig = {
     eyebrow: hero.eyebrow?.trim() || undefined,
     title: hero.title.trim().slice(0, 80),
     subheading: hero.subheading?.trim() || undefined,
-    cta: hero.cta?.trim() || undefined,
-    image_url: hero.image_url || undefined,
-    order,
+    logo_url: hero.logo_url || undefined,
   };
 
   const { supabase, store } = await getOwnedStore();

@@ -20,10 +20,11 @@ export function StepHero({
   return (
     <section className="flex flex-col gap-5">
       <div>
-        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">Design your storefront hero</h1>
+        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">
+          Brand your storefront
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          The top section of your store. Your vibe controls the design — you
-          control the words and image.
+          Add your logo and tagline — your vibe controls the look.
         </p>
       </div>
 

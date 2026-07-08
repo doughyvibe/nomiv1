@@ -38,9 +38,7 @@ export function CartProvider({
   slug: string;
   children: React.ReactNode;
 }) {
-  const [cart, setCart] = useState<Cart>(() =>
-    typeof window !== "undefined" ? loadCart(slug) : { items: [] },
-  );
+  const [cart, setCart] = useState<Cart>({ items: [] });
 
   const refresh = useCallback(() => {
     setCart(loadCart(slug));

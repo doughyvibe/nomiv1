@@ -6,14 +6,17 @@ import {
   type ProductInput,
   validateProductInput,
 } from "@/lib/products/validate";
+import { collectCategories, normalizeCategory } from "@/lib/products/category";
 import { friendlyDbError } from "@/lib/errors/friendly-db";
 import { deriveOnboardingStep } from "@/lib/stores/progress";
-import type { Store } from "@/lib/stores/types";
+import type { Product, Store } from "@/lib/stores/types";
 import { createClient } from "@/lib/supabase/server";
 
 export type { ProductInput } from "@/lib/products/validate";
 
-type ActionResult = { error: string } | { success: true };
+type ActionResult =
+  | { error: string }
+  | { success: true; filtersLive?: boolean; categories?: string[] };
 
 async function ownedStoreContext(): Promise<
   | { error: string }
@@ -64,7 +67,7 @@ function cleanProductFields(product: ProductInput) {
     price_cents: product.price_cents,
     description: product.description.trim(),
     image_url: product.image_url || null,
-    category: product.category?.trim() || null,
+    category: normalizeCategory(product.category),
   };
 }
 
@@ -77,6 +80,20 @@ function revalidateProductPaths(store: Store, productId?: string) {
   }
 }
 
+async function filterStatus(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  storeId: string,
+): Promise<{ filtersLive: boolean; categories: string[] }> {
+  const { data: products } = await supabase
+    .from("products")
+    .select("category")
+    .eq("store_id", storeId)
+    .eq("archived", false);
+
+  const categories = collectCategories((products as Product[]) ?? []);
+  return { filtersLive: categories.length >= 2, categories };
+}
+
 export async function addProductAction(
   product: ProductInput,
 ): Promise<ActionResult> {
@@ -87,15 +104,49 @@ export async function addProductAction(
   if ("error" in ctx) return ctx;
 
   const { supabase, store } = ctx;
-  const { error } = await supabase.from("products").insert({
-    store_id: store.id,
-    ...cleanProductFields(product),
-  });
+
+  const priorCategories = collectCategories(
+    (
+      await supabase
+        .from("products")
+        .select("category")
+        .eq("store_id", store.id)
+        .eq("archived", false)
+    ).data ?? [],
+  );
+
+  const nextCategory = normalizeCategory(product.category);
+  const filtersJustLive =
+    Boolean(nextCategory) &&
+    priorCategories.length === 1 &&
+    !priorCategories.some((c) => c.toLowerCase() === nextCategory!.toLowerCase());
+
+  const { data: inserted, error } = await supabase
+    .from("products")
+    .insert({
+      store_id: store.id,
+      ...cleanProductFields(product),
+    })
+    .select("id")
+    .single();
 
   if (error) return { error: friendlyDbError(error) };
 
+  if (!store.featured_product_id && inserted?.id) {
+    await supabase
+      .from("stores")
+      .update({ featured_product_id: inserted.id })
+      .eq("id", store.id);
+  }
+
+  const { filtersLive, categories } = await filterStatus(supabase, store.id);
+
   revalidateProductPaths(store);
-  return { success: true };
+  return {
+    success: true,
+    filtersLive: filtersJustLive && filtersLive,
+    categories: filtersLive ? categories : undefined,
+  };
 }
 
 export async function updateProductAction(
@@ -127,7 +178,42 @@ export async function updateProductAction(
 
   if (error) return { error: friendlyDbError(error) };
 
+  const { filtersLive, categories } = await filterStatus(supabase, store.id);
+
   revalidateProductPaths(store, productId);
+  return {
+    success: true,
+    filtersLive,
+    categories: filtersLive ? categories : undefined,
+  };
+}
+
+export async function setFeaturedProductAction(
+  productId: string,
+): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const { supabase, store } = ctx;
+  const { data: product } = await supabase
+    .from("products")
+    .select("id")
+    .eq("id", productId)
+    .eq("store_id", store.id)
+    .eq("archived", false)
+    .maybeSingle();
+
+  if (!product) return { error: "Product not found" };
+
+  const { error } = await supabase
+    .from("stores")
+    .update({ featured_product_id: productId })
+    .eq("id", store.id);
+
+  if (error) return { error: friendlyDbError(error) };
+
+  revalidatePath("/dashboard/products");
+  revalidatePath(`/s/${store.slug}`);
   return { success: true };
 }
 
@@ -155,6 +241,23 @@ export async function archiveProductAction(
     .eq("store_id", store.id);
 
   if (error) return { error: friendlyDbError(error) };
+
+  if (store.featured_product_id === productId) {
+    const { data: next } = await supabase
+      .from("products")
+      .select("id")
+      .eq("store_id", store.id)
+      .eq("archived", false)
+      .neq("id", productId)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    await supabase
+      .from("stores")
+      .update({ featured_product_id: next?.id ?? null })
+      .eq("id", store.id);
+  }
 
   revalidateProductPaths(store, productId);
   return { success: true };

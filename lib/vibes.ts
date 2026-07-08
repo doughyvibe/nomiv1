@@ -12,14 +12,14 @@ export type VibeMeta = {
 
 export const VIBES: VibeMeta[] = [
   {
-    id: "industrial",
-    name: "Industrial",
-    tagline: "Rugged, dark, forged metal at night.",
-    suitableFor: "Outdoor gear, tools, fishing, performance products",
+    id: "epicurean",
+    name: "Noir",
+    tagline: "Dark, premium, cinematic.",
+    suitableFor: "Any trade — food, handmade, retail, services",
     swatch: {
-      bg: "rgb(8 14 19)",
-      primary: "rgb(45 212 191)",
-      secondary: "rgb(168 106 58)",
+      bg: "rgb(18 20 20)",
+      primary: "rgb(255 181 152)",
+      secondary: "rgb(154 241 49)",
     },
     provisional: false,
   },

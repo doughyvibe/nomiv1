@@ -31,7 +31,7 @@ export default async function StorefrontSlugLayout({
   const storefront = await getPublishedStorefront(slug);
   if (!storefront) notFound();
 
-  const vibe = storefront.store.vibe ?? "industrial";
+  const vibe = storefront.store.vibe ?? "epicurean";
 
   return (
     <div

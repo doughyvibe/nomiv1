@@ -64,3 +64,22 @@ export async function saveHeroAction(hero: HeroConfig): Promise<ActionResult> {
   revalidateDashboardStore(ctx.store);
   return { success: true };
 }
+
+export async function saveFeaturedSectionTitleAction(
+  title: string,
+): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const clean = title.trim().slice(0, 60) || null;
+
+  const { error } = await ctx.supabase
+    .from("stores")
+    .update({ featured_section_title: clean })
+    .eq("id", ctx.store.id);
+
+  if (error) return { error: error.message };
+
+  revalidateDashboardStore(ctx.store);
+  return { success: true };
+}

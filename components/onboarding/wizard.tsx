@@ -73,7 +73,7 @@ export function OnboardingWizard({ store, products, derivedStep }: WizardProps) 
       )}
       {step === 3 && store && <StepHero store={store} onDone={advance} />}
       {step === 4 && store && (
-        <StepProduct products={products} onDone={advance} />
+        <StepProduct store={store} products={products} onDone={advance} />
       )}
       {step === 5 && store && (
         <StepFulfillment store={store} onDone={advance} />

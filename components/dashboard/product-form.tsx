@@ -2,25 +2,38 @@
 
 import { useState, useTransition } from "react";
 
+import { CategoryPicker } from "@/components/dashboard/category-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getStorefrontUrl } from "@/lib/host";
 import { uploadStoreImage } from "@/lib/images/compress";
+import { collectCategories, normalizeCategory } from "@/lib/products/category";
 import { parsePriceToCents, type ProductInput } from "@/lib/products/validate";
+import type { TradeHint } from "@/lib/stores/types";
 import { createClient } from "@/lib/supabase/client";
 
 type ProductFormProps = {
   initial?: Partial<ProductInput>;
   submitLabel: string;
   disabled?: boolean;
-  onSubmit: (product: ProductInput) => Promise<{ error: string } | { success: true }>;
-  onSuccess?: () => void;
+  existingCategories?: string[];
+  tradeHint?: TradeHint | null;
+  storeSlug?: string;
+  onSubmit: (product: ProductInput) => Promise<
+    | { error: string }
+    | { success: true; filtersLive?: boolean; categories?: string[] }
+  >;
+  onSuccess?: (result: { filtersLive?: boolean; categories?: string[] }) => void;
 };
 
 export function ProductForm({
   initial,
   submitLabel,
   disabled = false,
+  existingCategories = [],
+  tradeHint = null,
+  storeSlug,
   onSubmit,
   onSuccess,
 }: ProductFormProps) {
@@ -35,6 +48,7 @@ export function ProductForm({
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   async function handleImage(file: File | undefined) {
@@ -58,6 +72,7 @@ export function ProductForm({
 
   function handleSave() {
     setError(null);
+    setToast(null);
     const priceCents = parsePriceToCents(price);
     if (priceCents == null) {
       setError("Enter a valid price, e.g. 9.50");
@@ -70,13 +85,24 @@ export function ProductForm({
         price_cents: priceCents,
         description,
         image_url: imageUrl || undefined,
-        category: category || undefined,
+        category: normalizeCategory(category) || undefined,
       });
       if ("error" in result) {
         setError(result.error);
         return;
       }
-      onSuccess?.();
+
+      if (result.filtersLive && result.categories?.length) {
+        const preview = storeSlug ? getStorefrontUrl(storeSlug) : null;
+        setToast(
+          `Storefront filters are live: ${result.categories.join(", ")}${preview ? " — preview your store to see them." : "."}`,
+        );
+      }
+
+      onSuccess?.({
+        filtersLive: result.filtersLive,
+        categories: result.categories,
+      });
     });
   }
 
@@ -88,7 +114,7 @@ export function ProductForm({
           id="product-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Black Gold Slayer"
+          placeholder="Signature item"
           maxLength={80}
           disabled={disabled}
         />
@@ -124,9 +150,18 @@ export function ProductForm({
         {uploading && (
           <p className="text-muted-foreground text-xs">Uploading…</p>
         )}
-        {imageUrl && !uploading && (
-          <p className="text-xs text-emerald-600">Image ready</p>
-        )}
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>Category</Label>
+        <CategoryPicker
+          value={category}
+          onChange={setCategory}
+          existingCategories={collectCategories(
+            existingCategories.map((c) => ({ category: c })),
+          )}
+          tradeHint={tradeHint}
+          disabled={disabled}
+        />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="product-description">Description</Label>
@@ -134,28 +169,40 @@ export function ProductForm({
           id="product-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Matte black/gold jig for a wide erratic fall."
+          placeholder="Materials, sizing, what is included…"
           maxLength={300}
           disabled={disabled}
           rows={3}
           className="w-full min-w-0 rounded-lg border border-input bg-transparent px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm resize-none"
         />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="product-category">Category (optional)</Label>
-        <Input
-          id="product-category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="Metal Jigs"
-          maxLength={40}
-          disabled={disabled}
-        />
+        <p className="text-muted-foreground text-xs">
+          Long descriptions hide quick-add on your storefront — buyers will tap
+          through to read details (good for services and courses).
+        </p>
       </div>
 
       {error && (
         <p className="text-destructive text-sm" role="alert">
           {error}
+        </p>
+      )}
+
+      {toast && (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+          {toast}
+          {storeSlug ? (
+            <>
+              {" "}
+              <a
+                href={getStorefrontUrl(storeSlug)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline"
+              >
+                Preview store
+              </a>
+            </>
+          ) : null}
         </p>
       )}
 

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { Package } from "lucide-react";
 
+import { FeaturedProductButton } from "@/components/dashboard/featured-product-button";
 import {
   DashboardEmptyState,
   DashboardPanel,
 } from "@/components/dashboard/dashboard-ui";
 import { formatPrice } from "@/lib/money";
-import type { Product } from "@/lib/stores/types";
+import { normalizeCategory } from "@/lib/products/category";
+import type { Product, Store } from "@/lib/stores/types";
 
 function ProductThumbnail({ product }: { product: Product }) {
   if (product.image_url) {
@@ -31,10 +33,12 @@ function ProductThumbnail({ product }: { product: Product }) {
 
 export function ProductsListView({
   products,
+  store,
   showArchived,
   archivedCount,
 }: {
   products: Product[];
+  store: Pick<Store, "featured_product_id">;
   showArchived: boolean;
   archivedCount: number;
 }) {
@@ -64,24 +68,34 @@ export function ProductsListView({
         <ul className="flex flex-col gap-2.5">
           {products.map((product) => (
             <li key={product.id}>
-              <Link
-                href={`/products/${product.id}/edit`}
-                className="dashboard-stat flex items-center gap-3 rounded-2xl border border-border bg-card p-3.5 transition-all hover:border-foreground/15 hover:shadow-[0_4px_20px_rgba(22,19,14,0.06)] sm:p-4"
-              >
-                <ProductThumbnail product={product} />
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{product.name}</p>
-                  <p className="text-muted-foreground text-sm">
-                    {formatPrice(product.price_cents)}
-                    {product.category ? ` · ${product.category}` : ""}
-                  </p>
-                  {product.archived ? (
-                    <p className="text-muted-foreground mt-1 text-xs">
-                      Archived
+              <div className="dashboard-stat flex items-center gap-3 rounded-2xl border border-border bg-card p-3.5 sm:p-4">
+                <Link
+                  href={`/products/${product.id}/edit`}
+                  className="flex min-w-0 flex-1 items-center gap-3"
+                >
+                  <ProductThumbnail product={product} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{product.name}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {formatPrice(product.price_cents)}
+                      {product.category
+                        ? ` · ${normalizeCategory(product.category)}`
+                        : ""}
                     </p>
-                  ) : null}
-                </div>
-              </Link>
+                    {product.archived ? (
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        Archived
+                      </p>
+                    ) : null}
+                  </div>
+                </Link>
+                {!product.archived ? (
+                  <FeaturedProductButton
+                    productId={product.id}
+                    isFeatured={store.featured_product_id === product.id}
+                  />
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

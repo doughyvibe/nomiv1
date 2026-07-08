@@ -6,18 +6,22 @@ import { useState } from "react";
 import { addProductAction } from "@/app/(dashboard)/dashboard/products/actions";
 import { ProductForm } from "@/components/dashboard/product-form";
 import { Button } from "@/components/ui/button";
-import type { Product } from "@/lib/stores/types";
+import { collectCategories } from "@/lib/products/category";
+import type { Product, Store } from "@/lib/stores/types";
 
 export function StepProduct({
+  store,
   products,
   onDone,
 }: {
+  store: Store;
   products: Product[];
   onDone: () => void;
 }) {
   const router = useRouter();
   const [justAdded, setJustAdded] = useState(false);
   const hasProducts = products.length > 0;
+  const existingCategories = collectCategories(products);
 
   return (
     <section className="flex flex-col gap-5">
@@ -49,6 +53,9 @@ export function StepProduct({
       )}
 
       <ProductForm
+        existingCategories={existingCategories}
+        tradeHint={store.trade_hint ?? null}
+        storeSlug={store.slug}
         submitLabel={hasProducts ? "Add another product" : "Save product"}
         onSubmit={addProductAction}
         onSuccess={() => {
