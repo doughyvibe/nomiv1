@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
@@ -27,41 +27,45 @@ export function StickyCheckoutBar() {
     >
       <div
         className={cn(
-          "pointer-events-auto mx-auto flex max-w-[1280px] items-center gap-3 rounded-2xl border border-vibe-border/30 bg-vibe-surface/95 px-4 py-3 shadow-lg backdrop-blur-md transition-all",
+          "checkout-bar pointer-events-auto mx-auto flex max-w-[1280px] items-center gap-4 rounded-2xl border border-vibe-border/30 bg-vibe-surface/95 px-4 py-3 shadow-lg backdrop-blur-md transition-all",
           hasItems ? "justify-between" : "justify-center",
         )}
       >
         <Link
           href="/cart"
           className={cn(
-            "flex min-h-11 items-center gap-2 text-vibe-text transition-colors",
-            !hasItems && "justify-center px-4",
+            "flex min-h-11 items-center gap-2.5 text-vibe-text transition-colors",
+            !hasItems && "justify-center px-2",
           )}
         >
-          <ShoppingCart className="size-5 shrink-0 text-vibe-text-muted" />
+          <ShoppingCart
+            className={cn(
+              "size-6 shrink-0",
+              hasItems ? "checkout-bar-icon-active" : "text-vibe-text-muted",
+            )}
+          />
           {hasItems ? (
             <>
-              <span className="text-sm text-vibe-text-muted">
+              <span className="text-base text-vibe-text-muted">
                 {count} {count === 1 ? "item" : "items"}
               </span>
-              <span className="font-display text-lg font-semibold text-vibe-text">
+              <span className="font-display text-xl font-semibold text-vibe-text-bright">
                 {formatPrice(subtotal)}
               </span>
             </>
           ) : (
-            <span className="text-sm font-medium text-vibe-text-muted">
-              Cart · 0
+            <span className="text-base font-medium text-vibe-text-muted">
+              Your cart is empty
             </span>
           )}
         </Link>
 
         {hasItems ? (
           <Link
-            href="/cart"
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-vibe-primary text-vibe-primary-fg transition-transform active:scale-95"
-            aria-label="Go to checkout"
+            href="/checkout"
+            className="checkout-bar-cta inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-vibe-primary px-5 text-base font-semibold text-vibe-primary-fg transition-transform active:scale-95"
           >
-            <ArrowRight className="size-5" />
+            Checkout
           </Link>
         ) : null}
       </div>

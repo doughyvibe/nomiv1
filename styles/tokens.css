@@ -25,6 +25,7 @@
   --vibe-primary: 13 148 136;
   --vibe-primary-fg: 8 14 19;
   --vibe-secondary: 168 106 58;
+  --vibe-secondary-fg: 255 255 255;
   --vibe-surface: 255 255 255;
   --vibe-border: 228 228 231;
   --vibe-text: 24 24 27;
@@ -179,6 +180,7 @@
   --vibe-primary: 255 181 152;
   --vibe-primary-fg: 89 29 0;
   --vibe-secondary: 154 241 49;
+  --vibe-secondary-fg: 29 55 0;
   --vibe-surface: 30 32 32;
   --vibe-border: 51 53 53;
   --vibe-text: 226 226 226;
@@ -505,12 +507,44 @@
   border-color: rgb(var(--vibe-text-variant));
 }
 
+/* Noir sticky checkout bar — glass + lime zest CTA */
+[data-vibe="epicurean"] .checkout-bar,
+[data-vibe="industrial"] .checkout-bar {
+  border-color: rgb(255 255 255 / 0.12);
+  background: rgb(var(--vibe-surface) / 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+[data-vibe="epicurean"] .checkout-bar-icon-active,
+[data-vibe="industrial"] .checkout-bar-icon-active {
+  color: rgb(var(--vibe-secondary));
+}
+
+[data-vibe="epicurean"] .checkout-bar-cta,
+[data-vibe="industrial"] .checkout-bar-cta {
+  border: 1px solid rgb(var(--vibe-secondary));
+  background: transparent;
+  color: rgb(var(--vibe-secondary));
+  font-family: var(--font-display);
+  box-shadow: 0 0 20px rgb(var(--vibe-secondary) / 0.25);
+}
+
+[data-vibe="epicurean"] .checkout-bar-cta:hover,
+[data-vibe="industrial"] .checkout-bar-cta:hover {
+  box-shadow: 0 0 28px rgb(var(--vibe-secondary) / 0.35);
+  background: rgb(var(--vibe-secondary) / 0.08);
+}
+
 /* Legacy alias — maps old industrial selector to epicurean during transition */
 [data-vibe="industrial"] {
   --vibe-bg: 18 20 20;
   --vibe-primary: 255 181 152;
   --vibe-primary-fg: 89 29 0;
   --vibe-secondary: 154 241 49;
+  --vibe-secondary-fg: 29 55 0;
   --vibe-surface: 30 32 32;
   --vibe-border: 51 53 53;
   --vibe-text: 226 226 226;

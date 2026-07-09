@@ -21,6 +21,7 @@
   --color-vibe-primary: rgb(var(--vibe-primary) / <alpha-value>);
   --color-vibe-primary-fg: rgb(var(--vibe-primary-fg) / <alpha-value>);
   --color-vibe-secondary: rgb(var(--vibe-secondary) / <alpha-value>);
+  --color-vibe-secondary-fg: rgb(var(--vibe-secondary-fg) / <alpha-value>);
   --color-vibe-surface: rgb(var(--vibe-surface) / <alpha-value>);
   --color-vibe-border: rgb(var(--vibe-border) / <alpha-value>);
   --color-vibe-text: rgb(var(--vibe-text) / <alpha-value>);
