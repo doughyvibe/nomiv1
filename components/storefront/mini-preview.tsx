@@ -8,6 +8,7 @@ import {
   resolveFeaturedProduct,
 } from "@/lib/products/featured";
 import { resolveFeaturedSectionTitle } from "@/lib/featured-section";
+import { heroLogoClassName } from "@/lib/stores/hero-logo";
 import type { HeroConfig, Product, Store, Vibe } from "@/lib/stores/types";
 
 type MiniPreviewProps = {
@@ -21,6 +22,10 @@ type MiniPreviewProps = {
 
 function isNoirVibe(vibe: Vibe): boolean {
   return vibe === "epicurean";
+}
+
+function isAtelierVibe(vibe: Vibe): boolean {
+  return vibe === "atelier";
 }
 
 function Monogram({ name }: { name: string }) {
@@ -68,6 +73,8 @@ export function MiniPreview({
     ),
   ];
   const noir = isNoirVibe(vibe);
+  const atelier = isAtelierVibe(vibe);
+  const noMonogram = noir || atelier;
   const eyebrow = hero?.eyebrow?.trim();
   const tagline = hero?.subheading?.trim();
 
@@ -84,7 +91,7 @@ export function MiniPreview({
       >
         <div
           className={
-            noir
+            noir || atelier
               ? "storefront-hero -mx-3 -mt-3 mb-1 flex flex-col items-center px-3 pb-2 pt-3 text-center"
               : "flex flex-col items-center gap-1 text-center"
           }
@@ -93,14 +100,15 @@ export function MiniPreview({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={hero.logo_url}
-              alt=""
-              className={
-                noir
-                  ? "mb-1 size-8 rounded-full object-cover"
-                  : "size-8 rounded-full object-cover"
-              }
+              alt={title}
+              className={cn(
+                "mb-1",
+                heroLogoClassName(hero.logo_size, hero.logo_style, {
+                  preview: true,
+                }),
+              )}
             />
-          ) : noir ? null : (
+          ) : noMonogram ? null : (
             <Monogram name={title} />
           )}
           {eyebrow ? (
@@ -108,14 +116,20 @@ export function MiniPreview({
               className={
                 noir
                   ? "mb-0.5 text-[11px] leading-[14px] font-semibold"
-                  : "text-[8px] uppercase tracking-widest"
+                  : atelier
+                    ? "hero-atelier-eyebrow mb-0.5 text-[7px]"
+                    : "text-[8px] uppercase tracking-widest"
               }
-              style={{
-                color: noir
-                  ? "rgb(var(--vibe-text-bright))"
-                  : "rgb(var(--vibe-text-muted))",
-                fontFamily: noir ? "var(--font-display)" : undefined,
-              }}
+              style={
+                noir
+                  ? {
+                      color: "rgb(var(--vibe-text-bright))",
+                      fontFamily: "var(--font-display)",
+                    }
+                  : atelier
+                    ? undefined
+                    : { color: "rgb(var(--vibe-text-muted))" }
+              }
             >
               {eyebrow}
             </p>
@@ -124,14 +138,20 @@ export function MiniPreview({
             className={
               noir
                 ? "text-[14px] leading-[17px] font-bold tracking-tight"
-                : "font-display text-sm leading-tight font-bold"
+                : atelier
+                  ? "hero-atelier-title text-[13px] leading-tight"
+                  : "font-display text-sm leading-tight font-bold"
             }
-            style={{
-              color: noir
-                ? "rgb(var(--vibe-primary-container))"
-                : "rgb(var(--vibe-primary))",
-              fontFamily: noir ? "var(--font-display)" : undefined,
-            }}
+            style={
+              noir
+                ? {
+                    color: "rgb(var(--vibe-primary-container))",
+                    fontFamily: "var(--font-display)",
+                  }
+                : atelier
+                  ? undefined
+                  : { color: "rgb(var(--vibe-primary))" }
+            }
           >
             {title}
           </h2>
@@ -140,13 +160,17 @@ export function MiniPreview({
               className={
                 noir
                   ? "mt-0.5 max-w-[9rem] text-[8px] leading-[12px]"
-                  : "text-[9px] leading-snug"
+                  : atelier
+                    ? "hero-atelier-tagline mt-1 max-w-[9rem] text-[8px]"
+                    : "text-[9px] leading-snug"
               }
-              style={{
-                color: noir
-                  ? "rgb(var(--vibe-text-variant))"
-                  : "rgb(var(--vibe-text-muted))",
-              }}
+              style={
+                noir
+                  ? { color: "rgb(var(--vibe-text-variant))" }
+                  : atelier
+                    ? undefined
+                    : { color: "rgb(var(--vibe-text-muted))" }
+              }
             >
               {tagline}
             </p>
@@ -158,19 +182,26 @@ export function MiniPreview({
             className={cn(
               "vibe-card rounded-lg p-2",
               noir && "featured-noir-card featured-noir-section",
+              atelier && "featured-atelier-card featured-atelier-section",
             )}
-            style={{ backgroundColor: "rgb(var(--vibe-surface))" }}
+            style={
+              atelier
+                ? undefined
+                : { backgroundColor: "rgb(var(--vibe-surface))" }
+            }
           >
             <div
               className={cn(
                 "mb-1 flex items-center justify-between",
                 noir && "featured-noir-header",
+                atelier && "featured-atelier-header",
               )}
             >
               <p
                 className={cn(
                   "text-[8px] font-semibold",
                   noir && "featured-noir-header-title",
+                  atelier && "featured-atelier-header-title text-[10px]",
                 )}
               >
                 {resolveFeaturedSectionTitle(store?.featured_section_title)}
@@ -186,6 +217,7 @@ export function MiniPreview({
               className={cn(
                 "truncate text-[10px] font-medium",
                 noir && "featured-noir-name",
+                atelier && "featured-atelier-name text-[11px]",
               )}
             >
               {featured.name}
@@ -194,9 +226,10 @@ export function MiniPreview({
               className={cn(
                 "text-[9px] font-semibold",
                 noir && "featured-noir-price",
+                atelier && "featured-atelier-price text-[10px]",
               )}
               style={
-                noir
+                noir || atelier
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
               }
@@ -213,14 +246,13 @@ export function MiniPreview({
                 key={cat}
                 className={cn(
                   "catalog-pill shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide",
-                  noir
-                    ? i === 0
+                  (noir || atelier) &&
+                    (i === 0
                       ? "catalog-pill-active"
-                      : "catalog-pill-inactive"
-                    : undefined,
+                      : "catalog-pill-inactive"),
                 )}
                 style={
-                  noir
+                  noir || atelier
                     ? undefined
                     : {
                         backgroundColor:
@@ -250,8 +282,15 @@ export function MiniPreview({
           ).map((p, i) => (
             <div
               key={i}
-              className="vibe-card flex flex-col gap-0.5 rounded p-1.5"
-              style={{ backgroundColor: "rgb(var(--vibe-surface))" }}
+              className={cn(
+                "vibe-card flex flex-col gap-0.5 rounded p-1.5",
+                atelier && "catalog-atelier-card",
+              )}
+              style={
+                atelier
+                  ? undefined
+                  : { backgroundColor: "rgb(var(--vibe-surface))" }
+              }
             >
               <p
                 className={cn(
@@ -264,10 +303,12 @@ export function MiniPreview({
               <p
                 className={cn(
                   "catalog-card-price text-[8px] font-semibold",
-                  !noir && "text-vibe-primary",
+                  !noir && !atelier && "text-vibe-primary",
                 )}
                 style={
-                  noir ? undefined : { color: "rgb(var(--vibe-primary))" }
+                  noir || atelier
+                    ? undefined
+                    : { color: "rgb(var(--vibe-primary))" }
                 }
               >
                 {formatPrice(p.price_cents)}

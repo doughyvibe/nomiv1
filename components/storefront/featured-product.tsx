@@ -14,11 +14,17 @@ import { cn } from "@/lib/utils";
 type FeaturedProductProps = {
   product: Product;
   sectionTitle?: string | null;
-  vibe?: Vibe | "industrial";
+  vibe?: Vibe | "industrial" | "unicorn";
 };
 
-function isNoirVibe(vibe: Vibe | "industrial" | undefined): boolean {
+function isNoirVibe(vibe: Vibe | "industrial" | "unicorn" | undefined): boolean {
   return vibe === "epicurean" || vibe === "industrial";
+}
+
+function isAtelierVibe(
+  vibe: Vibe | "industrial" | "unicorn" | undefined,
+): boolean {
+  return vibe === "atelier" || vibe === "unicorn";
 }
 
 export function FeaturedProduct({
@@ -30,6 +36,7 @@ export function FeaturedProduct({
   const [added, setAdded] = useState(false);
   const quickAdd = allowsQuickAdd(product);
   const noir = isNoirVibe(vibe);
+  const atelier = isAtelierVibe(vibe);
   const heading = resolveFeaturedSectionTitle(sectionTitle);
 
   function handleQuickAdd(e: React.MouseEvent) {
@@ -41,17 +48,25 @@ export function FeaturedProduct({
   }
 
   return (
-    <section className={cn("px-5 sm:px-6", noir && "featured-noir-section")}>
+    <section
+      className={cn(
+        "px-5 sm:px-6",
+        noir && "featured-noir-section",
+        atelier && "featured-atelier-section",
+      )}
+    >
       <div
         className={cn(
           "mb-4 flex items-center justify-between",
           noir && "featured-noir-header",
+          atelier && "featured-atelier-header",
         )}
       >
         <h2
           className={cn(
             "font-display text-lg font-semibold text-vibe-text md:text-xl",
             noir && "featured-noir-header-title",
+            atelier && "featured-atelier-header-title",
           )}
         >
           {heading}
@@ -66,12 +81,14 @@ export function FeaturedProduct({
         className={cn(
           "vibe-card group block overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.99] md:grid md:grid-cols-2 md:gap-0",
           noir && "featured-noir-card",
+          atelier && "featured-atelier-card",
         )}
       >
         <div
           className={cn(
             "relative aspect-[4/3] overflow-hidden md:aspect-auto md:min-h-[280px]",
             noir && "featured-noir-image-wrap",
+            atelier && "featured-atelier-image-wrap",
           )}
         >
           {product.image_url ? (
@@ -87,7 +104,9 @@ export function FeaturedProduct({
                   "pointer-events-none absolute inset-x-0 bottom-0 h-1/3",
                   noir
                     ? "featured-noir-image-fade"
-                    : "bg-gradient-to-t from-vibe-surface to-transparent",
+                    : atelier
+                      ? "featured-atelier-image-fade"
+                      : "bg-gradient-to-t from-vibe-surface to-transparent",
                 )}
               />
             </>
@@ -100,12 +119,18 @@ export function FeaturedProduct({
           className={cn(
             "flex flex-col gap-3 p-5 md:relative md:justify-center md:p-8",
             noir && "featured-noir-body",
+            atelier && "featured-atelier-body",
           )}
         >
+          {atelier ? (
+            <span className="featured-atelier-eyebrow">Featured</span>
+          ) : null}
+
           <p
             className={cn(
               "font-display text-xl font-semibold text-vibe-text md:text-2xl",
               noir && "featured-noir-name",
+              atelier && "featured-atelier-name",
             )}
           >
             {product.name}
@@ -116,6 +141,7 @@ export function FeaturedProduct({
               className={cn(
                 "line-clamp-3 text-sm leading-relaxed text-vibe-text-muted",
                 noir && "featured-noir-desc",
+                atelier && "featured-atelier-desc",
               )}
             >
               {product.description}
@@ -126,12 +152,14 @@ export function FeaturedProduct({
             className={cn(
               "mt-auto flex items-center justify-between gap-3 pt-2",
               noir && "featured-noir-price-row",
+              atelier && "featured-atelier-price-row flex-col items-stretch gap-6",
             )}
           >
             <p
               className={cn(
                 "text-xl font-semibold text-vibe-primary md:text-2xl",
                 noir && "featured-noir-price",
+                atelier && "featured-atelier-price",
               )}
             >
               {formatPrice(product.price_cents)}
@@ -145,10 +173,17 @@ export function FeaturedProduct({
                 className={cn(
                   "flex size-11 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-surface transition-colors",
                   noir && "featured-noir-add",
+                  atelier && "featured-atelier-add",
                   added && "bg-vibe-primary text-vibe-primary-fg",
                 )}
               >
-                {added ? (
+                {atelier ? (
+                  added ? (
+                    <span>Added</span>
+                  ) : (
+                    <span>Add to Cart</span>
+                  )
+                ) : added ? (
                   <span className="text-xs font-semibold">✓</span>
                 ) : (
                   <Plus className="size-5" />

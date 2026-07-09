@@ -1,11 +1,12 @@
 "use client";
 
 import type { HeroConfig, Vibe } from "@/lib/stores/types";
+import { heroLogoClassName } from "@/lib/stores/hero-logo";
 
 type StorefrontHeroProps = {
   storeName: string;
   hero: Partial<HeroConfig>;
-  vibe?: Vibe | "industrial";
+  vibe?: Vibe | "industrial" | "unicorn";
 };
 
 function Monogram({ name }: { name: string }) {
@@ -20,8 +21,35 @@ function Monogram({ name }: { name: string }) {
   );
 }
 
-function isNoirVibe(vibe: Vibe | "industrial" | undefined): boolean {
+function HeroLogo({
+  url,
+  alt,
+  size,
+  style,
+}: {
+  url: string;
+  alt: string;
+  size: HeroConfig["logo_size"];
+  style: HeroConfig["logo_style"];
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={alt}
+      className={heroLogoClassName(size, style)}
+    />
+  );
+}
+
+function isNoirVibe(vibe: Vibe | "industrial" | "unicorn" | undefined): boolean {
   return vibe === "epicurean" || vibe === "industrial";
+}
+
+function isAtelierVibe(
+  vibe: Vibe | "industrial" | "unicorn" | undefined,
+): boolean {
+  return vibe === "atelier" || vibe === "unicorn";
 }
 
 function NoirHero({
@@ -37,12 +65,14 @@ function NoirHero({
   return (
     <section className="storefront-hero flex flex-col items-center px-5 pb-8 pt-10 text-center sm:px-6">
       {hero.logo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={hero.logo_url}
-          alt=""
-          className="mb-4 size-14 rounded-full object-cover md:size-16"
-        />
+        <div className="mb-4">
+          <HeroLogo
+            url={hero.logo_url}
+            alt={title}
+            size={hero.logo_size}
+            style={hero.logo_style}
+          />
+        </div>
       ) : null}
 
       {eyebrow ? (
@@ -58,6 +88,46 @@ function NoirHero({
   );
 }
 
+/** Atelier: logo optional; no monogram; no cover/CTA (product locks). */
+function AtelierHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero flex flex-col items-center px-5 pb-10 pt-10 text-center sm:px-6 md:pb-14 md:pt-14">
+      {hero.logo_url ? (
+        <div className="mb-6">
+          <HeroLogo
+            url={hero.logo_url}
+            alt={title}
+            size={hero.logo_size}
+            style={hero.logo_style}
+          />
+        </div>
+      ) : null}
+
+      {eyebrow ? (
+        <p className="hero-atelier-eyebrow mb-3 text-balance">{eyebrow}</p>
+      ) : null}
+
+      <h1 className="hero-atelier-title text-balance">{title}</h1>
+
+      {tagline ? (
+        <>
+          <div className="hero-atelier-rule my-6" aria-hidden />
+          <p className="hero-atelier-tagline text-balance">{tagline}</p>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
 function DefaultHero({
   title,
   hero,
@@ -68,11 +138,11 @@ function DefaultHero({
   return (
     <section className="flex flex-col items-center gap-4 px-5 pb-10 pt-8 text-center sm:px-6 md:gap-5 md:pb-12 md:pt-12">
       {hero.logo_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={hero.logo_url}
-          alt=""
-          className="size-14 rounded-full object-cover md:size-16"
+        <HeroLogo
+          url={hero.logo_url}
+          alt={title}
+          size={hero.logo_size}
+          style={hero.logo_style}
         />
       ) : (
         <Monogram name={title} />
@@ -106,6 +176,10 @@ export function StorefrontHero({
 
   if (isNoirVibe(vibe)) {
     return <NoirHero title={title} hero={hero} />;
+  }
+
+  if (isAtelierVibe(vibe)) {
+    return <AtelierHero title={title} hero={hero} />;
   }
 
   return <DefaultHero title={title} hero={hero} />;

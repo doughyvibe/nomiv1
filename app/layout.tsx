@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import {
-  archivoBlack,
   bebasNeue,
+  dmSans,
+  ebGaramond,
   hankenGrotesk,
   inter,
   plusJakartaSans,
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${archivoBlack.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}
+      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${ebGaramond.variable} ${dmSans.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}
     >
       <body className="min-h-full font-body">{children}</body>
     </html>

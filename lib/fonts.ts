@@ -1,6 +1,7 @@
 import {
-  Archivo_Black,
   Bebas_Neue,
+  DM_Sans,
+  EB_Garamond,
   Hanken_Grotesk,
   Inter,
   Plus_Jakarta_Sans,
@@ -28,11 +29,19 @@ export const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-/** Unicorn — soft pastel display (docs/unicorn/lavenderTheme.md) */
-export const archivoBlack = Archivo_Black({
+/** Atelier — display serif (docs/atelier_storefront/atelierDESIGN.md) */
+export const ebGaramond = EB_Garamond({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-archivo-black",
+  variable: "--font-eb-garamond",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/** Atelier — body / UI sans */
+export const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["400", "500", "700"],
   display: "swap",
 });
 

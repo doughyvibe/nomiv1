@@ -40,7 +40,10 @@ export default async function StorefrontPage({
       ) : null}
 
       {catalog.length > 0 ? (
-        <ProductCatalog products={catalog} />
+        <ProductCatalog
+          products={catalog}
+          vibe={store.vibe ?? "epicurean"}
+        />
       ) : products.length === 0 ? (
         <section className="px-5 py-12 text-center sm:px-6">
           <div className="vibe-card mx-auto max-w-md rounded-[var(--vibe-radius)] px-6 py-12">

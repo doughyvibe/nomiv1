@@ -19,7 +19,7 @@ export function StorefrontShell({
   return (
     <CartProvider slug={slug}>
       <div
-        className="mx-auto min-h-full w-full max-w-[1280px]"
+        className="mx-auto min-h-dvh w-full max-w-[1280px]"
         style={{
           paddingBottom: isShopHome
             ? "calc(5.5rem + env(safe-area-inset-bottom, 0px))"

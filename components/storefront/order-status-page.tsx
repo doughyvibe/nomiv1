@@ -6,6 +6,7 @@ import QRCode from "react-qr-code";
 
 import { notifySellerAction } from "@/app/(storefront)/s/[slug]/actions";
 import { OrderReceipt } from "@/components/storefront/order-receipt";
+import { useStorefront } from "@/components/storefront/storefront-context";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { downloadPayNowQrImage } from "@/lib/paynow/download-qr-image";
 import { formatPrice } from "@/lib/money";
 import type { LoadedOrder } from "@/lib/orders/load-order";
 import { buyerOrderView } from "@/lib/orders/status";
+import { cn } from "@/lib/utils";
 
 type OrderStatusPageProps = {
   slug: string;
@@ -53,13 +55,20 @@ function useCountdown(expiresAt: string) {
 function StatusShell({
   title,
   children,
+  atelier,
 }: {
   title: string;
   children: React.ReactNode;
+  atelier: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center px-4 py-8 text-center">
-      <p className="vibe-display font-display text-xl font-bold uppercase">
+    <div className="flex flex-col items-center px-5 py-8 text-center sm:px-6">
+      <p
+        className={cn(
+          "vibe-display font-display text-xl font-bold uppercase",
+          atelier && "pay-atelier-status-title",
+        )}
+      >
         {title}
       </p>
       <div className="mt-6 w-full">{children}</div>
@@ -73,6 +82,8 @@ export function OrderStatusPageContent({
   payload,
 }: OrderStatusPageProps) {
   const router = useRouter();
+  const { store: liveStore } = useStorefront();
+  const atelier = liveStore.vibe === "atelier";
   const { order, store } = data;
   const qrRef = useRef<HTMLDivElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -130,11 +141,11 @@ export function OrderStatusPageContent({
       order.status === "completed" ? "Order completed" : "Order confirmed";
 
     return (
-      <StatusShell title={title}>
+      <StatusShell title={title} atelier={atelier}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           {store.name} has verified your payment. Your order is being prepared.
         </p>
-        <OrderReceipt data={data} showPaidLabel />
+        <OrderReceipt data={data} showPaidLabel atelier={atelier} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to check your order status any time.
         </p>
@@ -144,25 +155,25 @@ export function OrderStatusPageContent({
 
   if (view === "cancelled") {
     return (
-      <StatusShell title="Order cancelled">
+      <StatusShell title="Order cancelled" atelier={atelier}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           This order was cancelled. If you have questions, contact {store.name}{" "}
           with reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} showPaidLabel={false} />
+        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} />
       </StatusShell>
     );
   }
 
   if (awaiting) {
     return (
-      <StatusShell title="Awaiting seller verification">
+      <StatusShell title="Awaiting seller verification" atelier={atelier}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           The seller will verify your payment manually. Check back on this page
           for updates — your order is not confirmed until they verify payment.
         </p>
-        <OrderReceipt data={data} />
+        <OrderReceipt data={data} atelier={atelier} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to see when your order is confirmed.
         </p>
@@ -172,23 +183,38 @@ export function OrderStatusPageContent({
 
   if (view === "expired" || countdown.expired) {
     return (
-      <StatusShell title="Payment window expired">
+      <StatusShell title="Payment window expired" atelier={atelier}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           If you already paid, contact {store.name} with your order reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} />
+        <OrderReceipt data={data} atelier={atelier} />
       </StatusShell>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 px-4 py-6">
+    <div
+      className={cn(
+        "flex flex-col gap-6 px-5 py-6 sm:px-6",
+        atelier && "pay-atelier",
+      )}
+    >
       <div className="text-center">
-        <p className="vibe-display text-xs tracking-widest text-vibe-text-muted uppercase">
+        <p
+          className={cn(
+            "vibe-display text-xs tracking-widest text-vibe-text-muted uppercase",
+            atelier && "checkout-atelier-section-label",
+          )}
+        >
           Payment pending
         </p>
-        <h1 className="vibe-display mt-2 font-display text-2xl font-bold uppercase">
+        <h1
+          className={cn(
+            "vibe-display mt-2 font-display text-2xl font-bold uppercase",
+            atelier && "pay-atelier-amount",
+          )}
+        >
           {formatPrice(order.total_cents)}
         </h1>
         <p className="mt-1 text-sm text-vibe-text-muted">
@@ -197,11 +223,21 @@ export function OrderStatusPageContent({
       </div>
 
       {payload ? (
-        <div className="metal-panel rust-edge flex flex-col items-center rounded-[var(--vibe-radius)] p-6">
+        <div
+          className={cn(
+            "metal-panel rust-edge flex flex-col items-center rounded-[var(--vibe-radius)] p-6",
+            atelier && "checkout-atelier-panel",
+          )}
+        >
           <div ref={qrRef} className="rounded-lg bg-white p-4">
             <QRCode value={payload} size={220} />
           </div>
-          <p className="mt-4 text-sm font-medium text-vibe-primary">
+          <p
+            className={cn(
+              "mt-4 text-sm font-medium text-vibe-primary",
+              atelier && "pay-atelier-timer",
+            )}
+          >
             Complete payment within {countdown.label}
           </p>
           <p className="mt-1 text-xs text-vibe-text-muted">
@@ -221,7 +257,10 @@ export function OrderStatusPageContent({
             type="button"
             onClick={handleSaveQr}
             disabled={savingQr}
-            className="vibe-display w-full rounded-[var(--vibe-radius)] border border-vibe-border/40 py-3 text-sm font-semibold uppercase transition-transform active:scale-[0.98] disabled:opacity-50"
+            className={cn(
+              "vibe-display w-full rounded-[var(--vibe-radius)] border border-vibe-border/40 py-3 text-sm font-semibold uppercase transition-transform active:scale-[0.98] disabled:opacity-50",
+              atelier && "pay-atelier-secondary",
+            )}
           >
             {savingQr ? "Saving…" : "Save QR code"}
           </button>
@@ -233,8 +272,18 @@ export function OrderStatusPageContent({
         </>
       )}
 
-      <section className="metal-panel rust-edge rounded-[var(--vibe-radius)] p-4 text-sm">
-        <h2 className="vibe-display text-xs font-semibold text-vibe-text-muted uppercase">
+      <section
+        className={cn(
+          "metal-panel rust-edge rounded-[var(--vibe-radius)] p-4 text-sm",
+          atelier && "checkout-atelier-panel",
+        )}
+      >
+        <h2
+          className={cn(
+            "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
+            atelier && "checkout-atelier-section-label",
+          )}
+        >
           How to pay
         </h2>
         <ol className="mt-3 list-decimal space-y-2 pl-4 text-vibe-text-muted">
@@ -247,7 +296,7 @@ export function OrderStatusPageContent({
         </p>
       </section>
 
-      <OrderReceipt data={data} />
+      <OrderReceipt data={data} atelier={atelier} />
 
       {notifyState?.error && (
         <p className="text-sm text-red-400" role="alert">
@@ -259,7 +308,10 @@ export function OrderStatusPageContent({
         type="button"
         onClick={() => setModalOpen(true)}
         disabled={notifyPending}
-        className="vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-50"
+        className={cn(
+          "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-50",
+          atelier && "checkout-atelier-cta",
+        )}
       >
         {notifyPending ? "Notifying…" : "Notify seller to verify payment"}
       </button>
@@ -270,7 +322,12 @@ export function OrderStatusPageContent({
           className="border-vibe-border/40 bg-vibe-surface text-vibe-text sm:max-w-md"
         >
           <DialogHeader>
-            <DialogTitle className="vibe-display font-display uppercase">
+            <DialogTitle
+              className={cn(
+                "vibe-display font-display uppercase",
+                atelier && "pay-atelier-dialog-title",
+              )}
+            >
               Notify seller to verify payment?
             </DialogTitle>
             <DialogDescription className="text-vibe-text-muted">
@@ -286,7 +343,7 @@ export function OrderStatusPageContent({
               type="checkbox"
               checked={checked}
               onChange={(e) => setChecked(e.target.checked)}
-              className="mt-1"
+              className={cn("mt-1", atelier && "checkout-atelier-radio")}
             />
             <span>I have completed payment using the QR code above.</span>
           </label>
@@ -303,7 +360,10 @@ export function OrderStatusPageContent({
               type="button"
               disabled={!checked || notifyPending}
               onClick={handleNotify}
-              className="vibe-display rounded-[var(--vibe-radius)] bg-vibe-primary px-4 py-2 text-sm font-semibold text-vibe-primary-fg uppercase disabled:opacity-50"
+              className={cn(
+                "vibe-display rounded-[var(--vibe-radius)] bg-vibe-primary px-4 py-2 text-sm font-semibold text-vibe-primary-fg uppercase disabled:opacity-50",
+                atelier && "checkout-atelier-cta px-5 py-2.5",
+              )}
             >
               Yes, notify seller
             </button>

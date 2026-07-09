@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowLeft, Minus, Plus } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
@@ -14,6 +15,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const { store } = useStorefront();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const atelier = store.vibe === "atelier";
 
   function handleAdd() {
     addToCart(product.id, quantity);
@@ -22,18 +24,27 @@ export function ProductDetail({ product }: { product: Product }) {
   }
 
   return (
-    <div className="flex flex-col">
-      <div className="px-4 pt-4">
+    <div className={cn("flex flex-col", atelier && "pdp-atelier")}>
+      <div className="px-5 pt-4 sm:px-6">
         <Link
           href="/"
-          className="vibe-display inline-flex min-h-11 items-center text-xs font-semibold text-vibe-primary uppercase"
+          className={cn(
+            "pdp-back inline-flex min-h-11 items-center gap-2 text-sm font-medium text-vibe-text-muted transition-colors hover:text-vibe-text",
+            atelier && "pdp-atelier-back",
+          )}
         >
-          ← Back to shop
+          <ArrowLeft className="size-4 shrink-0" aria-hidden />
+          Back to shop
         </Link>
       </div>
 
       {product.image_url ? (
-        <div className="mt-4 overflow-hidden">
+        <div
+          className={cn(
+            "mt-3 overflow-hidden",
+            atelier && "pdp-atelier-image mx-5 rounded-xl sm:mx-6",
+          )}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={product.image_url}
@@ -45,53 +56,89 @@ export function ProductDetail({ product }: { product: Product }) {
           />
         </div>
       ) : (
-        <div className="mt-4 aspect-square w-full bg-vibe-border/20" />
+        <div
+          className={cn(
+            "mt-3 aspect-square w-full bg-vibe-border/20",
+            atelier && "mx-5 rounded-xl sm:mx-6",
+          )}
+        />
       )}
 
-      <div className="flex flex-col gap-4 px-4 py-6">
-        {product.category?.trim() && (
-          <span className="vibe-display inline-flex w-fit rounded-[var(--vibe-radius)] border border-vibe-border/40 px-2 py-1 text-[10px] font-semibold text-vibe-text-muted uppercase">
+      <div className="flex flex-col gap-5 px-5 py-6 sm:px-6">
+        {product.category?.trim() ? (
+          <span
+            className={cn(
+              "inline-flex w-fit rounded-full border border-vibe-border/40 px-3 py-1 text-[10px] font-semibold tracking-wider text-vibe-text-muted uppercase",
+              atelier && "pdp-atelier-category",
+            )}
+          >
             {product.category}
           </span>
-        )}
+        ) : null}
 
-        <h1 className="font-display text-2xl font-bold text-vibe-text">
-          {product.name}
-        </h1>
+        <div className="flex flex-col gap-2">
+          <h1
+            className={cn(
+              "font-display text-2xl font-bold text-vibe-text md:text-3xl",
+              atelier && "pdp-atelier-title",
+            )}
+          >
+            {product.name}
+          </h1>
 
-        <p className="text-xl font-semibold text-vibe-primary">
-          {formatPrice(product.price_cents)}
-        </p>
-
-        {product.description?.trim() && (
-          <p className="text-sm leading-relaxed text-vibe-text-muted">
-            {product.description}
+          <p
+            className={cn(
+              "text-xl font-semibold text-vibe-primary",
+              atelier && "pdp-atelier-price",
+            )}
+          >
+            {formatPrice(product.price_cents)}
           </p>
-        )}
 
-        <div className="metal-panel rust-edge flex items-center justify-between rounded-[var(--vibe-radius)] p-3">
-          <span className="vibe-display text-xs font-semibold uppercase">
+          {product.description?.trim() ? (
+            <p
+              className={cn(
+                "mt-1 text-sm leading-relaxed text-vibe-text-muted",
+                atelier && "pdp-atelier-desc",
+              )}
+            >
+              {product.description}
+            </p>
+          ) : null}
+        </div>
+
+        {/* Quantity is a secondary control — keep it quiet so Add to cart owns the page */}
+        <div
+          className={cn(
+            "pdp-qty flex items-center justify-between gap-4",
+            atelier && "pdp-atelier-qty",
+          )}
+        >
+          <span className="text-xs font-medium tracking-wider text-vibe-text-muted uppercase">
             Quantity
           </span>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               aria-label="Decrease quantity"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="flex size-11 items-center justify-center rounded-[var(--vibe-radius)] border border-vibe-border/40 text-lg font-medium transition-transform active:scale-95"
+              className="flex size-10 items-center justify-center rounded-full text-vibe-text-muted transition-colors hover:bg-vibe-border/20 hover:text-vibe-text active:scale-95"
             >
-              −
+              <Minus className="size-4" />
             </button>
-            <span className="min-w-[2ch] text-center font-medium">
+            <span
+              className="min-w-[2.5rem] text-center text-base font-medium tabular-nums text-vibe-text"
+              aria-live="polite"
+            >
               {quantity}
             </span>
             <button
               type="button"
               aria-label="Increase quantity"
               onClick={() => setQuantity((q) => q + 1)}
-              className="flex size-11 items-center justify-center rounded-[var(--vibe-radius)] border border-vibe-border/40 text-lg font-medium transition-transform active:scale-95"
+              className="flex size-10 items-center justify-center rounded-full text-vibe-text-muted transition-colors hover:bg-vibe-border/20 hover:text-vibe-text active:scale-95"
             >
-              +
+              <Plus className="size-4" />
             </button>
           </div>
         </div>
@@ -100,7 +147,8 @@ export function ProductDetail({ product }: { product: Product }) {
           type="button"
           onClick={handleAdd}
           className={cn(
-            "vibe-display w-full rounded-[var(--vibe-radius)] py-3.5 text-sm font-semibold uppercase transition-transform active:scale-[0.98]",
+            "pdp-add w-full rounded-full py-4 text-sm font-semibold uppercase tracking-wider transition-transform active:scale-[0.98]",
+            atelier && "pdp-atelier-add",
             added
               ? "bg-vibe-secondary text-vibe-bg"
               : "bg-vibe-primary text-vibe-primary-fg",
@@ -108,10 +156,6 @@ export function ProductDetail({ product }: { product: Product }) {
         >
           {added ? "Added to cart" : "Add to cart"}
         </button>
-
-        <p className="text-center text-xs text-vibe-text-muted">
-          {store.name}
-        </p>
       </div>
     </div>
   );

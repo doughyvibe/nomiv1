@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { createOrderAction } from "@/app/(storefront)/s/[slug]/actions";
 import { useCart } from "@/components/storefront/cart-context";
@@ -10,12 +11,14 @@ import { useStorefront } from "@/components/storefront/storefront-context";
 import { clearCart } from "@/lib/cart/storage";
 import { formatPrice } from "@/lib/money";
 import type { FulfillmentConfig } from "@/lib/stores/types";
+import { cn } from "@/lib/utils";
 
 export function CheckoutForm({ slug }: { slug: string }) {
   const router = useRouter();
   const { cart } = useCart();
   const { store, products } = useStorefront();
   const fulfillment = store.fulfillment as FulfillmentConfig;
+  const atelier = store.vibe === "atelier";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
   const lines = cart.items
@@ -53,9 +56,16 @@ export function CheckoutForm({ slug }: { slug: string }) {
 
   if (lines.length === 0) {
     return (
-      <div className="px-4 py-16 text-center">
+      <div className="px-5 py-16 text-center sm:px-6">
         <p className="text-vibe-text-muted">Your cart is empty.</p>
-        <Link href="/cart" className="mt-4 inline-block text-vibe-primary">
+        <Link
+          href="/cart"
+          className={cn(
+            "mt-4 inline-flex min-h-11 items-center gap-1.5 text-vibe-primary",
+            atelier && "checkout-atelier-back",
+          )}
+        >
+          <ArrowLeft className="size-3.5" aria-hidden />
           Back to cart
         </Link>
       </div>
@@ -69,15 +79,30 @@ export function CheckoutForm({ slug }: { slug: string }) {
       : "pickup";
 
   return (
-    <form action={formAction} className="flex flex-col gap-6 px-4 py-6">
+    <form
+      action={formAction}
+      className={cn(
+        "flex flex-col gap-6 px-5 py-6 sm:px-6",
+        atelier && "checkout-atelier",
+      )}
+    >
       <div>
         <Link
           href="/cart"
-          className="vibe-display inline-flex min-h-11 items-center text-xs font-semibold text-vibe-primary uppercase"
+          className={cn(
+            "inline-flex min-h-11 items-center gap-2 text-sm font-medium text-vibe-text-muted transition-colors hover:text-vibe-text",
+            atelier && "checkout-atelier-back",
+          )}
         >
-          ← Back to cart
+          <ArrowLeft className="size-4 shrink-0" aria-hidden />
+          Back to cart
         </Link>
-        <h1 className="vibe-display mt-4 font-display text-xl font-bold uppercase">
+        <h1
+          className={cn(
+            "vibe-display mt-4 font-display text-xl font-bold uppercase",
+            atelier && "checkout-atelier-title",
+          )}
+        >
           Checkout
         </h1>
       </div>
@@ -92,8 +117,18 @@ export function CheckoutForm({ slug }: { slug: string }) {
         </p>
       )}
 
-      <section className="metal-panel rust-edge rounded-[var(--vibe-radius)] p-4">
-        <h2 className="vibe-display text-xs font-semibold text-vibe-text-muted uppercase">
+      <section
+        className={cn(
+          "metal-panel rust-edge rounded-[var(--vibe-radius)] p-4",
+          atelier && "checkout-atelier-panel",
+        )}
+      >
+        <h2
+          className={cn(
+            "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
+            atelier && "checkout-atelier-section-label",
+          )}
+        >
           Order summary
         </h2>
         <ul className="mt-3 flex flex-col gap-2">
@@ -117,20 +152,35 @@ export function CheckoutForm({ slug }: { slug: string }) {
 
       {(pickupEnabled || deliveryEnabled) && (
         <fieldset className="flex flex-col gap-3">
-          <legend className="vibe-display text-xs font-semibold text-vibe-text-muted uppercase">
+          <legend
+            className={cn(
+              "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
+              atelier && "checkout-atelier-section-label",
+            )}
+          >
             Fulfillment
           </legend>
           {pickupEnabled && (
-            <label className="metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3">
+            <label
+              className={cn(
+                "metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3",
+                atelier && "checkout-atelier-option",
+              )}
+            >
               <input
                 type="radio"
                 name="fulfillment_method"
                 value="pickup"
                 defaultChecked={defaultMethod === "pickup"}
-                className="mt-1"
+                className={cn("mt-1", atelier && "checkout-atelier-radio")}
               />
               <span>
-                <span className="vibe-display block text-sm font-semibold uppercase">
+                <span
+                  className={cn(
+                    "vibe-display block text-sm font-semibold uppercase",
+                    atelier && "checkout-atelier-option-title",
+                  )}
+                >
                   Pickup
                 </span>
                 {fulfillment.pickup?.instructions && (
@@ -142,16 +192,26 @@ export function CheckoutForm({ slug }: { slug: string }) {
             </label>
           )}
           {deliveryEnabled && (
-            <label className="metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3">
+            <label
+              className={cn(
+                "metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3",
+                atelier && "checkout-atelier-option",
+              )}
+            >
               <input
                 type="radio"
                 name="fulfillment_method"
                 value="delivery"
                 defaultChecked={defaultMethod === "delivery"}
-                className="mt-1"
+                className={cn("mt-1", atelier && "checkout-atelier-radio")}
               />
               <span>
-                <span className="vibe-display block text-sm font-semibold uppercase">
+                <span
+                  className={cn(
+                    "vibe-display block text-sm font-semibold uppercase",
+                    atelier && "checkout-atelier-option-title",
+                  )}
+                >
                   Delivery (+{formatPrice(deliveryFee)})
                 </span>
                 {fulfillment.delivery?.instructions && (
@@ -166,7 +226,12 @@ export function CheckoutForm({ slug }: { slug: string }) {
       )}
 
       <section className="flex flex-col gap-4">
-        <h2 className="vibe-display text-xs font-semibold text-vibe-text-muted uppercase">
+        <h2
+          className={cn(
+            "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
+            atelier && "checkout-atelier-section-label",
+          )}
+        >
           Your details
         </h2>
         <label className="flex flex-col gap-1.5">
@@ -175,7 +240,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
             name="customer_name"
             required
             autoComplete="name"
-            className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary"
+            className={cn(
+              "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+              atelier && "checkout-atelier-input",
+            )}
           />
         </label>
         <label className="flex flex-col gap-1.5">
@@ -189,7 +257,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
             inputMode="tel"
             autoComplete="tel"
             placeholder="91234567"
-            className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary"
+            className={cn(
+              "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+              atelier && "checkout-atelier-input",
+            )}
           />
         </label>
         <label className="flex flex-col gap-1.5">
@@ -199,7 +270,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
             required
             type="email"
             autoComplete="email"
-            className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary"
+            className={cn(
+              "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+              atelier && "checkout-atelier-input",
+            )}
           />
         </label>
         {deliveryEnabled && (
@@ -210,7 +284,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
             <textarea
               name="delivery_address"
               rows={2}
-              className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary"
+              className={cn(
+                "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+                atelier && "checkout-atelier-input",
+              )}
             />
           </label>
         )}
@@ -221,7 +298,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
           <textarea
             name="order_notes"
             rows={2}
-            className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary"
+            className={cn(
+              "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+              atelier && "checkout-atelier-input",
+            )}
           />
         </label>
       </section>
@@ -235,7 +315,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-60"
+        className={cn(
+          "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-60",
+          atelier && "checkout-atelier-cta",
+        )}
       >
         {pending ? "Creating order…" : "Place order & pay"}
       </button>

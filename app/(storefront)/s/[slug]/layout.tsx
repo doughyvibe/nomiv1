@@ -22,7 +22,7 @@ export default async function StorefrontSlugLayout({
 
   if (gate.kind === "unavailable") {
     return (
-      <div data-surface="storefront" className="min-h-full">
+      <div data-surface="storefront" className="min-h-dvh">
         <StoreUnavailable slug={slug} />
       </div>
     );
@@ -37,7 +37,7 @@ export default async function StorefrontSlugLayout({
     <div
       data-surface="storefront"
       data-vibe={vibe}
-      className="min-h-full bg-vibe-bg text-vibe-text"
+      className="min-h-dvh bg-vibe-bg text-vibe-text"
     >
       <StorefrontProvider value={storefront}>
         <StorefrontShell slug={slug}>{children}</StorefrontShell>

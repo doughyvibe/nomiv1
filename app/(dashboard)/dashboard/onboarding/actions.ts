@@ -124,7 +124,7 @@ export async function createStore(
 // Step 2 — vibe
 // ---------------------------------------------------------------------------
 
-const VALID_VIBES: Vibe[] = ["unicorn", "outback", "futuristic", "epicurean"];
+const VALID_VIBES: Vibe[] = ["atelier", "outback", "futuristic", "epicurean"];
 
 export async function saveVibe(vibe: Vibe): Promise<ActionResult> {
   if (!VALID_VIBES.includes(vibe)) return { ok: false, error: "Invalid vibe" };
@@ -179,6 +179,20 @@ export async function saveHero(hero: HeroConfig): Promise<ActionResult> {
     title: hero.title.trim().slice(0, 80),
     subheading: hero.subheading?.trim() || undefined,
     logo_url: hero.logo_url || undefined,
+    logo_size:
+      hero.logo_url &&
+      (hero.logo_size === "s" ||
+        hero.logo_size === "m" ||
+        hero.logo_size === "l")
+        ? hero.logo_size
+        : undefined,
+    logo_style:
+      hero.logo_url &&
+      (hero.logo_style === "plain" ||
+        hero.logo_style === "rounded" ||
+        hero.logo_style === "circle")
+        ? hero.logo_style
+        : undefined,
   };
 
   const { supabase, store } = await getOwnedStore();

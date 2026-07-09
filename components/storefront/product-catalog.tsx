@@ -8,19 +8,26 @@ import { useCart } from "@/components/storefront/cart-context";
 import { formatPrice } from "@/lib/money";
 import { normalizeCategory } from "@/lib/products/category";
 import { allowsQuickAdd } from "@/lib/products/quick-add";
-import type { Product } from "@/lib/stores/types";
+import type { Product, Vibe } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
+
+function isAtelierVibe(vibe: Vibe | "industrial" | "unicorn" | undefined): boolean {
+  return vibe === "atelier" || vibe === "unicorn";
+}
 
 function ProductCard({
   product,
   index,
+  atelier,
 }: {
   product: Product;
   index: number;
+  atelier: boolean;
 }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const quickAdd = allowsQuickAdd(product);
+  const blurb = atelier ? product.description?.trim() : null;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -36,13 +43,19 @@ function ProductCard({
       className={cn(
         "vibe-card group flex flex-col overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.98]",
         "animate-fade-up opacity-0",
+        atelier && "catalog-atelier-card",
       )}
       style={{
         animationDelay: `${80 + index * 50}ms`,
         animationFillMode: "forwards",
       }}
     >
-      <div className="relative aspect-square overflow-hidden">
+      <div
+        className={cn(
+          "relative aspect-square overflow-hidden",
+          atelier && "catalog-atelier-image",
+        )}
+      >
         {product.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -55,14 +68,32 @@ function ProductCard({
         ) : (
           <div className="size-full bg-vibe-border/20" />
         )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-vibe-surface/80 to-transparent" />
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-vibe-surface/80 to-transparent",
+            atelier && "catalog-atelier-image-fade",
+          )}
+        />
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-3 md:p-4">
+      <div
+        className={cn(
+          "flex flex-1 flex-col gap-2 p-3 md:p-4",
+          atelier && "catalog-atelier-body",
+        )}
+      >
         <h3 className="catalog-card-title line-clamp-2 text-sm font-medium leading-snug text-vibe-text md:text-base">
           {product.name}
         </h3>
-        <div className="mt-auto flex items-center justify-between gap-2">
+        {blurb ? (
+          <p className="catalog-card-desc line-clamp-1">{blurb}</p>
+        ) : null}
+        <div
+          className={cn(
+            "mt-auto flex items-center justify-between gap-2",
+            atelier && "catalog-atelier-price-row",
+          )}
+        >
           <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
             {formatPrice(product.price_cents)}
           </p>
@@ -91,9 +122,14 @@ function ProductCard({
 
 type ProductCatalogProps = {
   products: Product[];
+  vibe?: Vibe | "industrial" | "unicorn";
 };
 
-export function ProductCatalog({ products }: ProductCatalogProps) {
+export function ProductCatalog({
+  products,
+  vibe,
+}: ProductCatalogProps) {
+  const atelier = isAtelierVibe(vibe);
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of products) {
@@ -113,58 +149,76 @@ export function ProductCatalog({ products }: ProductCatalogProps) {
 
   if (products.length === 0) return null;
 
+  const pillButtons = (
+    <>
+      {["All", ...categories].map((cat) => (
+        <button
+          key={cat}
+          type="button"
+          onClick={() => setActive(cat)}
+          className={cn(
+            "catalog-pill shrink-0 rounded-full px-6 py-2 text-xs font-semibold uppercase tracking-wider transition-colors min-h-11",
+            active === cat
+              ? "catalog-pill-active border border-vibe-primary bg-vibe-surface text-vibe-primary"
+              : "catalog-pill-inactive bg-vibe-surface text-vibe-text-muted",
+          )}
+        >
+          {cat}
+        </button>
+      ))}
+    </>
+  );
+
   return (
     <section id="catalog" className="catalog-section px-5 pb-8 pt-6 sm:px-6 md:pb-12 md:pt-10">
       {showFilters ? (
         <>
-          {/* Mobile: scrollable pills */}
-          <div className="mb-6 flex gap-3 overflow-x-auto pb-1 md:hidden">
-            {["All", ...categories].map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setActive(cat)}
-                className={cn(
-                  "catalog-pill shrink-0 rounded-full px-6 py-2 text-xs font-semibold uppercase tracking-wider transition-colors min-h-11",
-                  active === cat
-                    ? "catalog-pill-active border border-vibe-primary bg-vibe-surface text-vibe-primary"
-                    : "catalog-pill-inactive bg-vibe-surface text-vibe-text-muted",
-                )}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Mobile pills; Atelier keeps pills on desktop too */}
+          <div
+            className={cn(
+              "mb-6 flex gap-3 overflow-x-auto pb-1",
+              atelier ? "md:mb-8" : "md:hidden",
+            )}
+          >
+            {pillButtons}
           </div>
 
-          {/* Desktop: underline tabs */}
-          <div className="catalog-tabs mb-8 hidden gap-6 border-b border-vibe-border/30 md:flex">
-            {["All", ...categories].map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setActive(cat)}
-                className={cn(
-                  "catalog-tab min-h-11 border-b-2 border-transparent pb-3 text-sm font-medium transition-colors",
-                  active === cat
-                    ? "catalog-tab-active border-vibe-primary text-vibe-primary"
-                    : "catalog-tab-inactive text-vibe-text-muted hover:text-vibe-text",
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Desktop underline tabs — skipped for Atelier (mockup uses pills) */}
+          {!atelier ? (
+            <div className="catalog-tabs mb-8 hidden gap-6 border-b border-vibe-border/30 md:flex">
+              {["All", ...categories].map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setActive(cat)}
+                  className={cn(
+                    "catalog-tab min-h-11 border-b-2 border-transparent pb-3 text-sm font-medium transition-colors",
+                    active === cat
+                      ? "catalog-tab-active border-vibe-primary text-vibe-primary"
+                      : "catalog-tab-inactive text-vibe-text-muted hover:text-vibe-text",
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+      <div className="grid grid-cols-2 gap-4 gap-y-10 md:grid-cols-4 md:gap-6 md:gap-y-12">
         {filtered.length === 0 ? (
           <p className="col-span-full py-8 text-center text-sm text-vibe-text-muted">
             No products in this category.
           </p>
         ) : (
           filtered.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              index={i}
+              atelier={atelier}
+            />
           ))
         )}
       </div>

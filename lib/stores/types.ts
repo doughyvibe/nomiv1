@@ -1,6 +1,6 @@
 import type { PayNowProxyType } from "@/lib/paynow";
 
-export type Vibe = "unicorn" | "outback" | "futuristic" | "epicurean";
+export type Vibe = "atelier" | "outback" | "futuristic" | "epicurean";
 
 export type TradeHint = "general" | "food" | "handmade" | "services" | "plants";
 
@@ -19,14 +19,24 @@ export const HERO_BLOCKS = [
 ] as const;
 export type HeroBlock = (typeof HERO_BLOCKS)[number];
 
+export const HERO_LOGO_SIZES = ["s", "m", "l"] as const;
+export type HeroLogoSize = (typeof HERO_LOGO_SIZES)[number];
+
+export const HERO_LOGO_STYLES = ["plain", "rounded", "circle"] as const;
+export type HeroLogoStyle = (typeof HERO_LOGO_STYLES)[number];
+
 export type HeroConfig = {
   eyebrow?: string;
   title: string;
   subheading?: string;
   logo_url?: string;
+  /** Brand mark size preset — default medium */
+  logo_size?: HeroLogoSize;
+  /** Frame style — default plain (no crop). Circle uses contain, not cover. */
+  logo_style?: HeroLogoStyle;
   /** @deprecated */
   cta?: string;
-  /** @deprecated */
+  /** @deprecated Cover/banner — not used (product lock: no hero banner) */
   image_url?: string;
   /** @deprecated */
   order?: HeroBlock[];

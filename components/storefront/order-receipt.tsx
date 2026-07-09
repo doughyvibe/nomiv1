@@ -1,19 +1,39 @@
 import { formatFulfillmentSummary } from "@/lib/orders/contact-buyer";
 import { formatPrice } from "@/lib/money";
 import type { LoadedOrder } from "@/lib/orders/load-order";
+import { cn } from "@/lib/utils";
 
 export function OrderReceipt({
   data,
   showPaidLabel = false,
+  atelier = false,
 }: {
   data: LoadedOrder;
   showPaidLabel?: boolean;
+  atelier?: boolean;
 }) {
   const { order, store, items } = data;
+  const fulfillmentSummary = formatFulfillmentSummary(order);
+  const methodLabel =
+    order.fulfillment_method.charAt(0).toUpperCase() +
+    order.fulfillment_method.slice(1);
+  // Avoid "Pickup / Pickup" — only show summary when it adds detail
+  const showSummaryDetail =
+    fulfillmentSummary.toLowerCase() !== methodLabel.toLowerCase();
 
   return (
-    <div className="metal-panel rust-edge w-full rounded-[var(--vibe-radius)] p-4 text-left text-sm">
-      <p className="vibe-display text-xs font-semibold text-vibe-text-muted uppercase">
+    <div
+      className={cn(
+        "metal-panel rust-edge w-full rounded-[var(--vibe-radius)] p-4 text-left text-sm",
+        atelier && "checkout-atelier-panel",
+      )}
+    >
+      <p
+        className={cn(
+          "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
+          atelier && "checkout-atelier-section-label",
+        )}
+      >
         {showPaidLabel ? "Order receipt" : "Order summary"}
       </p>
 
@@ -52,20 +72,32 @@ export function OrderReceipt({
             <dd>{formatPrice(order.fulfillment_fee_cents)}</dd>
           </div>
         )}
-        <div className="flex justify-between font-semibold text-vibe-primary">
+        <div
+          className={cn(
+            "flex justify-between font-semibold text-vibe-primary",
+            atelier && "checkout-atelier-total",
+          )}
+        >
           <dt>{showPaidLabel ? "Total paid" : "Total due"}</dt>
           <dd>{formatPrice(order.total_cents)}</dd>
         </div>
       </dl>
 
       <div className="mt-4 border-t border-vibe-border/30 pt-3">
-        <p className="text-vibe-text-muted text-xs font-medium uppercase">
+        <p
+          className={cn(
+            "text-vibe-text-muted text-xs font-medium uppercase",
+            atelier && "checkout-atelier-section-label",
+          )}
+        >
           Fulfillment
         </p>
-        <p className="mt-1 capitalize">{order.fulfillment_method}</p>
-        <p className="text-vibe-text-muted mt-0.5 text-xs">
-          {formatFulfillmentSummary(order)}
-        </p>
+        <p className="mt-1 capitalize">{methodLabel}</p>
+        {showSummaryDetail ? (
+          <p className="text-vibe-text-muted mt-0.5 text-xs">
+            {fulfillmentSummary}
+          </p>
+        ) : null}
       </div>
     </div>
   );
