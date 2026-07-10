@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import {
-  bebasNeue,
+  chivo,
   dmSans,
   ebGaramond,
   hankenGrotesk,
   inter,
+  jetbrainsMono,
+  orbitron,
   plusJakartaSans,
-  syne,
+  spaceGrotesk,
 } from "@/lib/fonts";
 import "./globals.css";
 
@@ -29,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${ebGaramond.variable} ${dmSans.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}
+      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${ebGaramond.variable} ${dmSans.variable} ${chivo.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full font-body">{children}</body>
     </html>

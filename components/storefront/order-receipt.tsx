@@ -7,10 +7,14 @@ export function OrderReceipt({
   data,
   showPaidLabel = false,
   atelier = false,
+  expedition = false,
+  cyberpunk = false,
 }: {
   data: LoadedOrder;
   showPaidLabel?: boolean;
   atelier?: boolean;
+  expedition?: boolean;
+  cyberpunk?: boolean;
 }) {
   const { order, store, items } = data;
   const fulfillmentSummary = formatFulfillmentSummary(order);
@@ -26,12 +30,16 @@ export function OrderReceipt({
       className={cn(
         "metal-panel rust-edge w-full rounded-[var(--vibe-radius)] p-4 text-left text-sm",
         atelier && "checkout-atelier-panel",
+        expedition && "checkout-expedition-panel",
+        cyberpunk && "checkout-cyberpunk-panel",
       )}
     >
       <p
         className={cn(
           "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
           atelier && "checkout-atelier-section-label",
+          expedition && "checkout-expedition-section-label",
+          cyberpunk && "checkout-cyberpunk-section-label",
         )}
       >
         {showPaidLabel ? "Order receipt" : "Order summary"}
@@ -76,6 +84,8 @@ export function OrderReceipt({
           className={cn(
             "flex justify-between font-semibold text-vibe-primary",
             atelier && "checkout-atelier-total",
+            expedition && "pay-expedition-amount",
+            cyberpunk && "pay-cyberpunk-amount",
           )}
         >
           <dt>{showPaidLabel ? "Total paid" : "Total due"}</dt>
@@ -88,6 +98,8 @@ export function OrderReceipt({
           className={cn(
             "text-vibe-text-muted text-xs font-medium uppercase",
             atelier && "checkout-atelier-section-label",
+          expedition && "checkout-expedition-section-label",
+          cyberpunk && "checkout-cyberpunk-section-label",
           )}
         >
           Fulfillment

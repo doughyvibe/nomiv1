@@ -28,6 +28,14 @@ function isAtelierVibe(vibe: Vibe): boolean {
   return vibe === "atelier";
 }
 
+function isExpeditionVibe(vibe: Vibe): boolean {
+  return vibe === "expedition";
+}
+
+function isCyberpunkVibe(vibe: Vibe): boolean {
+  return vibe === "cyberpunk";
+}
+
 function Monogram({ name }: { name: string }) {
   return (
     <div
@@ -74,7 +82,10 @@ export function MiniPreview({
   ];
   const noir = isNoirVibe(vibe);
   const atelier = isAtelierVibe(vibe);
-  const noMonogram = noir || atelier;
+  const expedition = isExpeditionVibe(vibe);
+  const cyberpunk = isCyberpunkVibe(vibe);
+  const noMonogram = noir || atelier || expedition || cyberpunk;
+  const styledHero = noir || atelier || expedition || cyberpunk;
   const eyebrow = hero?.eyebrow?.trim();
   const tagline = hero?.subheading?.trim();
 
@@ -91,8 +102,11 @@ export function MiniPreview({
       >
         <div
           className={
-            noir || atelier
-              ? "storefront-hero -mx-3 -mt-3 mb-1 flex flex-col items-center px-3 pb-2 pt-3 text-center"
+            styledHero
+              ? cn(
+                  "storefront-hero -mx-3 -mt-3 mb-1 flex flex-col px-3 pb-2 pt-3",
+                  expedition ? "items-start text-left" : "items-center text-center",
+                )
               : "flex flex-col items-center gap-1 text-center"
           }
         >
@@ -118,7 +132,11 @@ export function MiniPreview({
                   ? "mb-0.5 text-[11px] leading-[14px] font-semibold"
                   : atelier
                     ? "hero-atelier-eyebrow mb-0.5 text-[7px]"
-                    : "text-[8px] uppercase tracking-widest"
+                    : expedition
+                      ? "hero-expedition-eyebrow mb-1 text-[7px]"
+                      : cyberpunk
+                        ? "hero-cyberpunk-eyebrow mb-1 text-[7px]"
+                        : "text-[8px] uppercase tracking-widest"
               }
               style={
                 noir
@@ -126,7 +144,7 @@ export function MiniPreview({
                       color: "rgb(var(--vibe-text-bright))",
                       fontFamily: "var(--font-display)",
                     }
-                  : atelier
+                  : atelier || expedition || cyberpunk
                     ? undefined
                     : { color: "rgb(var(--vibe-text-muted))" }
               }
@@ -140,7 +158,11 @@ export function MiniPreview({
                 ? "text-[14px] leading-[17px] font-bold tracking-tight"
                 : atelier
                   ? "hero-atelier-title text-[13px] leading-tight"
-                  : "font-display text-sm leading-tight font-bold"
+                  : expedition
+                    ? "hero-expedition-title text-[15px] leading-none"
+                    : cyberpunk
+                      ? "hero-cyberpunk-title text-[12px] leading-tight"
+                      : "font-display text-sm leading-tight font-bold"
             }
             style={
               noir
@@ -148,7 +170,7 @@ export function MiniPreview({
                     color: "rgb(var(--vibe-primary-container))",
                     fontFamily: "var(--font-display)",
                   }
-                : atelier
+                : atelier || expedition || cyberpunk
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
             }
@@ -162,12 +184,16 @@ export function MiniPreview({
                   ? "mt-0.5 max-w-[9rem] text-[8px] leading-[12px]"
                   : atelier
                     ? "hero-atelier-tagline mt-1 max-w-[9rem] text-[8px]"
-                    : "text-[9px] leading-snug"
+                    : expedition
+                      ? "hero-expedition-tagline mt-1 max-w-[10rem] text-[7px]"
+                      : cyberpunk
+                        ? "hero-cyberpunk-tagline mt-1 max-w-[10rem] text-[8px]"
+                        : "text-[9px] leading-snug"
               }
               style={
                 noir
                   ? { color: "rgb(var(--vibe-text-variant))" }
-                  : atelier
+                  : atelier || expedition || cyberpunk
                     ? undefined
                     : { color: "rgb(var(--vibe-text-muted))" }
               }
@@ -183,9 +209,11 @@ export function MiniPreview({
               "vibe-card rounded-lg p-2",
               noir && "featured-noir-card featured-noir-section",
               atelier && "featured-atelier-card featured-atelier-section",
+              expedition && "featured-expedition-card featured-expedition-section",
+              cyberpunk && "featured-cyberpunk-card featured-cyberpunk-section",
             )}
             style={
-              atelier
+              atelier || expedition || cyberpunk
                 ? undefined
                 : { backgroundColor: "rgb(var(--vibe-surface))" }
             }
@@ -195,6 +223,8 @@ export function MiniPreview({
                 "mb-1 flex items-center justify-between",
                 noir && "featured-noir-header",
                 atelier && "featured-atelier-header",
+                expedition && "featured-expedition-header",
+                cyberpunk && "featured-cyberpunk-header",
               )}
             >
               <p
@@ -202,6 +232,8 @@ export function MiniPreview({
                   "text-[8px] font-semibold",
                   noir && "featured-noir-header-title",
                   atelier && "featured-atelier-header-title text-[10px]",
+                  expedition && "featured-expedition-header-title text-[9px]",
+                  cyberpunk && "featured-cyberpunk-header-title text-[8px]",
                 )}
               >
                 {resolveFeaturedSectionTitle(store?.featured_section_title)}
@@ -212,12 +244,19 @@ export function MiniPreview({
                   aria-hidden
                 />
               ) : null}
+              {expedition ? (
+                <span className="featured-expedition-header-mark text-[8px]" aria-hidden>
+                  ◆
+                </span>
+              ) : null}
             </div>
             <p
               className={cn(
                 "truncate text-[10px] font-medium",
                 noir && "featured-noir-name",
                 atelier && "featured-atelier-name text-[11px]",
+                expedition && "featured-expedition-name text-[10px]",
+                cyberpunk && "featured-cyberpunk-name text-[10px]",
               )}
             >
               {featured.name}
@@ -227,9 +266,11 @@ export function MiniPreview({
                 "text-[9px] font-semibold",
                 noir && "featured-noir-price",
                 atelier && "featured-atelier-price text-[10px]",
+                expedition && "featured-expedition-price text-[8px]",
+                cyberpunk && "featured-cyberpunk-price text-[8px]",
               )}
               style={
-                noir || atelier
+                noir || atelier || expedition || cyberpunk
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
               }
@@ -246,13 +287,13 @@ export function MiniPreview({
                 key={cat}
                 className={cn(
                   "catalog-pill shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide",
-                  (noir || atelier) &&
+                  (noir || atelier || expedition || cyberpunk) &&
                     (i === 0
                       ? "catalog-pill-active"
                       : "catalog-pill-inactive"),
                 )}
                 style={
-                  noir || atelier
+                  noir || atelier || expedition || cyberpunk
                     ? undefined
                     : {
                         backgroundColor:
@@ -285,9 +326,11 @@ export function MiniPreview({
               className={cn(
                 "vibe-card flex flex-col gap-0.5 rounded p-1.5",
                 atelier && "catalog-atelier-card",
+                expedition && "catalog-expedition-card",
+                cyberpunk && "catalog-cyberpunk-card",
               )}
               style={
-                atelier
+                atelier || expedition || cyberpunk
                   ? undefined
                   : { backgroundColor: "rgb(var(--vibe-surface))" }
               }
@@ -295,18 +338,20 @@ export function MiniPreview({
               <p
                 className={cn(
                   "catalog-card-title line-clamp-2 text-[9px] leading-tight",
-                  noir ? "font-semibold" : "font-medium",
+                  noir || expedition || cyberpunk ? "font-semibold" : "font-medium",
                 )}
               >
                 {p.name}
               </p>
               <p
                 className={cn(
-                  "catalog-card-price text-[8px] font-semibold",
-                  !noir && !atelier && "text-vibe-primary",
+                  "text-[8px] font-semibold",
+                  !expedition && "catalog-card-price",
+                  expedition && "featured-expedition-price text-[7px]",
+                  !noir && !atelier && !expedition && !cyberpunk && "text-vibe-primary",
                 )}
                 style={
-                  noir || atelier
+                  noir || atelier || expedition || cyberpunk
                     ? undefined
                     : { color: "rgb(var(--vibe-primary))" }
                 }

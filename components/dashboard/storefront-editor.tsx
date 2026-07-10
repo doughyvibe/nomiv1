@@ -49,11 +49,11 @@ export function StorefrontEditor({
 
       <DashboardPanel>
         <DashboardPanelHeader
-          title="Hero"
-          description="Top section of your store — words, image, and block order"
+          title="Top of your shop"
+          description="Logo, shop name, and a short intro buyers see first"
         />
         <DashboardPanelBody>
-          <HeroEditor store={store} submitLabel="Save hero" onSaveHero={saveHeroAction} />
+          <HeroEditor store={store} submitLabel="Save" onSaveHero={saveHeroAction} />
         </DashboardPanelBody>
       </DashboardPanel>
     </div>

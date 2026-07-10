@@ -14,17 +14,31 @@ import { cn } from "@/lib/utils";
 type FeaturedProductProps = {
   product: Product;
   sectionTitle?: string | null;
-  vibe?: Vibe | "industrial" | "unicorn";
+  vibe?: Vibe | "industrial" | "unicorn" | "outback" | "futuristic";
 };
 
-function isNoirVibe(vibe: Vibe | "industrial" | "unicorn" | undefined): boolean {
+function isNoirVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
   return vibe === "epicurean" || vibe === "industrial";
 }
 
 function isAtelierVibe(
-  vibe: Vibe | "industrial" | "unicorn" | undefined,
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
 ): boolean {
   return vibe === "atelier" || vibe === "unicorn";
+}
+
+function isExpeditionVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "expedition" || vibe === "outback";
+}
+
+function isCyberpunkVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "cyberpunk" || vibe === "futuristic";
 }
 
 export function FeaturedProduct({
@@ -37,7 +51,10 @@ export function FeaturedProduct({
   const quickAdd = allowsQuickAdd(product);
   const noir = isNoirVibe(vibe);
   const atelier = isAtelierVibe(vibe);
+  const expedition = isExpeditionVibe(vibe);
+  const cyberpunk = isCyberpunkVibe(vibe);
   const heading = resolveFeaturedSectionTitle(sectionTitle);
+  const fullWidthCta = atelier || expedition || cyberpunk;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -53,6 +70,8 @@ export function FeaturedProduct({
         "px-5 sm:px-6",
         noir && "featured-noir-section",
         atelier && "featured-atelier-section",
+        expedition && "featured-expedition-section",
+        cyberpunk && "featured-cyberpunk-section",
       )}
     >
       <div
@@ -60,6 +79,8 @@ export function FeaturedProduct({
           "mb-4 flex items-center justify-between",
           noir && "featured-noir-header",
           atelier && "featured-atelier-header",
+          expedition && "featured-expedition-header",
+          cyberpunk && "featured-cyberpunk-header",
         )}
       >
         <h2
@@ -67,12 +88,19 @@ export function FeaturedProduct({
             "font-display text-lg font-semibold text-vibe-text md:text-xl",
             noir && "featured-noir-header-title",
             atelier && "featured-atelier-header-title",
+            expedition && "featured-expedition-header-title",
+            cyberpunk && "featured-cyberpunk-header-title",
           )}
         >
           {heading}
         </h2>
         {noir ? (
           <Star className="featured-noir-header-star size-5 shrink-0" aria-hidden />
+        ) : null}
+        {expedition ? (
+          <span className="featured-expedition-header-mark" aria-hidden>
+            ◆
+          </span>
         ) : null}
       </div>
 
@@ -82,6 +110,8 @@ export function FeaturedProduct({
           "vibe-card group block overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.99] md:grid md:grid-cols-2 md:gap-0",
           noir && "featured-noir-card",
           atelier && "featured-atelier-card",
+          expedition && "featured-expedition-card",
+          cyberpunk && "featured-cyberpunk-card",
         )}
       >
         <div
@@ -89,6 +119,8 @@ export function FeaturedProduct({
             "relative aspect-[4/3] overflow-hidden md:aspect-auto md:min-h-[280px]",
             noir && "featured-noir-image-wrap",
             atelier && "featured-atelier-image-wrap",
+            expedition && "featured-expedition-image-wrap",
+            cyberpunk && "featured-cyberpunk-image-wrap",
           )}
         >
           {product.image_url ? (
@@ -106,7 +138,11 @@ export function FeaturedProduct({
                     ? "featured-noir-image-fade"
                     : atelier
                       ? "featured-atelier-image-fade"
-                      : "bg-gradient-to-t from-vibe-surface to-transparent",
+                      : expedition
+                        ? "featured-expedition-image-fade"
+                        : cyberpunk
+                          ? "featured-cyberpunk-image-fade"
+                          : "bg-gradient-to-t from-vibe-surface to-transparent",
                 )}
               />
             </>
@@ -120,21 +156,36 @@ export function FeaturedProduct({
             "flex flex-col gap-3 p-5 md:relative md:justify-center md:p-8",
             noir && "featured-noir-body",
             atelier && "featured-atelier-body",
+            expedition && "featured-expedition-body",
+            cyberpunk && "featured-cyberpunk-body",
           )}
         >
           {atelier ? (
             <span className="featured-atelier-eyebrow">Featured</span>
           ) : null}
+          {cyberpunk ? (
+            <span className="featured-cyberpunk-eyebrow">Featured</span>
+          ) : null}
 
-          <p
-            className={cn(
-              "font-display text-xl font-semibold text-vibe-text md:text-2xl",
-              noir && "featured-noir-name",
-              atelier && "featured-atelier-name",
-            )}
-          >
-            {product.name}
-          </p>
+          {expedition ? (
+            <div className="featured-expedition-name-row">
+              <p className="featured-expedition-name">{product.name}</p>
+              <p className="featured-expedition-price">
+                {formatPrice(product.price_cents)}
+              </p>
+            </div>
+          ) : (
+            <p
+              className={cn(
+                "font-display text-xl font-semibold text-vibe-text md:text-2xl",
+                noir && "featured-noir-name",
+                atelier && "featured-atelier-name",
+                cyberpunk && "featured-cyberpunk-name",
+              )}
+            >
+              {product.name}
+            </p>
+          )}
 
           {product.description?.trim() ? (
             <p
@@ -142,6 +193,8 @@ export function FeaturedProduct({
                 "line-clamp-3 text-sm leading-relaxed text-vibe-text-muted",
                 noir && "featured-noir-desc",
                 atelier && "featured-atelier-desc",
+                expedition && "featured-expedition-desc",
+                cyberpunk && "featured-cyberpunk-desc",
               )}
             >
               {product.description}
@@ -153,17 +206,22 @@ export function FeaturedProduct({
               "mt-auto flex items-center justify-between gap-3 pt-2",
               noir && "featured-noir-price-row",
               atelier && "featured-atelier-price-row flex-col items-stretch gap-6",
+              expedition && "featured-expedition-price-row",
+              cyberpunk && "featured-cyberpunk-price-row",
             )}
           >
-            <p
-              className={cn(
-                "text-xl font-semibold text-vibe-primary md:text-2xl",
-                noir && "featured-noir-price",
-                atelier && "featured-atelier-price",
-              )}
-            >
-              {formatPrice(product.price_cents)}
-            </p>
+            {!expedition ? (
+              <p
+                className={cn(
+                  "text-xl font-semibold text-vibe-primary md:text-2xl",
+                  noir && "featured-noir-price",
+                  atelier && "featured-atelier-price",
+                  cyberpunk && "featured-cyberpunk-price",
+                )}
+              >
+                {formatPrice(product.price_cents)}
+              </p>
+            ) : null}
 
             {quickAdd ? (
               <button
@@ -174,14 +232,16 @@ export function FeaturedProduct({
                   "flex size-11 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-surface transition-colors",
                   noir && "featured-noir-add",
                   atelier && "featured-atelier-add",
+                  expedition && "featured-expedition-add",
+                  cyberpunk && "featured-cyberpunk-add",
                   added && "bg-vibe-primary text-vibe-primary-fg",
                 )}
               >
-                {atelier ? (
+                {fullWidthCta ? (
                   added ? (
                     <span>Added</span>
                   ) : (
-                    <span>Add to Cart</span>
+                    <span>{expedition || cyberpunk ? "Add to cart" : "Add to Cart"}</span>
                   )
                 ) : added ? (
                   <span className="text-xs font-semibold">✓</span>

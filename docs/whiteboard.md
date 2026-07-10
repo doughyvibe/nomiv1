@@ -18,7 +18,11 @@
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-07-11 | Cyberpunk visual overhaul (shop home + cart/checkout/payment/PDP) | Orbitron + Space Grotesk; black/cyan/purple neon; sticky checkout; featured “Add to cart”; no cover/hero CTA/bottom nav/fake specs; scoped under `[data-vibe="cyberpunk"]` |
+| 2026-07-11 | Futuristic renamed → **Cyberpunk** (`vibe: "cyberpunk"`) | Display + DB id; migration remaps `futuristic` → `cyberpunk` |
 | 2026-07-09 | Noir (`epicurean`) storefront styling complete | Hero, featured, catalog, sticky bar — scoped under `[data-vibe="epicurean"]` |
+| 2026-07-10 | Expedition visual overhaul (shop home + cart/checkout/payment/PDP) | Chivo + JetBrains Mono + Hanken; navy/safety-yellow; 0 radius; hard shadows; scoped under `[data-vibe="expedition"]`; featured CTA “Add to cart”; no cover/hero CTA/bottom nav/fake specs |
+| 2026-07-10 | Outback renamed → **Expedition** (`vibe: "expedition"`) | Display + DB id; migration remaps `outback` → `expedition` |
 | 2026-07-10 | Hero logo is shared media (all vibes); **no banner/cover** | `logo_size` + `logo_style` on `HeroConfig`; render with `object-contain` (never crop); circle frames without cover-crop |
 | 2026-07-10 | Atelier visual overhaul (shop home) | EB Garamond + DM Sans; hero/featured/catalog/sticky/MiniPreview scoped under `[data-vibe="atelier"]`; no cover/CTA/monogram |
 | 2026-07-10 | Unicorn renamed → **Atelier** (`vibe: "atelier"`) | Display + DB id; migration remaps `unicorn` → `atelier`; monogram dropped when no logo |

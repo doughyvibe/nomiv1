@@ -36,7 +36,7 @@ export function StepPublish({
     { label: "Store name added", done: Boolean(store.name) },
     { label: "Subdomain claimed", done: Boolean(store.slug) },
     { label: "Vibe selected", done: Boolean(store.vibe) },
-    { label: "Hero created", done: heroIsComplete(store.hero) },
+    { label: "Shop intro set up", done: heroIsComplete(store.hero) },
     { label: "First product added", done: products.length > 0 },
     { label: "Fulfillment configured", done: fulfillmentIsComplete(store.fulfillment) },
     { label: "PayNow payment configured", done: paynowIsComplete(store.paynow) },

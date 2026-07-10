@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, ShoppingCart } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { formatPrice } from "@/lib/money";
@@ -11,23 +11,45 @@ import { allowsQuickAdd } from "@/lib/products/quick-add";
 import type { Product, Vibe } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
-function isAtelierVibe(vibe: Vibe | "industrial" | "unicorn" | undefined): boolean {
+function isAtelierVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
   return vibe === "atelier" || vibe === "unicorn";
+}
+
+function isExpeditionVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "expedition" || vibe === "outback";
+}
+
+function isCyberpunkVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "cyberpunk" || vibe === "futuristic";
 }
 
 function ProductCard({
   product,
   index,
   atelier,
+  expedition,
+  cyberpunk,
 }: {
   product: Product;
   index: number;
   atelier: boolean;
+  expedition: boolean;
+  cyberpunk: boolean;
 }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const quickAdd = allowsQuickAdd(product);
-  const blurb = atelier ? product.description?.trim() : null;
+  const blurb = cyberpunk
+    ? product.category?.trim() || product.description?.trim() || null
+    : atelier || expedition
+      ? product.description?.trim()
+      : null;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -44,6 +66,8 @@ function ProductCard({
         "vibe-card group flex flex-col overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.98]",
         "animate-fade-up opacity-0",
         atelier && "catalog-atelier-card",
+        expedition && "catalog-expedition-card",
+        cyberpunk && "catalog-cyberpunk-card",
       )}
       style={{
         animationDelay: `${80 + index * 50}ms`,
@@ -54,6 +78,8 @@ function ProductCard({
         className={cn(
           "relative aspect-square overflow-hidden",
           atelier && "catalog-atelier-image",
+          expedition && "catalog-expedition-image",
+          cyberpunk && "catalog-cyberpunk-image",
         )}
       >
         {product.image_url ? (
@@ -68,10 +94,17 @@ function ProductCard({
         ) : (
           <div className="size-full bg-vibe-border/20" />
         )}
+        {expedition ? (
+          <span className="catalog-expedition-price-stamp">
+            {formatPrice(product.price_cents)}
+          </span>
+        ) : null}
         <div
           className={cn(
             "pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-vibe-surface/80 to-transparent",
             atelier && "catalog-atelier-image-fade",
+            expedition && "catalog-expedition-image-fade",
+            cyberpunk && "catalog-cyberpunk-image-fade",
           )}
         />
       </div>
@@ -80,6 +113,8 @@ function ProductCard({
         className={cn(
           "flex flex-1 flex-col gap-2 p-3 md:p-4",
           atelier && "catalog-atelier-body",
+          expedition && "catalog-expedition-body",
+          cyberpunk && "catalog-cyberpunk-body",
         )}
       >
         <h3 className="catalog-card-title line-clamp-2 text-sm font-medium leading-snug text-vibe-text md:text-base">
@@ -109,6 +144,8 @@ function ProductCard({
             >
               {added ? (
                 <span className="text-[10px] font-bold">✓</span>
+              ) : cyberpunk ? (
+                <ShoppingCart className="size-4" />
               ) : (
                 <Plus className="size-4" />
               )}
@@ -122,7 +159,7 @@ function ProductCard({
 
 type ProductCatalogProps = {
   products: Product[];
-  vibe?: Vibe | "industrial" | "unicorn";
+  vibe?: Vibe | "industrial" | "unicorn" | "outback" | "futuristic";
 };
 
 export function ProductCatalog({
@@ -130,6 +167,9 @@ export function ProductCatalog({
   vibe,
 }: ProductCatalogProps) {
   const atelier = isAtelierVibe(vibe);
+  const expedition = isExpeditionVibe(vibe);
+  const cyberpunk = isCyberpunkVibe(vibe);
+  const pillsOnDesktop = atelier || expedition || cyberpunk;
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of products) {
@@ -173,18 +213,18 @@ export function ProductCatalog({
     <section id="catalog" className="catalog-section px-5 pb-8 pt-6 sm:px-6 md:pb-12 md:pt-10">
       {showFilters ? (
         <>
-          {/* Mobile pills; Atelier keeps pills on desktop too */}
+          {/* Mobile pills; Atelier + Expedition keep pills on desktop too */}
           <div
             className={cn(
               "mb-6 flex gap-3 overflow-x-auto pb-1",
-              atelier ? "md:mb-8" : "md:hidden",
+              pillsOnDesktop ? "md:mb-8" : "md:hidden",
             )}
           >
             {pillButtons}
           </div>
 
-          {/* Desktop underline tabs — skipped for Atelier (mockup uses pills) */}
-          {!atelier ? (
+          {/* Desktop underline tabs — skipped when vibe uses pills */}
+          {!pillsOnDesktop ? (
             <div className="catalog-tabs mb-8 hidden gap-6 border-b border-vibe-border/30 md:flex">
               {["All", ...categories].map((cat) => (
                 <button
@@ -218,6 +258,8 @@ export function ProductCatalog({
               product={product}
               index={i}
               atelier={atelier}
+              expedition={expedition}
+              cyberpunk={cyberpunk}
             />
           ))
         )}

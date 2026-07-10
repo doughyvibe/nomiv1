@@ -16,6 +16,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const atelier = store.vibe === "atelier";
+  const expedition = store.vibe === "expedition";
+  const cyberpunk = store.vibe === "cyberpunk";
 
   function handleAdd() {
     addToCart(product.id, quantity);
@@ -24,13 +26,22 @@ export function ProductDetail({ product }: { product: Product }) {
   }
 
   return (
-    <div className={cn("flex flex-col", atelier && "pdp-atelier")}>
+    <div
+      className={cn(
+        "flex flex-col",
+        atelier && "pdp-atelier",
+        expedition && "pdp-expedition",
+        cyberpunk && "pdp-cyberpunk",
+      )}
+    >
       <div className="px-5 pt-4 sm:px-6">
         <Link
           href="/"
           className={cn(
             "pdp-back inline-flex min-h-11 items-center gap-2 text-sm font-medium text-vibe-text-muted transition-colors hover:text-vibe-text",
             atelier && "pdp-atelier-back",
+            expedition && "pdp-expedition-back",
+            cyberpunk && "pdp-cyberpunk-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -81,6 +92,8 @@ export function ProductDetail({ product }: { product: Product }) {
             className={cn(
               "font-display text-2xl font-bold text-vibe-text md:text-3xl",
               atelier && "pdp-atelier-title",
+              expedition && "pdp-expedition-title",
+              cyberpunk && "pdp-cyberpunk-title",
             )}
           >
             {product.name}
@@ -90,6 +103,8 @@ export function ProductDetail({ product }: { product: Product }) {
             className={cn(
               "text-xl font-semibold text-vibe-primary",
               atelier && "pdp-atelier-price",
+              expedition && "pdp-expedition-price",
+              cyberpunk && "pdp-cyberpunk-price",
             )}
           >
             {formatPrice(product.price_cents)}
@@ -149,6 +164,8 @@ export function ProductDetail({ product }: { product: Product }) {
           className={cn(
             "pdp-add w-full rounded-full py-4 text-sm font-semibold uppercase tracking-wider transition-transform active:scale-[0.98]",
             atelier && "pdp-atelier-add",
+            expedition && "pdp-expedition-add",
+            cyberpunk && "pdp-cyberpunk-add",
             added
               ? "bg-vibe-secondary text-vibe-bg"
               : "bg-vibe-primary text-vibe-primary-fg",

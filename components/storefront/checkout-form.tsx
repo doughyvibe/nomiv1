@@ -19,6 +19,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
   const { store, products } = useStorefront();
   const fulfillment = store.fulfillment as FulfillmentConfig;
   const atelier = store.vibe === "atelier";
+  const expedition = store.vibe === "expedition";
+  const cyberpunk = store.vibe === "cyberpunk";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
   const lines = cart.items
@@ -63,6 +65,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           className={cn(
             "mt-4 inline-flex min-h-11 items-center gap-1.5 text-vibe-primary",
             atelier && "checkout-atelier-back",
+            expedition && "checkout-expedition-back",
+            cyberpunk && "checkout-cyberpunk-back",
           )}
         >
           <ArrowLeft className="size-3.5" aria-hidden />
@@ -84,6 +88,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
       className={cn(
         "flex flex-col gap-6 px-5 py-6 sm:px-6",
         atelier && "checkout-atelier",
+        expedition && "checkout-expedition",
+        cyberpunk && "checkout-cyberpunk",
       )}
     >
       <div>
@@ -92,6 +98,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           className={cn(
             "inline-flex min-h-11 items-center gap-2 text-sm font-medium text-vibe-text-muted transition-colors hover:text-vibe-text",
             atelier && "checkout-atelier-back",
+            expedition && "checkout-expedition-back",
+            cyberpunk && "checkout-cyberpunk-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -101,6 +109,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           className={cn(
             "vibe-display mt-4 font-display text-xl font-bold uppercase",
             atelier && "checkout-atelier-title",
+            expedition && "checkout-expedition-title",
+            cyberpunk && "checkout-cyberpunk-title",
           )}
         >
           Checkout
@@ -121,12 +131,16 @@ export function CheckoutForm({ slug }: { slug: string }) {
         className={cn(
           "metal-panel rust-edge rounded-[var(--vibe-radius)] p-4",
           atelier && "checkout-atelier-panel",
+          expedition && "checkout-expedition-panel",
+          cyberpunk && "checkout-cyberpunk-panel",
         )}
       >
         <h2
           className={cn(
             "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
             atelier && "checkout-atelier-section-label",
+            expedition && "checkout-expedition-section-label",
+            cyberpunk && "checkout-cyberpunk-section-label",
           )}
         >
           Order summary
@@ -156,6 +170,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             className={cn(
               "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
               atelier && "checkout-atelier-section-label",
+            expedition && "checkout-expedition-section-label",
+            cyberpunk && "checkout-cyberpunk-section-label",
             )}
           >
             Fulfillment
@@ -165,6 +181,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               className={cn(
                 "metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3",
                 atelier && "checkout-atelier-option",
+                expedition && "checkout-expedition-option",
+                cyberpunk && "checkout-cyberpunk-option",
               )}
             >
               <input
@@ -172,7 +190,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 name="fulfillment_method"
                 value="pickup"
                 defaultChecked={defaultMethod === "pickup"}
-                className={cn("mt-1", atelier && "checkout-atelier-radio")}
+                className={cn("mt-1", atelier && "checkout-atelier-radio",
+                  expedition && "checkout-expedition-radio",
+                  cyberpunk && "checkout-cyberpunk-radio")}
               />
               <span>
                 <span
@@ -196,6 +216,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               className={cn(
                 "metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3",
                 atelier && "checkout-atelier-option",
+                expedition && "checkout-expedition-option",
+                cyberpunk && "checkout-cyberpunk-option",
               )}
             >
               <input
@@ -203,7 +225,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 name="fulfillment_method"
                 value="delivery"
                 defaultChecked={defaultMethod === "delivery"}
-                className={cn("mt-1", atelier && "checkout-atelier-radio")}
+                className={cn("mt-1", atelier && "checkout-atelier-radio",
+                  expedition && "checkout-expedition-radio",
+                  cyberpunk && "checkout-cyberpunk-radio")}
               />
               <span>
                 <span
@@ -230,6 +254,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           className={cn(
             "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
             atelier && "checkout-atelier-section-label",
+            expedition && "checkout-expedition-section-label",
+            cyberpunk && "checkout-cyberpunk-section-label",
           )}
         >
           Your details
@@ -243,6 +269,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             className={cn(
               "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
               atelier && "checkout-atelier-input",
+              expedition && "checkout-expedition-input",
+              cyberpunk && "checkout-cyberpunk-input",
             )}
           />
         </label>
@@ -260,6 +288,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             className={cn(
               "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
               atelier && "checkout-atelier-input",
+              expedition && "checkout-expedition-input",
+              cyberpunk && "checkout-cyberpunk-input",
             )}
           />
         </label>
@@ -273,6 +303,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             className={cn(
               "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
               atelier && "checkout-atelier-input",
+              expedition && "checkout-expedition-input",
+              cyberpunk && "checkout-cyberpunk-input",
             )}
           />
         </label>
@@ -287,6 +319,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               className={cn(
                 "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
                 atelier && "checkout-atelier-input",
+              expedition && "checkout-expedition-input",
+              cyberpunk && "checkout-cyberpunk-input",
               )}
             />
           </label>
@@ -301,6 +335,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             className={cn(
               "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
               atelier && "checkout-atelier-input",
+              expedition && "checkout-expedition-input",
+              cyberpunk && "checkout-cyberpunk-input",
             )}
           />
         </label>
@@ -318,6 +354,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
         className={cn(
           "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-60",
           atelier && "checkout-atelier-cta",
+          expedition && "checkout-expedition-cta",
+          cyberpunk && "checkout-cyberpunk-cta",
         )}
       >
         {pending ? "Creating order…" : "Place order & pay"}

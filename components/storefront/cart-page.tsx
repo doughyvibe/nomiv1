@@ -12,6 +12,8 @@ export function CartPageContent() {
   const { cart, setQuantity, removeItem } = useCart();
   const { products, store } = useStorefront();
   const atelier = store.vibe === "atelier";
+  const expedition = store.vibe === "expedition";
+  const cyberpunk = store.vibe === "cyberpunk";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -37,12 +39,16 @@ export function CartPageContent() {
         className={cn(
           "flex flex-col items-center px-5 py-16 text-center sm:px-6",
           atelier && "cart-atelier-empty",
+          expedition && "cart-expedition-empty",
+          cyberpunk && "cart-cyberpunk-empty",
         )}
       >
         <p
           className={cn(
             "vibe-display font-display text-lg font-bold uppercase",
             atelier && "cart-atelier-empty-title",
+            expedition && "cart-expedition-title",
+            cyberpunk && "cart-cyberpunk-title",
           )}
         >
           Your cart is empty
@@ -55,6 +61,8 @@ export function CartPageContent() {
           className={cn(
             "vibe-display mt-8 inline-flex rounded-[var(--vibe-radius)] bg-vibe-primary px-6 py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase",
             atelier && "cart-atelier-cta",
+            expedition && "cart-expedition-cta",
+            cyberpunk && "cart-cyberpunk-cta",
           )}
         >
           Continue shopping
@@ -68,6 +76,8 @@ export function CartPageContent() {
       className={cn(
         "flex flex-col gap-6 px-5 py-6 sm:px-6",
         atelier && "cart-atelier",
+        expedition && "cart-expedition",
+        cyberpunk && "cart-cyberpunk",
       )}
     >
       <div className="flex items-center justify-between gap-4">
@@ -75,14 +85,21 @@ export function CartPageContent() {
           className={cn(
             "vibe-display font-display text-xl font-bold uppercase",
             atelier && "cart-atelier-title",
+            expedition && "cart-expedition-title",
+            cyberpunk && "cart-cyberpunk-title",
           )}
         >
           Cart
         </h1>
-        {atelier ? (
+        {atelier || expedition || cyberpunk ? (
           <Link
             href="/"
-            className="cart-atelier-back inline-flex min-h-11 items-center gap-1.5 text-sm text-vibe-text-muted"
+            className={cn(
+              "inline-flex min-h-11 items-center gap-1.5 text-sm text-vibe-text-muted",
+              atelier && "cart-atelier-back",
+              expedition && "cart-expedition-back",
+              cyberpunk && "cart-cyberpunk-back",
+            )}
           >
             <ArrowLeft className="size-3.5" aria-hidden />
             Keep shopping
@@ -97,6 +114,8 @@ export function CartPageContent() {
             className={cn(
               "metal-panel rust-edge flex gap-3 rounded-[var(--vibe-radius)] p-3",
               atelier && "cart-atelier-line",
+              expedition && "cart-expedition-line",
+              cyberpunk && "cart-cyberpunk-line",
             )}
           >
             {product.image_url ? (
@@ -210,6 +229,8 @@ export function CartPageContent() {
         className={cn(
           "vibe-display flex w-full items-center justify-center rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98]",
           atelier && "cart-atelier-cta",
+          expedition && "cart-expedition-cta",
+            cyberpunk && "cart-cyberpunk-cta",
         )}
       >
         Checkout

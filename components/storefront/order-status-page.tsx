@@ -56,10 +56,14 @@ function StatusShell({
   title,
   children,
   atelier,
+  expedition,
+  cyberpunk,
 }: {
   title: string;
   children: React.ReactNode;
   atelier: boolean;
+  expedition: boolean;
+  cyberpunk: boolean;
 }) {
   return (
     <div className="flex flex-col items-center px-5 py-8 text-center sm:px-6">
@@ -67,6 +71,8 @@ function StatusShell({
         className={cn(
           "vibe-display font-display text-xl font-bold uppercase",
           atelier && "pay-atelier-status-title",
+          expedition && "pay-expedition-status-title",
+          cyberpunk && "pay-cyberpunk-status-title",
         )}
       >
         {title}
@@ -84,6 +90,8 @@ export function OrderStatusPageContent({
   const router = useRouter();
   const { store: liveStore } = useStorefront();
   const atelier = liveStore.vibe === "atelier";
+  const expedition = liveStore.vibe === "expedition";
+  const cyberpunk = liveStore.vibe === "cyberpunk";
   const { order, store } = data;
   const qrRef = useRef<HTMLDivElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -141,11 +149,11 @@ export function OrderStatusPageContent({
       order.status === "completed" ? "Order completed" : "Order confirmed";
 
     return (
-      <StatusShell title={title} atelier={atelier}>
+      <StatusShell title={title} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           {store.name} has verified your payment. Your order is being prepared.
         </p>
-        <OrderReceipt data={data} showPaidLabel atelier={atelier} />
+        <OrderReceipt data={data} showPaidLabel atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to check your order status any time.
         </p>
@@ -155,25 +163,25 @@ export function OrderStatusPageContent({
 
   if (view === "cancelled") {
     return (
-      <StatusShell title="Order cancelled" atelier={atelier}>
+      <StatusShell title="Order cancelled" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           This order was cancelled. If you have questions, contact {store.name}{" "}
           with reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} />
+        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
       </StatusShell>
     );
   }
 
   if (awaiting) {
     return (
-      <StatusShell title="Awaiting seller verification" atelier={atelier}>
+      <StatusShell title="Awaiting seller verification" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           The seller will verify your payment manually. Check back on this page
           for updates — your order is not confirmed until they verify payment.
         </p>
-        <OrderReceipt data={data} atelier={atelier} />
+        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to see when your order is confirmed.
         </p>
@@ -183,12 +191,12 @@ export function OrderStatusPageContent({
 
   if (view === "expired" || countdown.expired) {
     return (
-      <StatusShell title="Payment window expired" atelier={atelier}>
+      <StatusShell title="Payment window expired" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           If you already paid, contact {store.name} with your order reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} atelier={atelier} />
+        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
       </StatusShell>
     );
   }
@@ -198,6 +206,8 @@ export function OrderStatusPageContent({
       className={cn(
         "flex flex-col gap-6 px-5 py-6 sm:px-6",
         atelier && "pay-atelier",
+        expedition && "pay-expedition",
+        cyberpunk && "pay-cyberpunk",
       )}
     >
       <div className="text-center">
@@ -205,6 +215,8 @@ export function OrderStatusPageContent({
           className={cn(
             "vibe-display text-xs tracking-widest text-vibe-text-muted uppercase",
             atelier && "checkout-atelier-section-label",
+            expedition && "checkout-expedition-section-label",
+            cyberpunk && "checkout-cyberpunk-section-label",
           )}
         >
           Payment pending
@@ -213,6 +225,8 @@ export function OrderStatusPageContent({
           className={cn(
             "vibe-display mt-2 font-display text-2xl font-bold uppercase",
             atelier && "pay-atelier-amount",
+            expedition && "pay-expedition-amount",
+            cyberpunk && "pay-cyberpunk-amount",
           )}
         >
           {formatPrice(order.total_cents)}
@@ -227,6 +241,8 @@ export function OrderStatusPageContent({
           className={cn(
             "metal-panel rust-edge flex flex-col items-center rounded-[var(--vibe-radius)] p-6",
             atelier && "checkout-atelier-panel",
+            expedition && "checkout-expedition-panel",
+            cyberpunk && "checkout-cyberpunk-panel",
           )}
         >
           <div ref={qrRef} className="rounded-lg bg-white p-4">
@@ -260,6 +276,8 @@ export function OrderStatusPageContent({
             className={cn(
               "vibe-display w-full rounded-[var(--vibe-radius)] border border-vibe-border/40 py-3 text-sm font-semibold uppercase transition-transform active:scale-[0.98] disabled:opacity-50",
               atelier && "pay-atelier-secondary",
+              expedition && "pay-expedition-secondary",
+              cyberpunk && "pay-cyberpunk-secondary",
             )}
           >
             {savingQr ? "Saving…" : "Save QR code"}
@@ -276,12 +294,16 @@ export function OrderStatusPageContent({
         className={cn(
           "metal-panel rust-edge rounded-[var(--vibe-radius)] p-4 text-sm",
           atelier && "checkout-atelier-panel",
+            expedition && "checkout-expedition-panel",
+            cyberpunk && "checkout-cyberpunk-panel",
         )}
       >
         <h2
           className={cn(
             "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
             atelier && "checkout-atelier-section-label",
+            expedition && "checkout-expedition-section-label",
+            cyberpunk && "checkout-cyberpunk-section-label",
           )}
         >
           How to pay
@@ -296,7 +318,7 @@ export function OrderStatusPageContent({
         </p>
       </section>
 
-      <OrderReceipt data={data} atelier={atelier} />
+      <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
 
       {notifyState?.error && (
         <p className="text-sm text-red-400" role="alert">
@@ -311,6 +333,8 @@ export function OrderStatusPageContent({
         className={cn(
           "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-50",
           atelier && "checkout-atelier-cta",
+          expedition && "checkout-expedition-cta",
+          cyberpunk && "checkout-cyberpunk-cta",
         )}
       >
         {notifyPending ? "Notifying…" : "Notify seller to verify payment"}
@@ -343,7 +367,9 @@ export function OrderStatusPageContent({
               type="checkbox"
               checked={checked}
               onChange={(e) => setChecked(e.target.checked)}
-              className={cn("mt-1", atelier && "checkout-atelier-radio")}
+              className={cn("mt-1", atelier && "checkout-atelier-radio",
+                expedition && "checkout-expedition-radio",
+                cyberpunk && "checkout-cyberpunk-radio")}
             />
             <span>I have completed payment using the QR code above.</span>
           </label>
@@ -363,6 +389,8 @@ export function OrderStatusPageContent({
               className={cn(
                 "vibe-display rounded-[var(--vibe-radius)] bg-vibe-primary px-4 py-2 text-sm font-semibold text-vibe-primary-fg uppercase disabled:opacity-50",
                 atelier && "checkout-atelier-cta px-5 py-2.5",
+                expedition && "checkout-expedition-cta px-5 py-2.5",
+                cyberpunk && "checkout-cyberpunk-cta px-5 py-2.5",
               )}
             >
               Yes, notify seller

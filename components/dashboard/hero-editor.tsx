@@ -28,20 +28,20 @@ type HeroEditorProps = {
 };
 
 const SIZE_LABELS: Record<HeroLogoSize, string> = {
-  s: "S",
-  m: "M",
-  l: "L",
+  s: "Small",
+  m: "Medium",
+  l: "Large",
 };
 
 const STYLE_LABELS: Record<HeroLogoStyle, string> = {
-  plain: "Plain",
-  rounded: "Rounded",
-  circle: "Circle",
+  plain: "As uploaded",
+  rounded: "Soft corners",
+  circle: "Round frame",
 };
 
 export function HeroEditor({
   store,
-  submitLabel = "Save hero",
+  submitLabel = "Save",
   onSaveHero,
   onSuccess,
 }: HeroEditorProps) {
@@ -120,10 +120,10 @@ export function HeroEditor({
       <div className="flex flex-col gap-6 sm:flex-row">
         <div className="flex flex-1 flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="hero-logo">Logo (optional)</Label>
+            <Label htmlFor="hero-logo">Your logo (optional)</Label>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              Your brand mark above the store name. PNG with a transparent
-              background works best — we won&apos;t crop your logo.
+              Shows above your shop name. A square image with a clear background
+              works best. We show your full logo — nothing gets cut off.
             </p>
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -160,15 +160,15 @@ export function HeroEditor({
           {logoUrl ? (
             <>
               <div className="flex flex-col gap-2">
-                <Label>Logo size</Label>
-                <div className="flex gap-2">
+                <Label>How big should the logo be?</Label>
+                <div className="flex flex-wrap gap-2">
                   {HERO_LOGO_SIZES.map((size) => (
                     <button
                       key={size}
                       type="button"
                       onClick={() => setLogoSize(size)}
                       className={cn(
-                        "min-h-11 min-w-11 rounded-md border px-3 text-sm font-medium transition-colors",
+                        "min-h-11 rounded-md border px-3 text-sm font-medium transition-colors",
                         logoSize === size
                           ? "border-foreground bg-foreground text-background"
                           : "border-border text-muted-foreground hover:text-foreground",
@@ -180,7 +180,7 @@ export function HeroEditor({
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <Label>Logo style</Label>
+                <Label>Logo shape</Label>
                 <div className="flex flex-wrap gap-2">
                   {HERO_LOGO_STYLES.map((style) => (
                     <button
@@ -198,25 +198,31 @@ export function HeroEditor({
                     </button>
                   ))}
                 </div>
-                <p className="text-muted-foreground text-xs">
-                  Circle frames the mark without cropping it.
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Round frame puts your logo in a circle without cutting it.
+                  Watch the preview on the right as you choose.
                 </p>
               </div>
             </>
           ) : null}
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="hero-eyebrow">Eyebrow (optional)</Label>
+            <Label htmlFor="hero-eyebrow">
+              Short line above your shop name (optional)
+            </Label>
             <Input
               id="hero-eyebrow"
               value={eyebrow}
               onChange={(e) => setEyebrow(e.target.value)}
-              placeholder="Est. 2024"
+              placeholder="e.g. Handmade in Singapore"
               maxLength={40}
             />
+            <p className="text-muted-foreground text-xs">
+              A small line of text above the big shop name.
+            </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="hero-title">Store name on storefront</Label>
+            <Label htmlFor="hero-title">Shop name</Label>
             <Input
               id="hero-title"
               value={title}
@@ -224,22 +230,31 @@ export function HeroEditor({
               placeholder={store.name}
               maxLength={80}
             />
+            <p className="text-muted-foreground text-xs">
+              The main name buyers see at the top of your shop.
+            </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="hero-subheading">Tagline</Label>
+            <Label htmlFor="hero-subheading">
+              One-line description (optional)
+            </Label>
             <Input
               id="hero-subheading"
               value={subheading}
               onChange={(e) => setSubheading(e.target.value)}
-              placeholder="What you sell in one line"
+              placeholder="e.g. Fresh bakes, ready for pickup"
               maxLength={140}
             />
+            <p className="text-muted-foreground text-xs">
+              A short sentence under your shop name — what you sell, in plain
+              words.
+            </p>
           </div>
         </div>
 
         <div className="sm:w-[240px]">
           <p className="text-muted-foreground mb-2 text-xs font-medium">
-            Live preview
+            How it looks on your shop
           </p>
           {store.vibe ? (
             <MiniPreview
@@ -250,7 +265,7 @@ export function HeroEditor({
             />
           ) : (
             <p className="text-muted-foreground text-sm">
-              Choose a vibe first to preview styling.
+              Pick a vibe first to see a preview.
             </p>
           )}
         </div>

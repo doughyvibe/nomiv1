@@ -6,7 +6,7 @@ import { heroLogoClassName } from "@/lib/stores/hero-logo";
 type StorefrontHeroProps = {
   storeName: string;
   hero: Partial<HeroConfig>;
-  vibe?: Vibe | "industrial" | "unicorn";
+  vibe?: Vibe | "industrial" | "unicorn" | "outback" | "futuristic";
 };
 
 function Monogram({ name }: { name: string }) {
@@ -42,14 +42,28 @@ function HeroLogo({
   );
 }
 
-function isNoirVibe(vibe: Vibe | "industrial" | "unicorn" | undefined): boolean {
+function isNoirVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
   return vibe === "epicurean" || vibe === "industrial";
 }
 
 function isAtelierVibe(
-  vibe: Vibe | "industrial" | "unicorn" | undefined,
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
 ): boolean {
   return vibe === "atelier" || vibe === "unicorn";
+}
+
+function isExpeditionVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "expedition" || vibe === "outback";
+}
+
+function isCyberpunkVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "cyberpunk" || vibe === "futuristic";
 }
 
 function NoirHero({
@@ -128,6 +142,80 @@ function AtelierHero({
   );
 }
 
+/** Expedition: heavy wordmark, yellow-ruled eyebrow; no cover/CTA. */
+function ExpeditionHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero flex flex-col items-start px-5 pb-8 pt-10 text-left sm:px-6 md:pb-12 md:pt-14">
+      {hero.logo_url ? (
+        <div className="mb-5">
+          <HeroLogo
+            url={hero.logo_url}
+            alt={title}
+            size={hero.logo_size}
+            style={hero.logo_style}
+          />
+        </div>
+      ) : null}
+
+      {eyebrow ? (
+        <p className="hero-expedition-eyebrow mb-4 text-balance">{eyebrow}</p>
+      ) : null}
+
+      <h1 className="hero-expedition-title text-balance">{title}</h1>
+
+      {tagline ? (
+        <p className="hero-expedition-tagline mt-4 text-balance">{tagline}</p>
+      ) : null}
+    </section>
+  );
+}
+
+/** Cyberpunk: cyan eyebrow, Orbitron wordmark; no cover/CTA. */
+function CyberpunkHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero flex flex-col items-center px-5 pb-8 pt-10 text-center sm:px-6 md:pb-12 md:pt-14">
+      {hero.logo_url ? (
+        <div className="mb-5">
+          <HeroLogo
+            url={hero.logo_url}
+            alt={title}
+            size={hero.logo_size}
+            style={hero.logo_style}
+          />
+        </div>
+      ) : null}
+
+      {eyebrow ? (
+        <p className="hero-cyberpunk-eyebrow mb-3 text-balance">{eyebrow}</p>
+      ) : null}
+
+      <h1 className="hero-cyberpunk-title text-balance">{title}</h1>
+
+      {tagline ? (
+        <p className="hero-cyberpunk-tagline mt-4 text-balance">{tagline}</p>
+      ) : null}
+    </section>
+  );
+}
+
 function DefaultHero({
   title,
   hero,
@@ -180,6 +268,14 @@ export function StorefrontHero({
 
   if (isAtelierVibe(vibe)) {
     return <AtelierHero title={title} hero={hero} />;
+  }
+
+  if (isExpeditionVibe(vibe)) {
+    return <ExpeditionHero title={title} hero={hero} />;
+  }
+
+  if (isCyberpunkVibe(vibe)) {
+    return <CyberpunkHero title={title} hero={hero} />;
   }
 
   return <DefaultHero title={title} hero={hero} />;

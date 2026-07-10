@@ -1,11 +1,13 @@
 import {
-  Bebas_Neue,
+  Chivo,
   DM_Sans,
   EB_Garamond,
   Hanken_Grotesk,
   Inter,
+  JetBrains_Mono,
+  Orbitron,
   Plus_Jakarta_Sans,
-  Syne,
+  Space_Grotesk,
 } from "next/font/google";
 
 export const inter = Inter({
@@ -45,18 +47,34 @@ export const dmSans = DM_Sans({
   display: "swap",
 });
 
-/** Outback — warm rugged display (docs/outback/orangeTheme.md) */
-export const syne = Syne({
+/** Expedition — industrial display (docs/expedition_storefront/DESIGN.md) */
+export const chivo = Chivo({
   subsets: ["latin"],
-  variable: "--font-syne",
-  weight: ["600", "700", "800"],
+  variable: "--font-chivo",
+  weight: ["400", "700", "900"],
   display: "swap",
 });
 
-/** Futuristic — neon urban display (docs/futuristic/neonTheme.md) */
-export const bebasNeue = Bebas_Neue({
+/** Expedition — technical labels / mono UI */
+export const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-bebas",
+  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
+
+/** Cyberpunk — neon display (docs/cyberpunk_storefront/screen.png) */
+export const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: "--font-orbitron",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+/** Cyberpunk — body / UI */
+export const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });

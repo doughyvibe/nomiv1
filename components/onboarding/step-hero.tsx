@@ -21,10 +21,10 @@ export function StepHero({
     <section className="flex flex-col gap-5">
       <div>
         <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">
-          Brand your storefront
+          Introduce your shop
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add your logo and tagline — your vibe controls the look.
+          Add your logo, shop name, and a short line about what you sell.
         </p>
       </div>
 
