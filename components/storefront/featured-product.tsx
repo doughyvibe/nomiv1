@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Plus, Star } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { resolveFeaturedSectionTitle } from "@/lib/featured-section";
 import { formatPrice } from "@/lib/money";
-import { allowsQuickAdd } from "@/lib/products/quick-add";
 import type { Product, Vibe } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +40,18 @@ function isCyberpunkVibe(
   return vibe === "cyberpunk" || vibe === "futuristic";
 }
 
+function isCandylandVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "candyland";
+}
+
+function isMarketVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "market";
+}
+
 export function FeaturedProduct({
   product,
   sectionTitle,
@@ -48,13 +59,14 @@ export function FeaturedProduct({
 }: FeaturedProductProps) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
-  const quickAdd = allowsQuickAdd(product);
   const noir = isNoirVibe(vibe);
   const atelier = isAtelierVibe(vibe);
   const expedition = isExpeditionVibe(vibe);
   const cyberpunk = isCyberpunkVibe(vibe);
+  const candyland = isCandylandVibe(vibe);
+  const market = isMarketVibe(vibe);
   const heading = resolveFeaturedSectionTitle(sectionTitle);
-  const fullWidthCta = atelier || expedition || cyberpunk;
+  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -72,6 +84,8 @@ export function FeaturedProduct({
         atelier && "featured-atelier-section",
         expedition && "featured-expedition-section",
         cyberpunk && "featured-cyberpunk-section",
+        candyland && "featured-candyland-section",
+        market && "featured-market-section",
       )}
     >
       <div
@@ -81,6 +95,8 @@ export function FeaturedProduct({
           atelier && "featured-atelier-header",
           expedition && "featured-expedition-header",
           cyberpunk && "featured-cyberpunk-header",
+          candyland && "featured-candyland-header",
+          market && "featured-market-header",
         )}
       >
         <h2
@@ -90,6 +106,8 @@ export function FeaturedProduct({
             atelier && "featured-atelier-header-title",
             expedition && "featured-expedition-header-title",
             cyberpunk && "featured-cyberpunk-header-title",
+            candyland && "featured-candyland-header-title",
+            market && "featured-market-header-title",
           )}
         >
           {heading}
@@ -112,6 +130,8 @@ export function FeaturedProduct({
           atelier && "featured-atelier-card",
           expedition && "featured-expedition-card",
           cyberpunk && "featured-cyberpunk-card",
+          candyland && "featured-candyland-card",
+          market && "featured-market-card",
         )}
       >
         <div
@@ -121,6 +141,8 @@ export function FeaturedProduct({
             atelier && "featured-atelier-image-wrap",
             expedition && "featured-expedition-image-wrap",
             cyberpunk && "featured-cyberpunk-image-wrap",
+            candyland && "featured-candyland-image-wrap",
+            market && "featured-market-image-wrap",
           )}
         >
           {product.image_url ? (
@@ -142,7 +164,11 @@ export function FeaturedProduct({
                         ? "featured-expedition-image-fade"
                         : cyberpunk
                           ? "featured-cyberpunk-image-fade"
-                          : "bg-gradient-to-t from-vibe-surface to-transparent",
+                          : candyland
+                            ? "featured-candyland-image-fade"
+                            : market
+                              ? "featured-market-image-fade"
+                              : "bg-gradient-to-t from-vibe-surface to-transparent",
                 )}
               />
             </>
@@ -158,6 +184,8 @@ export function FeaturedProduct({
             atelier && "featured-atelier-body",
             expedition && "featured-expedition-body",
             cyberpunk && "featured-cyberpunk-body",
+            candyland && "featured-candyland-body",
+            market && "featured-market-body",
           )}
         >
           {atelier ? (
@@ -181,6 +209,8 @@ export function FeaturedProduct({
                 noir && "featured-noir-name",
                 atelier && "featured-atelier-name",
                 cyberpunk && "featured-cyberpunk-name",
+                candyland && "featured-candyland-name",
+                market && "featured-market-name",
               )}
             >
               {product.name}
@@ -195,6 +225,8 @@ export function FeaturedProduct({
                 atelier && "featured-atelier-desc",
                 expedition && "featured-expedition-desc",
                 cyberpunk && "featured-cyberpunk-desc",
+                candyland && "featured-candyland-desc",
+                market && "featured-market-desc",
               )}
             >
               {product.description}
@@ -208,6 +240,8 @@ export function FeaturedProduct({
               atelier && "featured-atelier-price-row flex-col items-stretch gap-6",
               expedition && "featured-expedition-price-row",
               cyberpunk && "featured-cyberpunk-price-row",
+              candyland && "featured-candyland-price-row",
+              market && "featured-market-price-row",
             )}
           >
             {!expedition ? (
@@ -217,44 +251,41 @@ export function FeaturedProduct({
                   noir && "featured-noir-price",
                   atelier && "featured-atelier-price",
                   cyberpunk && "featured-cyberpunk-price",
+                  candyland && "featured-candyland-price",
+                  market && "featured-market-price",
                 )}
               >
                 {formatPrice(product.price_cents)}
               </p>
             ) : null}
 
-            {quickAdd ? (
-              <button
-                type="button"
-                onClick={handleQuickAdd}
-                aria-label={`Add ${product.name} to cart`}
-                className={cn(
-                  "flex size-11 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-surface transition-colors",
-                  noir && "featured-noir-add",
-                  atelier && "featured-atelier-add",
-                  expedition && "featured-expedition-add",
-                  cyberpunk && "featured-cyberpunk-add",
-                  added && "bg-vibe-primary text-vibe-primary-fg",
-                )}
-              >
-                {fullWidthCta ? (
-                  added ? (
-                    <span>Added</span>
-                  ) : (
-                    <span>{expedition || cyberpunk ? "Add to cart" : "Add to Cart"}</span>
-                  )
-                ) : added ? (
-                  <span className="text-xs font-semibold">✓</span>
+            <button
+              type="button"
+              onClick={handleQuickAdd}
+              aria-label={`Add ${product.name} to cart`}
+              className={cn(
+                "flex size-11 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-surface transition-colors",
+                noir && "featured-noir-add",
+                atelier && "featured-atelier-add",
+                expedition && "featured-expedition-add",
+                cyberpunk && "featured-cyberpunk-add",
+                candyland && "featured-candyland-add",
+                market && "featured-market-add",
+                added && "bg-vibe-primary text-vibe-primary-fg",
+              )}
+            >
+              {fullWidthCta ? (
+                added ? (
+                  <span>Added</span>
                 ) : (
-                  <Plus className="size-5" />
-                )}
-              </button>
-            ) : (
-              <span className="flex items-center gap-1 text-xs font-medium text-vibe-text-muted">
-                View details
-                <ArrowRight className="size-3.5" />
-              </span>
-            )}
+                  <span>{expedition || cyberpunk || candyland || market ? "Add to cart" : "Add to Cart"}</span>
+                )
+              ) : added ? (
+                <span className="text-xs font-semibold">✓</span>
+              ) : (
+                <Plus className="size-5" />
+              )}
+            </button>
           </div>
         </div>
       </Link>

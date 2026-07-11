@@ -59,6 +59,42 @@ export const VIBES: VibeMeta[] = [
     },
     provisional: false,
   },
+  {
+    id: "candyland",
+    name: "Candyland",
+    tagline: "Playful pastels, sweet and bold.",
+    suitableFor: "Sweets, kids, gifts, beauty, party goods",
+    swatch: {
+      bg: "rgb(255 255 255)",
+      primary: "rgb(255 45 138)",
+      secondary: "rgb(123 47 255)",
+    },
+    provisional: false,
+  },
+  {
+    id: "gallery",
+    name: "Gallery",
+    tagline: "Clean white space, art-forward.",
+    suitableFor: "Art, prints, photography, design, collectibles",
+    swatch: {
+      bg: "rgb(250 250 252)",
+      primary: "rgb(28 28 32)",
+      secondary: "rgb(140 140 150)",
+    },
+    provisional: true,
+  },
+  {
+    id: "market",
+    name: "Market",
+    tagline: "Quiet luxury for the modern agrarian.",
+    suitableFor: "Produce, bakeries, pantry goods, farm stalls",
+    swatch: {
+      bg: "rgb(255 248 245)",
+      primary: "rgb(136 69 48)",
+      secondary: "rgb(115 89 75)",
+    },
+    provisional: false,
+  },
 ];
 
 export function getVibeMeta(id: Vibe): VibeMeta {

@@ -1,3 +1,4 @@
+import localFont from "next/font/local";
 import {
   Chivo,
   DM_Sans,
@@ -5,6 +6,8 @@ import {
   Hanken_Grotesk,
   Inter,
   JetBrains_Mono,
+  League_Spartan,
+  Libre_Caslon_Text,
   Orbitron,
   Plus_Jakarta_Sans,
   Space_Grotesk,
@@ -76,5 +79,45 @@ export const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/** Candyland — display (docs/candyland_storefront) */
+export const leagueSpartan = League_Spartan({
+  subsets: ["latin"],
+  variable: "--font-league-spartan",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/** Market — editorial display serif (docs/market_storefront/DESIGN.md) */
+export const libreCaslonText = Libre_Caslon_Text({
+  subsets: ["latin"],
+  variable: "--font-libre-caslon",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+/** Candyland — body (Satoshi from Fontshare, self-hosted) */
+export const satoshi = localFont({
+  src: [
+    {
+      path: "../public/fonts/satoshi/Satoshi-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/satoshi/Satoshi-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/satoshi/Satoshi-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-satoshi",
   display: "swap",
 });

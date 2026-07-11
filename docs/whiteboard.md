@@ -18,6 +18,9 @@
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-07-11 | Market visual overhaul (shop home + cart/checkout/payment/PDP) | Libre Caslon + DM Sans; peach/terracotta/linen; outline featured “Add to cart”; soft linen sticky dock (not mockup charcoal); no cover/bottom nav |
+| 2026-07-11 | Candyland visual overhaul (shop home + cart/checkout/payment/PDP) | League Spartan + Satoshi; neo-brutalist pink/purple/lime; hard shadows; candy stripes hero; featured “Add to cart”; sticky lime bar; no cover/tints/bottom nav |
+| 2026-07-11 | Added provisional vibes: **Candyland**, **Gallery**, **Market** | Light placeholder tokens + picker entries; Candyland + Market overhauled since; Gallery still provisional |
 | 2026-07-11 | Cyberpunk visual overhaul (shop home + cart/checkout/payment/PDP) | Orbitron + Space Grotesk; black/cyan/purple neon; sticky checkout; featured “Add to cart”; no cover/hero CTA/bottom nav/fake specs; scoped under `[data-vibe="cyberpunk"]` |
 | 2026-07-11 | Futuristic renamed → **Cyberpunk** (`vibe: "cyberpunk"`) | Display + DB id; migration remaps `futuristic` → `cyberpunk` |
 | 2026-07-09 | Noir (`epicurean`) storefront styling complete | Hero, featured, catalog, sticky bar — scoped under `[data-vibe="epicurean"]` |

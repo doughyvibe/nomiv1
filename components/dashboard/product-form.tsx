@@ -176,8 +176,7 @@ export function ProductForm({
           className="w-full min-w-0 rounded-lg border border-input bg-transparent px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm resize-none"
         />
         <p className="text-muted-foreground text-xs">
-          Long descriptions hide quick-add on your storefront — buyers will tap
-          through to read details (good for services and courses).
+          Shown on the product page and as a short blurb on catalog cards.
         </p>
       </div>
 

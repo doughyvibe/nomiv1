@@ -21,6 +21,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
   const atelier = store.vibe === "atelier";
   const expedition = store.vibe === "expedition";
   const cyberpunk = store.vibe === "cyberpunk";
+  const candyland = store.vibe === "candyland";
+  const market = store.vibe === "market";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
   const lines = cart.items
@@ -67,6 +69,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             atelier && "checkout-atelier-back",
             expedition && "checkout-expedition-back",
             cyberpunk && "checkout-cyberpunk-back",
+            candyland && "checkout-candyland-back",
+          market && "checkout-market-back",
           )}
         >
           <ArrowLeft className="size-3.5" aria-hidden />
@@ -90,6 +94,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
         atelier && "checkout-atelier",
         expedition && "checkout-expedition",
         cyberpunk && "checkout-cyberpunk",
+        candyland && "checkout-candyland",
+          market && "checkout-market",
       )}
     >
       <div>
@@ -100,6 +106,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             atelier && "checkout-atelier-back",
             expedition && "checkout-expedition-back",
             cyberpunk && "checkout-cyberpunk-back",
+            candyland && "checkout-candyland-back",
+          market && "checkout-market-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -111,6 +119,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             atelier && "checkout-atelier-title",
             expedition && "checkout-expedition-title",
             cyberpunk && "checkout-cyberpunk-title",
+            candyland && "checkout-candyland-title",
+          market && "checkout-market-title",
           )}
         >
           Checkout
@@ -133,6 +143,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           atelier && "checkout-atelier-panel",
           expedition && "checkout-expedition-panel",
           cyberpunk && "checkout-cyberpunk-panel",
+          candyland && "checkout-candyland-panel",
+          market && "checkout-market-panel",
         )}
       >
         <h2
@@ -141,6 +153,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             atelier && "checkout-atelier-section-label",
             expedition && "checkout-expedition-section-label",
             cyberpunk && "checkout-cyberpunk-section-label",
+            candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
           )}
         >
           Order summary
@@ -172,6 +186,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               atelier && "checkout-atelier-section-label",
             expedition && "checkout-expedition-section-label",
             cyberpunk && "checkout-cyberpunk-section-label",
+            candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
             )}
           >
             Fulfillment
@@ -183,6 +199,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 atelier && "checkout-atelier-option",
                 expedition && "checkout-expedition-option",
                 cyberpunk && "checkout-cyberpunk-option",
+                candyland && "checkout-candyland-option",
+          market && "checkout-market-option",
               )}
             >
               <input
@@ -192,7 +210,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 defaultChecked={defaultMethod === "pickup"}
                 className={cn("mt-1", atelier && "checkout-atelier-radio",
                   expedition && "checkout-expedition-radio",
-                  cyberpunk && "checkout-cyberpunk-radio")}
+                  cyberpunk && "checkout-cyberpunk-radio",
+                  candyland && "checkout-candyland-radio",
+          market && "checkout-market-radio")}
               />
               <span>
                 <span
@@ -218,6 +238,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 atelier && "checkout-atelier-option",
                 expedition && "checkout-expedition-option",
                 cyberpunk && "checkout-cyberpunk-option",
+                candyland && "checkout-candyland-option",
+          market && "checkout-market-option",
               )}
             >
               <input
@@ -227,7 +249,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 defaultChecked={defaultMethod === "delivery"}
                 className={cn("mt-1", atelier && "checkout-atelier-radio",
                   expedition && "checkout-expedition-radio",
-                  cyberpunk && "checkout-cyberpunk-radio")}
+                  cyberpunk && "checkout-cyberpunk-radio",
+                  candyland && "checkout-candyland-radio",
+          market && "checkout-market-radio")}
               />
               <span>
                 <span
@@ -256,6 +280,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
             atelier && "checkout-atelier-section-label",
             expedition && "checkout-expedition-section-label",
             cyberpunk && "checkout-cyberpunk-section-label",
+            candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
           )}
         >
           Your details
@@ -271,6 +297,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               atelier && "checkout-atelier-input",
               expedition && "checkout-expedition-input",
               cyberpunk && "checkout-cyberpunk-input",
+              candyland && "checkout-candyland-input",
+          market && "checkout-market-input",
             )}
           />
         </label>
@@ -290,6 +318,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               atelier && "checkout-atelier-input",
               expedition && "checkout-expedition-input",
               cyberpunk && "checkout-cyberpunk-input",
+              candyland && "checkout-candyland-input",
+          market && "checkout-market-input",
             )}
           />
         </label>
@@ -305,6 +335,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               atelier && "checkout-atelier-input",
               expedition && "checkout-expedition-input",
               cyberpunk && "checkout-cyberpunk-input",
+              candyland && "checkout-candyland-input",
+          market && "checkout-market-input",
             )}
           />
         </label>
@@ -321,6 +353,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 atelier && "checkout-atelier-input",
               expedition && "checkout-expedition-input",
               cyberpunk && "checkout-cyberpunk-input",
+              candyland && "checkout-candyland-input",
+          market && "checkout-market-input",
               )}
             />
           </label>
@@ -337,6 +371,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
               atelier && "checkout-atelier-input",
               expedition && "checkout-expedition-input",
               cyberpunk && "checkout-cyberpunk-input",
+              candyland && "checkout-candyland-input",
+          market && "checkout-market-input",
             )}
           />
         </label>
@@ -356,6 +392,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           atelier && "checkout-atelier-cta",
           expedition && "checkout-expedition-cta",
           cyberpunk && "checkout-cyberpunk-cta",
+          candyland && "checkout-candyland-cta",
+          market && "checkout-market-cta",
         )}
       >
         {pending ? "Creating order…" : "Place order & pay"}

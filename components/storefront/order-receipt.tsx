@@ -9,12 +9,16 @@ export function OrderReceipt({
   atelier = false,
   expedition = false,
   cyberpunk = false,
+  candyland = false,
+  market = false,
 }: {
   data: LoadedOrder;
   showPaidLabel?: boolean;
   atelier?: boolean;
   expedition?: boolean;
   cyberpunk?: boolean;
+  candyland?: boolean;
+  market?: boolean;
 }) {
   const { order, store, items } = data;
   const fulfillmentSummary = formatFulfillmentSummary(order);
@@ -32,6 +36,8 @@ export function OrderReceipt({
         atelier && "checkout-atelier-panel",
         expedition && "checkout-expedition-panel",
         cyberpunk && "checkout-cyberpunk-panel",
+        candyland && "checkout-candyland-panel",
+          market && "checkout-market-panel",
       )}
     >
       <p
@@ -40,6 +46,8 @@ export function OrderReceipt({
           atelier && "checkout-atelier-section-label",
           expedition && "checkout-expedition-section-label",
           cyberpunk && "checkout-cyberpunk-section-label",
+          candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
         )}
       >
         {showPaidLabel ? "Order receipt" : "Order summary"}
@@ -86,6 +94,8 @@ export function OrderReceipt({
             atelier && "checkout-atelier-total",
             expedition && "pay-expedition-amount",
             cyberpunk && "pay-cyberpunk-amount",
+            candyland && "pay-candyland-amount",
+          market && "pay-market-amount",
           )}
         >
           <dt>{showPaidLabel ? "Total paid" : "Total due"}</dt>
@@ -100,6 +110,8 @@ export function OrderReceipt({
             atelier && "checkout-atelier-section-label",
           expedition && "checkout-expedition-section-label",
           cyberpunk && "checkout-cyberpunk-section-label",
+          candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
           )}
         >
           Fulfillment

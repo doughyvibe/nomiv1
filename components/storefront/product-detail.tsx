@@ -18,6 +18,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const atelier = store.vibe === "atelier";
   const expedition = store.vibe === "expedition";
   const cyberpunk = store.vibe === "cyberpunk";
+  const candyland = store.vibe === "candyland";
+  const market = store.vibe === "market";
 
   function handleAdd() {
     addToCart(product.id, quantity);
@@ -32,6 +34,8 @@ export function ProductDetail({ product }: { product: Product }) {
         atelier && "pdp-atelier",
         expedition && "pdp-expedition",
         cyberpunk && "pdp-cyberpunk",
+        candyland && "pdp-candyland",
+          market && "pdp-market",
       )}
     >
       <div className="px-5 pt-4 sm:px-6">
@@ -42,6 +46,8 @@ export function ProductDetail({ product }: { product: Product }) {
             atelier && "pdp-atelier-back",
             expedition && "pdp-expedition-back",
             cyberpunk && "pdp-cyberpunk-back",
+            candyland && "pdp-candyland-back",
+          market && "pdp-market-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -94,6 +100,8 @@ export function ProductDetail({ product }: { product: Product }) {
               atelier && "pdp-atelier-title",
               expedition && "pdp-expedition-title",
               cyberpunk && "pdp-cyberpunk-title",
+              candyland && "pdp-candyland-title",
+          market && "pdp-market-title",
             )}
           >
             {product.name}
@@ -105,6 +113,8 @@ export function ProductDetail({ product }: { product: Product }) {
               atelier && "pdp-atelier-price",
               expedition && "pdp-expedition-price",
               cyberpunk && "pdp-cyberpunk-price",
+              candyland && "pdp-candyland-price",
+          market && "pdp-market-price",
             )}
           >
             {formatPrice(product.price_cents)}
@@ -166,6 +176,8 @@ export function ProductDetail({ product }: { product: Product }) {
             atelier && "pdp-atelier-add",
             expedition && "pdp-expedition-add",
             cyberpunk && "pdp-cyberpunk-add",
+            candyland && "pdp-candyland-add",
+          market && "pdp-market-add",
             added
               ? "bg-vibe-secondary text-vibe-bg"
               : "bg-vibe-primary text-vibe-primary-fg",

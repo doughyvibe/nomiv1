@@ -6,7 +6,7 @@
  *
  * Vibe vars use --vibe-* prefix so they never collide with shadcn --primary / --secondary.
  * Industrial is the fully designed reference vibe (PRD §10 / JigWave).
- * Atelier, Expedition, Cyberpunk — see docs/atelier_storefront, docs/expedition_storefront, docs/cyberpunk_storefront.
+ * Atelier, Expedition, Cyberpunk, Candyland, Gallery, Market — see docs/*_storefront.
  */
 
 :root {
@@ -1936,12 +1936,48 @@
   --font-body: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-orbitron), ui-sans-serif, system-ui, sans-serif;
 
+  position: relative;
+  isolation: isolate;
   background-color: rgb(var(--vibe-bg));
   color: rgb(var(--vibe-text));
   font-family: var(--font-body);
+  /* Pulse-grid atmosphere: fine grid + violet/cyan bloom (no cover image) */
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.028) 1px, transparent 1px),
+    radial-gradient(
+      ellipse 75% 50% at 50% -8%,
+      rgb(var(--vibe-secondary) / 0.16),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 100% 15%,
+      rgb(var(--vibe-primary) / 0.07),
+      transparent 55%
+    );
+  background-size: 36px 36px, 36px 36px, 100% 100%, 100% 100%;
 }
 
-/* Cyberpunk hero — cyan eyebrow, Orbitron wordmark; no cover/CTA */
+/* CRT scanlines — contained to vibe root (works in MiniPreview; pointer-events none) */
+[data-vibe="cyberpunk"]::after,
+[data-vibe="futuristic"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgb(0 0 0 / 0.22) 50%,
+    rgb(0 0 0 / 0.22) 100%
+  );
+  background-size: 100% 3px;
+  opacity: 0.55;
+}
+
+/* Cyberpunk hero — white eyebrow, cyan glowing wordmark; no cover/CTA */
 [data-vibe="cyberpunk"] .hero-cyberpunk-eyebrow,
 [data-vibe="futuristic"] .hero-cyberpunk-eyebrow {
   font-family: var(--font-body);
@@ -1961,7 +1997,36 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgb(var(--vibe-primary));
-  text-shadow: 0 0 18px rgb(var(--vibe-primary) / 0.35);
+  text-shadow:
+    0 0 8px rgb(var(--vibe-primary) / 0.85),
+    0 0 22px rgb(var(--vibe-primary) / 0.5),
+    0 0 48px rgb(var(--vibe-primary) / 0.28);
+}
+
+[data-vibe="cyberpunk"] .storefront-hero,
+[data-vibe="futuristic"] .storefront-hero {
+  position: relative;
+  z-index: 1;
+}
+
+/* Soft cyan floor glow under the hero wordmark */
+[data-vibe="cyberpunk"] .storefront-hero::after,
+[data-vibe="futuristic"] .storefront-hero::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  width: min(16rem, 70%);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(var(--vibe-primary) / 0.55),
+    transparent
+  );
+  box-shadow: 0 0 12px rgb(var(--vibe-primary) / 0.45);
+  pointer-events: none;
 }
 
 [data-vibe="cyberpunk"] .hero-cyberpunk-tagline,
@@ -2217,8 +2282,8 @@
   font-family: var(--font-body);
   font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: rgb(var(--vibe-text-muted));
 }
 
@@ -2281,9 +2346,12 @@
   max-width: 36rem;
   border-radius: var(--vibe-radius);
   border: 1px solid rgb(var(--vibe-primary) / 0.35);
-  background: rgb(var(--vibe-surface) / 0.92);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 0 24px rgb(var(--vibe-primary) / 0.15);
+  background: rgb(var(--vibe-surface) / 0.55);
+  backdrop-filter: blur(16px) saturate(1.35);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  box-shadow:
+    0 0 24px rgb(var(--vibe-primary) / 0.15),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 
 [data-vibe="cyberpunk"] .checkout-bar-icon-active,
@@ -2437,4 +2505,959 @@
   text-transform: none;
   color: rgb(var(--vibe-primary));
   text-shadow: 0 0 16px rgb(var(--vibe-primary) / 0.45);
+}
+
+/* --------------------------------------------------------------------------
+ * Candyland — neo-brutalist candy pop (docs/candyland_storefront)
+ * Hot pink / electric purple / lime; thick black borders; hard offset shadows
+ * Locks: no cover, no hero CTA, sticky checkout, no fake specs, no image tints
+ * ------------------------------------------------------------------------ */
+[data-vibe="candyland"] {
+  --vibe-bg: 255 255 255;
+  --vibe-primary: 255 45 138;
+  --vibe-primary-fg: 255 255 255;
+  --vibe-secondary: 123 47 255;
+  --vibe-accent: 196 240 0;
+  --vibe-surface: 255 255 255;
+  --vibe-border: 0 0 0;
+  --vibe-text: 20 20 20;
+  --vibe-text-muted: 80 80 80;
+  --vibe-text-variant: 80 80 80;
+  --vibe-text-bright: 0 0 0;
+  --vibe-primary-container: 196 240 0;
+  --vibe-surface-elevated: 255 255 255;
+  --vibe-radius: 1.25rem;
+  --font-body: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-league-spartan), ui-sans-serif, system-ui, sans-serif;
+
+  background-color: rgb(var(--vibe-bg));
+  color: rgb(var(--vibe-text));
+  font-family: var(--font-body);
+}
+
+/* Candyland hero — candy-wrapper band; no cover/CTA */
+[data-vibe="candyland"] .hero-candyland-band {
+  background: linear-gradient(
+    160deg,
+    rgb(200 20 110) 0%,
+    rgb(var(--vibe-primary)) 38%,
+    rgb(90 30 190) 100%
+  );
+  border-bottom: 4px solid rgb(0 0 0);
+  box-shadow: 0 5px 0 0 rgb(var(--vibe-accent));
+}
+
+[data-vibe="candyland"] .hero-candyland-inner {
+  /* Soft scrim so white type stays readable on the neon wash */
+  background: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 0.12) 0%,
+    rgb(0 0 0 / 0.22) 100%
+  );
+}
+
+[data-vibe="candyland"] .hero-candyland-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(255 255 255);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.45);
+}
+
+[data-vibe="candyland"] .hero-candyland-title {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: rgb(255 255 255);
+  text-shadow:
+    0 2px 0 rgb(0 0 0 / 0.35),
+    0 4px 16px rgb(0 0 0 / 0.35);
+}
+
+[data-vibe="candyland"] .hero-candyland-tagline {
+  max-width: 22rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgb(255 255 255);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+}
+
+@media (min-width: 768px) {
+  [data-vibe="candyland"] .hero-candyland-title {
+    font-size: 2.75rem;
+  }
+}
+
+/* Candyland featured — pink frame, hard pink shadow */
+[data-vibe="candyland"] .featured-candyland-header {
+  margin-bottom: 0.75rem;
+  justify-content: center;
+}
+
+[data-vibe="candyland"] .featured-candyland-header-title {
+  display: inline-flex;
+  width: fit-content;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text-bright));
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  background: rgb(var(--vibe-accent));
+  box-shadow: 2px 2px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .vibe-card.featured-candyland-card {
+  background: rgb(var(--vibe-surface));
+  border: 3px solid rgb(var(--vibe-primary));
+  border-radius: 1.5rem;
+  box-shadow: 6px 6px 0 0 rgb(var(--vibe-primary));
+  overflow: hidden;
+}
+
+[data-vibe="candyland"] .featured-candyland-image-wrap {
+  aspect-ratio: 1;
+  margin: 1rem;
+  border-radius: 1.25rem;
+  border: 3px solid rgb(var(--vibe-secondary));
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="candyland"] .featured-candyland-image-wrap {
+    aspect-ratio: auto;
+    min-height: 18rem;
+    margin: 1.25rem;
+  }
+}
+
+[data-vibe="candyland"] .featured-candyland-image-fade {
+  display: none;
+}
+
+[data-vibe="candyland"] .featured-candyland-body {
+  padding: 0.5rem 1.25rem 1.5rem;
+  gap: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="candyland"] .featured-candyland-body {
+    padding: 1.5rem 1.75rem 1.75rem 0.5rem;
+    justify-content: center;
+  }
+}
+
+[data-vibe="candyland"] .featured-candyland-name {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-secondary));
+}
+
+@media (min-width: 768px) {
+  [data-vibe="candyland"] .featured-candyland-name {
+    font-size: 2.35rem;
+  }
+}
+
+[data-vibe="candyland"] .featured-candyland-desc {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgb(var(--vibe-text));
+}
+
+[data-vibe="candyland"] .featured-candyland-price-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+}
+
+[data-vibe="candyland"] .featured-candyland-price {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgb(var(--vibe-text-bright));
+  background: rgb(var(--vibe-accent));
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  padding: 0.55rem 1rem;
+  box-shadow: 3px 3px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .featured-candyland-add {
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 9rem;
+  height: auto;
+  min-height: 2.75rem;
+  border-radius: 9999px;
+  border: 2px solid rgb(0 0 0);
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 0 rgb(0 0 0);
+  padding-inline: 1.25rem;
+}
+
+[data-vibe="candyland"] .featured-candyland-add.bg-vibe-primary {
+  background: rgb(var(--vibe-secondary));
+  color: rgb(255 255 255);
+}
+
+/* Candyland catalog */
+[data-vibe="candyland"] .catalog-pill-active {
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  background: rgb(var(--vibe-primary));
+  color: rgb(255 255 255);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .catalog-pill-inactive {
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  background: rgb(255 255 255);
+  color: rgb(0 0 0);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+[data-vibe="candyland"] .vibe-card.catalog-candyland-card {
+  background: rgb(var(--vibe-surface));
+  border: 3px solid rgb(0 0 0);
+  border-radius: 1.25rem;
+  box-shadow: 5px 5px 0 0 rgb(var(--vibe-secondary));
+  overflow: hidden;
+}
+
+[data-vibe="candyland"] .catalog-candyland-image {
+  aspect-ratio: 1;
+  border-radius: 0;
+  border-bottom: 3px solid rgb(0 0 0);
+  margin-bottom: 0;
+  background: rgb(245 245 245);
+}
+
+[data-vibe="candyland"] .catalog-candyland-image-fade {
+  display: none;
+}
+
+[data-vibe="candyland"] .catalog-candyland-body {
+  gap: 0.4rem;
+  padding: 0.85rem;
+}
+
+[data-vibe="candyland"] .catalog-card-title {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="candyland"] .catalog-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="candyland"] .catalog-candyland-price-row {
+  margin-top: 0.5rem;
+  padding-top: 0.65rem;
+  border-top: 2px solid rgb(var(--vibe-primary));
+}
+
+[data-vibe="candyland"] .catalog-card-price {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: rgb(var(--vibe-text-bright));
+  background: rgb(var(--vibe-accent));
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  padding: 0.3rem 0.65rem;
+  box-shadow: 2px 2px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .catalog-card-add {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 2px solid rgb(0 0 0);
+  background: rgb(var(--vibe-primary));
+  color: rgb(255 255 255);
+  box-shadow: 2px 2px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .catalog-card-add.bg-vibe-primary {
+  background: rgb(var(--vibe-secondary));
+  color: rgb(255 255 255);
+}
+
+[data-vibe="candyland"] .vibe-card,
+[data-vibe="candyland"] .metal-panel {
+  background: rgb(var(--vibe-surface));
+  border: 2px solid rgb(0 0 0);
+  border-radius: var(--vibe-radius);
+  box-shadow: 4px 4px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .rust-edge {
+  box-shadow: 4px 4px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .vibe-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+/* Candyland sticky checkout — lime pill + purple CTA */
+[data-vibe="candyland"] .checkout-bar {
+  max-width: 36rem;
+  border-radius: 9999px;
+  border: 3px solid rgb(0 0 0);
+  background: rgb(var(--vibe-accent));
+  backdrop-filter: none;
+  box-shadow: 5px 5px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .checkout-bar-icon-active {
+  color: rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .checkout-bar-cta {
+  border-radius: 9999px;
+  border: 2px solid rgb(0 0 0);
+  background: rgb(var(--vibe-secondary));
+  color: rgb(255 255 255);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .checkout-bar .font-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .checkout-bar .text-vibe-text-muted {
+  color: rgb(0 0 0 / 0.7);
+}
+
+/* Candyland PDP / cart / checkout / payment */
+[data-vibe="candyland"] .pdp-candyland-back,
+[data-vibe="candyland"] .cart-candyland-back,
+[data-vibe="candyland"] .checkout-candyland-back {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="candyland"] .pdp-candyland-title,
+[data-vibe="candyland"] .cart-candyland-title,
+[data-vibe="candyland"] .checkout-candyland-title,
+[data-vibe="candyland"] .pay-candyland-status-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-secondary));
+}
+
+[data-vibe="candyland"] .pdp-candyland-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: rgb(var(--vibe-text-bright));
+  background: rgb(var(--vibe-accent));
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  display: inline-block;
+  width: fit-content;
+  box-shadow: 3px 3px 0 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .pdp-candyland-add,
+[data-vibe="candyland"] .cart-candyland-cta,
+[data-vibe="candyland"] .checkout-candyland-cta {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  border: 2px solid rgb(0 0 0);
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  box-shadow: 4px 4px 0 0 rgb(0 0 0);
+  padding-block: 1rem;
+}
+
+[data-vibe="candyland"] .metal-panel.cart-candyland-line,
+[data-vibe="candyland"] .metal-panel.checkout-candyland-panel,
+[data-vibe="candyland"] .metal-panel.checkout-candyland-option {
+  background: rgb(var(--vibe-surface));
+  border: 2px solid rgb(0 0 0);
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0 0 rgb(var(--vibe-secondary));
+}
+
+[data-vibe="candyland"] .checkout-candyland-input {
+  border-radius: 9999px;
+  border: 2px solid rgb(0 0 0);
+  background: rgb(255 255 255);
+  font-family: var(--font-body);
+  color: rgb(var(--vibe-text));
+}
+
+[data-vibe="candyland"] .checkout-candyland-input:focus {
+  border-color: rgb(var(--vibe-primary));
+  outline: none;
+  box-shadow: 3px 3px 0 0 rgb(var(--vibe-primary));
+}
+
+[data-vibe="candyland"] .checkout-candyland-radio {
+  accent-color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="candyland"] .checkout-candyland-section-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="candyland"] .pay-candyland-secondary {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  border: 2px solid rgb(0 0 0);
+  background: rgb(255 255 255);
+  color: rgb(0 0 0);
+  box-shadow: 3px 3px 0 0 rgb(0 0 0);
+  padding-block: 0.875rem;
+}
+
+[data-vibe="candyland"] .pay-candyland-amount {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: rgb(var(--vibe-secondary));
+}
+
+/* --------------------------------------------------------------------------
+ * Gallery — provisional light museum / white-cube placeholder
+ * Cool white + ink + stone. Full overhaul later.
+ * ------------------------------------------------------------------------ */
+[data-vibe="gallery"] {
+  --vibe-bg: 250 250 252;
+  --vibe-primary: 28 28 32;
+  --vibe-primary-fg: 250 250 252;
+  --vibe-secondary: 140 140 150;
+  --vibe-surface: 255 255 255;
+  --vibe-border: 220 220 226;
+  --vibe-text: 28 28 32;
+  --vibe-text-muted: 110 110 120;
+  --vibe-text-bright: 12 12 14;
+  --vibe-radius: 0.25rem;
+  --font-display: var(--font-plus-jakarta), var(--font-body);
+
+  background-color: rgb(var(--vibe-bg));
+  color: rgb(var(--vibe-text));
+}
+
+[data-vibe="gallery"] .vibe-card,
+[data-vibe="gallery"] .metal-panel {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border));
+  border-radius: var(--vibe-radius);
+  box-shadow: none;
+}
+
+[data-vibe="gallery"] .vibe-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+ * Market — Harvest & Co. editorial agrarian (docs/market_storefront)
+ * Peach wash + terracotta + linen; Libre Caslon + DM Sans; soft ambient depth.
+ * ------------------------------------------------------------------------ */
+[data-vibe="market"] {
+  --vibe-bg: 255 248 245;
+  --vibe-primary: 136 69 48;
+  --vibe-primary-fg: 255 255 255;
+  --vibe-secondary: 115 89 75;
+  --vibe-accent: 255 219 201;
+  --vibe-surface: 251 242 237;
+  --vibe-border: 217 193 187;
+  --vibe-text: 30 27 24;
+  --vibe-text-muted: 84 67 62;
+  --vibe-text-variant: 84 67 62;
+  --vibe-text-bright: 30 27 24;
+  --vibe-primary-container: 166 93 70;
+  --vibe-surface-elevated: 255 255 255;
+  --vibe-radius: 0.5rem;
+  --font-body: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-libre-caslon), ui-serif, Georgia, serif;
+
+  background-color: rgb(var(--vibe-bg));
+  background-image: radial-gradient(
+    ellipse 70% 45% at 50% 0%,
+    rgb(255 219 201 / 0.35),
+    transparent 60%
+  );
+  color: rgb(var(--vibe-text));
+  font-family: var(--font-body);
+}
+
+/* Market hero — quiet editorial, soft peach wash; no cover/CTA */
+[data-vibe="market"] .hero-market-band {
+  background: linear-gradient(
+    180deg,
+    rgb(255 242 234 / 0.85) 0%,
+    rgb(var(--vibe-bg) / 0) 100%
+  );
+}
+
+[data-vibe="market"] .hero-market-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="market"] .hero-market-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="market"] .hero-market-tagline {
+  max-width: 22rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(var(--vibe-text-muted));
+}
+
+@media (min-width: 768px) {
+  [data-vibe="market"] .hero-market-title {
+    font-size: 2.75rem;
+  }
+}
+
+/* Market featured */
+[data-vibe="market"] .featured-market-header {
+  margin-bottom: 0.85rem;
+}
+
+[data-vibe="market"] .featured-market-header-title {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="market"] .vibe-card.featured-market-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.55);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 40px rgb(136 69 48 / 0.06);
+}
+
+[data-vibe="market"] .featured-market-image-wrap {
+  aspect-ratio: 4 / 3;
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="market"] .featured-market-image-wrap {
+    aspect-ratio: auto;
+    min-height: 18rem;
+    border-radius: 0.75rem 0 0 0.75rem;
+  }
+}
+
+[data-vibe="market"] .featured-market-image-fade {
+  background: linear-gradient(
+    to top,
+    rgb(var(--vibe-surface) / 0.7),
+    transparent
+  );
+}
+
+[data-vibe="market"] .featured-market-body {
+  padding: 1.25rem 1.35rem 1.5rem;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="market"] .featured-market-body {
+    padding: 1.75rem 2rem;
+    justify-content: center;
+  }
+}
+
+[data-vibe="market"] .featured-market-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+@media (min-width: 768px) {
+  [data-vibe="market"] .featured-market-name {
+    font-size: 1.85rem;
+  }
+}
+
+[data-vibe="market"] .featured-market-desc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="market"] .featured-market-price-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+[data-vibe="market"] .featured-market-price {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: rgb(var(--vibe-primary));
+}
+
+/* Outline “Add to cart” (mockup ghost / secondary) */
+[data-vibe="market"] .featured-market-add {
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+[data-vibe="market"] .featured-market-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  border-color: rgb(var(--vibe-primary));
+}
+
+/* Market catalog pills + cards */
+[data-vibe="market"] .catalog-pill-active {
+  border: none;
+  border-radius: 9999px;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+[data-vibe="market"] .catalog-pill-inactive {
+  border: none;
+  border-radius: 9999px;
+  background: rgb(245 236 231);
+  color: rgb(var(--vibe-text-muted));
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+[data-vibe="market"] .vibe-card.catalog-market-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.45);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 28px rgb(136 69 48 / 0.05);
+}
+
+[data-vibe="market"] .catalog-market-image {
+  aspect-ratio: 1;
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+[data-vibe="market"] .catalog-market-image-fade {
+  background: linear-gradient(
+    to top,
+    rgb(var(--vibe-surface) / 0.55),
+    transparent
+  );
+}
+
+[data-vibe="market"] .catalog-market-body {
+  gap: 0.35rem;
+  padding: 0.9rem 0.95rem 1rem;
+}
+
+[data-vibe="market"] .catalog-card-title {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="market"] .catalog-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="market"] .catalog-market-price-row {
+  margin-top: 0.35rem;
+}
+
+[data-vibe="market"] .catalog-card-price {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .catalog-card-add {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--vibe-primary) / 0.45);
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .catalog-card-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  border-color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .vibe-card,
+[data-vibe="market"] .metal-panel {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.55);
+  border-radius: var(--vibe-radius);
+  box-shadow: 0 10px 32px rgb(136 69 48 / 0.06);
+}
+
+[data-vibe="market"] .rust-edge {
+  box-shadow: 0 10px 32px rgb(136 69 48 / 0.06);
+}
+
+[data-vibe="market"] .vibe-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+/*
+ * Market sticky checkout — linen dock (not mockup charcoal).
+ * Soft paper surface + terracotta CTA; ambient clay shadow.
+ */
+[data-vibe="market"] .checkout-bar {
+  max-width: 26rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(var(--vibe-border) / 0.65);
+  background: rgb(255 252 250 / 0.92);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 14px 36px rgb(136 69 48 / 0.12),
+    0 2px 6px rgb(30 27 24 / 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 0.55rem 0.65rem 0.55rem 1rem;
+}
+
+[data-vibe="market"] .checkout-bar-icon-active {
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .checkout-bar-cta {
+  border-radius: 0.375rem;
+  border: none;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-inline: 1.15rem;
+  box-shadow: 0 6px 16px rgb(136 69 48 / 0.22);
+}
+
+[data-vibe="market"] .checkout-bar .font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-size: 1.15rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="market"] .checkout-bar .text-vibe-text-muted {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgb(var(--vibe-text-muted));
+}
+
+/* Market PDP / cart / checkout / payment */
+[data-vibe="market"] .pdp-market-back,
+[data-vibe="market"] .cart-market-back,
+[data-vibe="market"] .checkout-market-back {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="market"] .pdp-market-title,
+[data-vibe="market"] .cart-market-title,
+[data-vibe="market"] .checkout-market-title,
+[data-vibe="market"] .pay-market-status-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="market"] .pdp-market-price {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .pdp-market-add,
+[data-vibe="market"] .cart-market-cta,
+[data-vibe="market"] .checkout-market-cta {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  border-radius: 0.375rem;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  box-shadow: 0 8px 20px rgb(136 69 48 / 0.18);
+}
+
+[data-vibe="market"] .metal-panel.cart-market-line,
+[data-vibe="market"] .metal-panel.checkout-market-panel,
+[data-vibe="market"] .metal-panel.checkout-market-option {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.55);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 28px rgb(136 69 48 / 0.05);
+}
+
+[data-vibe="market"] .checkout-market-input {
+  border-radius: 0.375rem;
+  border: 1px solid rgb(var(--vibe-border));
+  background: rgb(255 255 255);
+  font-family: var(--font-body);
+}
+
+[data-vibe="market"] .checkout-market-input:focus {
+  border-color: rgb(var(--vibe-primary));
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(136 69 48 / 0.12);
+}
+
+[data-vibe="market"] .checkout-market-radio {
+  accent-color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .checkout-market-section-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text-muted));
+}
+
+[data-vibe="market"] .pay-market-secondary {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: 0.375rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="market"] .pay-market-amount {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-primary));
 }

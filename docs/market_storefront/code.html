@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Harvest &amp; Co. | Modern Agrarian Provisions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&amp;family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#d2c4b9",
+                      "surface-dim": "#e1d8d4",
+                      "primary": "#884530",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed-variant": "#4e453d",
+                      "secondary-fixed": "#ffdbc9",
+                      "secondary": "#73594b",
+                      "on-secondary-fixed": "#29170d",
+                      "surface-variant": "#e9e1dc",
+                      "outline-variant": "#d9c1bb",
+                      "on-error-container": "#93000a",
+                      "on-background": "#1e1b18",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed-dim": "#e1c0ae",
+                      "on-secondary-fixed-variant": "#594235",
+                      "on-surface": "#1e1b18",
+                      "surface": "#fff8f5",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#eee0d5",
+                      "on-secondary-container": "#795f51",
+                      "tertiary-container": "#7a6f66",
+                      "surface-container": "#f5ece7",
+                      "inverse-primary": "#ffb59e",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#fff4f1",
+                      "on-tertiary-container": "#fff4ed",
+                      "surface-container-low": "#fbf2ed",
+                      "inverse-on-surface": "#f8efea",
+                      "on-primary-fixed-variant": "#733521",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed": "#211a14",
+                      "surface-bright": "#fff8f5",
+                      "error-container": "#ffdad6",
+                      "inverse-surface": "#34302c",
+                      "secondary-container": "#ffdbc9",
+                      "tertiary": "#60574e",
+                      "background": "#fff8f5",
+                      "outline": "#86736d",
+                      "primary-fixed": "#ffdbd0",
+                      "error": "#ba1a1a",
+                      "primary-container": "#a65d46",
+                      "surface-container-highest": "#e9e1dc",
+                      "on-surface-variant": "#54433e",
+                      "surface-tint": "#904b36",
+                      "surface-container-high": "#efe6e2",
+                      "on-primary-fixed": "#3a0b00",
+                      "primary-fixed-dim": "#ffb59e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "section-gap": "120px",
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "unit": "8px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Libre Caslon Text"
+                      ],
+                      "headline-md": [
+                              "Libre Caslon Text"
+                      ],
+                      "body-lg": [
+                              "DM Sans"
+                      ],
+                      "headline-lg": [
+                              "Libre Caslon Text"
+                      ],
+                      "headline-lg-mobile": [
+                              "Libre Caslon Text"
+                      ],
+                      "body-md": [
+                              "DM Sans"
+                      ],
+                      "label-caps": [
+                              "DM Sans"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.15em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Hide scrollbar for category nav but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+      </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md">
+<div class="flex justify-between items-center px-margin-mobile h-16 max-w-container-max mx-auto">
+<button aria-label="Menu" class="text-on-surface-variant hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-display-lg text-headline-md text-primary tracking-tighter">HARVEST &amp; CO.</h1>
+<button aria-label="Cart" class="text-on-surface-variant hover:opacity-70 transition-opacity relative">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+<span class="absolute -top-1 -right-1 bg-primary text-on-primary text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">4</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-16 pb-32">
+<!-- Hero Splash Section -->
+<section class="relative w-full h-[70vh] md:h-[80vh] flex flex-col justify-end p-margin-mobile">
+<div class="absolute inset-0 w-full h-full">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7sY1CJ2qhG7d1c8qLdqOBTITEfCTetROarUEL3XFfzS4_iVlxxiHLARZHv9K8gbnzFJt62qlcE49V7F-SGcJduE3BOYlMYwV7M8m1m56AvsLuHIHcvcMpqLc2HTMCmVI1VpOyAfWPbO8sXigFdKpZf_irqtDU5Qpc3ehEXjLo3qS2-rrZU_1z6hPKdm5u8iHuNMrSNzvvqGnIVtTLK0NMKVUMhx2eEmQr5W0utZfBAw5jvJIBpRDxz08hVbad88BmZQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/60 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-surface-container-lowest mb-4">HARVEST &amp; CO.</h2>
+<p class="font-body-lg text-surface-container-low mb-8 max-w-sm">From local soil to your table. Seasonal produce and handmade provisions, chosen with care.</p>
+<button class="bg-primary text-on-primary font-label-caps px-8 py-4 rounded-DEFAULT tracking-widest hover:bg-primary-container transition-colors shadow-sm">EXPLORE THE MARKET</button>
+</div>
+</section>
+<!-- Signature Pick Section -->
+<section class="px-margin-mobile mt-section-gap max-w-container-max mx-auto">
+<h3 class="font-label-caps text-on-surface-variant mb-6 tracking-widest">SIGNATURE PICK</h3>
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-[0_4px_24px_rgba(136,69,48,0.03)] relative">
+<div class="w-full h-64 md:h-96 relative">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvqVoK0UAjls490lhaAcMqLlk9oEl9sVcbIyYqu8BsWm4iKLl0-P39y380cZPOHP2M0eBqjkAzIrZ-6TF_oLabaNAv0zdIfFYLVzuGMfl0eDiRus3ImT3Pd1tVuM4V1Zk5R4j3MNyq5Kbb69yxF1xXL1vpVox8aeVgiK_dhgqckUeV-E_K0qfWvz75kfydKxo0G40LJdRB3X0iCll9o6dl0LeR90QXVz21HXLZh76aEddEZVN33mxi"/>
+<div class="absolute inset-0 bg-secondary/5 mix-blend-multiply"></div>
+</div>
+<div class="p-6 md:p-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4 bg-surface-container-low">
+<div class="max-w-md">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md text-on-surface">Artisan Pantry Bundle</h4>
+<span class="font-body-lg text-primary">$68</span>
+</div>
+<p class="font-body-md text-on-surface-variant">A seasonal collection of our most beloved larder staples, sourced from family farms within 50 miles.</p>
+</div>
+<button class="bg-surface text-primary border border-primary font-label-caps px-6 py-3 rounded-DEFAULT hover:bg-primary hover:text-on-primary transition-colors w-full md:w-auto mt-4 md:mt-0">ADD TO CART</button>
+</div>
+</div>
+</section>
+<!-- Horizontal Category Navigation -->
+<section class="mt-section-gap px-margin-mobile max-w-container-max mx-auto overflow-hidden">
+<div class="flex overflow-x-auto no-scrollbar gap-3 pb-4 -mx-margin-mobile px-margin-mobile snap-x">
+<button class="shrink-0 snap-start bg-primary text-on-primary font-label-caps px-5 py-2.5 rounded-full shadow-sm">ALL</button>
+<button class="shrink-0 snap-start bg-surface-container text-on-surface-variant font-label-caps px-5 py-2.5 rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30">SEASONAL FRUIT</button>
+<button class="shrink-0 snap-start bg-surface-container text-on-surface-variant font-label-caps px-5 py-2.5 rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30">FRESH VEGETABLES</button>
+<button class="shrink-0 snap-start bg-surface-container text-on-surface-variant font-label-caps px-5 py-2.5 rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30">BAKED DAILY</button>
+<button class="shrink-0 snap-start bg-surface-container text-on-surface-variant font-label-caps px-5 py-2.5 rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30">PANTRY STAPLES</button>
+<button class="shrink-0 snap-start bg-surface-container text-on-surface-variant font-label-caps px-5 py-2.5 rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30">ARTISAN PRESERVES</button>
+<button class="shrink-0 snap-start bg-surface-container text-on-surface-variant font-label-caps px-5 py-2.5 rounded-full hover:bg-surface-variant transition-colors border border-outline-variant/30">GIFT BASKETS</button>
+</div>
+</section>
+<!-- Product Collection Grid -->
+<section class="mt-8 px-margin-mobile max-w-container-max mx-auto mb-section-gap">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-gutter">
+<!-- Product Card 1 -->
+<article class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden mb-3 bg-surface-container-low shadow-[0_2px_12px_rgba(136,69,48,0.02)]">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiISBOMdRq0U_sshyShm_ULlSeJESK9hAWB3vRkuA1I7RKaBoIeZAj3GNNi4CznQ-ZEbiXH7GnqiRokKaCRlpV37G22Dmak8Shgi2yxiqagACuZI2C-49kipRuOXbdIlUyLKcI2r4BnNi56qvhoLSi-pvcJsrL8khq197BpvlJWD3715ILE8qqB6EE1ryR9bk_5rhil29ZoMJkm2NPiknziR6XzVnxUVQYFn6Qr43ycobXjXfTS5Ky"/>
+<button aria-label="Add Organic Strawberries to cart" class="absolute bottom-2 right-2 bg-surface/90 text-primary w-8 h-8 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+<h5 class="font-headline-md text-[20px] text-on-surface leading-tight mb-1">Organic Strawberries</h5>
+<p class="font-body-md text-[14px] text-on-surface-variant line-clamp-2 mb-2 flex-grow">Locally grown, sun-ripened, packed fresh daily.</p>
+<span class="font-body-lg text-primary mt-auto">$14</span>
+</article>
+<!-- Product Card 2 -->
+<article class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden mb-3 bg-surface-container-low shadow-[0_2px_12px_rgba(136,69,48,0.02)]">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5SUaC7r1oDZk09QJ3Ut20BNX311z8SAiARF5NyvzB6ngih-X7X4xs5bDQfkEdlYGxiJkzTdA4sHTeDznRbjnNKCefSapqloGq5v1lukp0jlE6zb17TL0BQde1pdeF1VkQ5uw_a29f2F8ZmUJMtW2NK5G8ievEN_GsCruALbYG1X8hMzRK7DLc-rSIagvFAOPAr_v5uEoDYc0SwF_HWzYQGIDyM9Kl0Dn9XKoa_UUwyOTC3hAmcgdD"/>
+<button aria-label="Add Sourdough Boule to cart" class="absolute bottom-2 right-2 bg-surface/90 text-primary w-8 h-8 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+<h5 class="font-headline-md text-[20px] text-on-surface leading-tight mb-1">Sourdough Boule</h5>
+<p class="font-body-md text-[14px] text-on-surface-variant line-clamp-2 mb-2 flex-grow">Slow-fermented 72hr dough, cracked wheat crust, perfect for toast.</p>
+<span class="font-body-lg text-primary mt-auto">$12</span>
+</article>
+<!-- Product Card 3 -->
+<article class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden mb-3 bg-surface-container-low shadow-[0_2px_12px_rgba(136,69,48,0.02)]">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9he-YmGn5jUapSii2mqfeF1_FDSvtR4ffC2qrF2jdeb20yOcPmhUoKKwn9Dw7Mk_RjCYF_ECvwnmggaW2Rdpyp1x6afrIsszmUyIjZGJ8aZRptgAq1F8nLiGOD_u2zGhwADYDktfCmG5h3HzYklSYknXBAtPzI-Nt5Hael1wPXrq_u8UCPlnBA_DzNeY3G2z7C3vS7cVGSRa_RQMXoNdHdFkoNn55vlhBS3ZzciPEhjLGjCnAlbvz"/>
+<button aria-label="Add Wildflower Honey to cart" class="absolute bottom-2 right-2 bg-surface/90 text-primary w-8 h-8 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+<h5 class="font-headline-md text-[20px] text-on-surface leading-tight mb-1">Wildflower Honey</h5>
+<p class="font-body-md text-[14px] text-on-surface-variant line-clamp-2 mb-2 flex-grow">Raw, unfiltered, cold-extracted from local apiaries.</p>
+<span class="font-body-lg text-primary mt-auto">$22</span>
+</article>
+<!-- Product Card 4 -->
+<article class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-square rounded-lg overflow-hidden mb-3 bg-surface-container-low shadow-[0_2px_12px_rgba(136,69,48,0.02)]">
+<img alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDocM-BuO7RllEenkZqAKTk4ZJVa_tgQkMZrog4Ow2e_JASMp2jnkrYGWSRUnhEwHmrY1obzAwLZiXd-Q7-fo0kJyhplXALuaF1pB4aR_61tYykI4AST-GRI8JDLKl7-UCylrbqTKdh1rvHm9CxFDZVXNL04NhFxHPWFBtVY562cE3NMtP16QKHk2uvNHQ-PMQlL_Gv6X8wvyZsOp52sP5T_Ycl0ODY5zKH6noO7DSWnF52UkU8CiyF"/>
+<button aria-label="Add Farm Fresh Eggs to cart" class="absolute bottom-2 right-2 bg-surface/90 text-primary w-8 h-8 rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+<h5 class="font-headline-md text-[20px] text-on-surface leading-tight mb-1">Farm Fresh Eggs</h5>
+<p class="font-body-md text-[14px] text-on-surface-variant line-clamp-2 mb-2 flex-grow">Pasture-raised, deep orange yolks, dozen count.</p>
+<span class="font-body-lg text-primary mt-auto">$10</span>
+</article>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (JSON Shell) -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-full bg-surface-container-low shadow-[0_-4px_20px_rgba(136,69,48,0.05)] md:hidden">
+<div class="flex justify-around items-center px-4 pb-6 pt-3 max-w-md mx-auto">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 hover:text-primary transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="storefront" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<span class="font-body-md text-label-caps mt-1">Shop</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-body-md text-label-caps mt-1">Journal</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-body-md text-label-caps mt-1">Cart</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-md text-label-caps mt-1">Account</span>
+</button>
+</div>
+</nav>
+<!-- Sticky Bottom Cart Banner (Sits above BottomNav on mobile) -->
+<div class="fixed bottom-[88px] md:bottom-6 left-0 right-0 px-margin-mobile z-40 max-w-md mx-auto md:max-w-xl flex justify-center">
+<div class="bg-inverse-surface text-inverse-on-surface rounded-full shadow-lg p-3 px-6 flex items-center justify-between w-full backdrop-blur-md">
+<div class="flex items-center gap-3">
+<div class="bg-surface text-primary w-8 h-8 rounded-full flex items-center justify-center font-label-caps font-bold">4</div>
+<span class="font-body-md font-medium text-surface-container-lowest">$58.00</span>
+</div>
+<button class="bg-primary text-on-primary font-label-caps px-6 py-2 rounded-full hover:bg-primary-container transition-colors tracking-wide">SECURE CHECKOUT</button>
+</div>
+</div>
+</body></html>

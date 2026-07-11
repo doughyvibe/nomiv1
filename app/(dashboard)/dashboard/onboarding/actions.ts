@@ -124,7 +124,15 @@ export async function createStore(
 // Step 2 — vibe
 // ---------------------------------------------------------------------------
 
-const VALID_VIBES: Vibe[] = ["atelier", "expedition", "cyberpunk", "epicurean"];
+const VALID_VIBES: Vibe[] = [
+  "atelier",
+  "expedition",
+  "cyberpunk",
+  "epicurean",
+  "candyland",
+  "gallery",
+  "market",
+];
 
 export async function saveVibe(vibe: Vibe): Promise<ActionResult> {
   if (!VALID_VIBES.includes(vibe)) return { ok: false, error: "Invalid vibe" };

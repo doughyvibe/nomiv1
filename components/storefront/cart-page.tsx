@@ -14,6 +14,8 @@ export function CartPageContent() {
   const atelier = store.vibe === "atelier";
   const expedition = store.vibe === "expedition";
   const cyberpunk = store.vibe === "cyberpunk";
+  const candyland = store.vibe === "candyland";
+  const market = store.vibe === "market";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -41,6 +43,8 @@ export function CartPageContent() {
           atelier && "cart-atelier-empty",
           expedition && "cart-expedition-empty",
           cyberpunk && "cart-cyberpunk-empty",
+          candyland && "cart-candyland-empty",
+          market && "cart-market-empty",
         )}
       >
         <p
@@ -49,6 +53,8 @@ export function CartPageContent() {
             atelier && "cart-atelier-empty-title",
             expedition && "cart-expedition-title",
             cyberpunk && "cart-cyberpunk-title",
+            candyland && "cart-candyland-title",
+          market && "cart-market-title",
           )}
         >
           Your cart is empty
@@ -63,6 +69,8 @@ export function CartPageContent() {
             atelier && "cart-atelier-cta",
             expedition && "cart-expedition-cta",
             cyberpunk && "cart-cyberpunk-cta",
+            candyland && "cart-candyland-cta",
+          market && "cart-market-cta",
           )}
         >
           Continue shopping
@@ -78,6 +86,8 @@ export function CartPageContent() {
         atelier && "cart-atelier",
         expedition && "cart-expedition",
         cyberpunk && "cart-cyberpunk",
+        candyland && "cart-candyland",
+          market && "cart-market",
       )}
     >
       <div className="flex items-center justify-between gap-4">
@@ -87,11 +97,13 @@ export function CartPageContent() {
             atelier && "cart-atelier-title",
             expedition && "cart-expedition-title",
             cyberpunk && "cart-cyberpunk-title",
+            candyland && "cart-candyland-title",
+          market && "cart-market-title",
           )}
         >
           Cart
         </h1>
-        {atelier || expedition || cyberpunk ? (
+        {atelier || expedition || cyberpunk || candyland || market ? (
           <Link
             href="/"
             className={cn(
@@ -99,6 +111,8 @@ export function CartPageContent() {
               atelier && "cart-atelier-back",
               expedition && "cart-expedition-back",
               cyberpunk && "cart-cyberpunk-back",
+              candyland && "cart-candyland-back",
+          market && "cart-market-back",
             )}
           >
             <ArrowLeft className="size-3.5" aria-hidden />
@@ -116,6 +130,8 @@ export function CartPageContent() {
               atelier && "cart-atelier-line",
               expedition && "cart-expedition-line",
               cyberpunk && "cart-cyberpunk-line",
+              candyland && "cart-candyland-line",
+          market && "cart-market-line",
             )}
           >
             {product.image_url ? (
@@ -231,6 +247,8 @@ export function CartPageContent() {
           atelier && "cart-atelier-cta",
           expedition && "cart-expedition-cta",
             cyberpunk && "cart-cyberpunk-cta",
+            candyland && "cart-candyland-cta",
+          market && "cart-market-cta",
         )}
       >
         Checkout

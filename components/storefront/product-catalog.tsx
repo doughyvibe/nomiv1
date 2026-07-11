@@ -7,7 +7,6 @@ import { Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "@/components/storefront/cart-context";
 import { formatPrice } from "@/lib/money";
 import { normalizeCategory } from "@/lib/products/category";
-import { allowsQuickAdd } from "@/lib/products/quick-add";
 import type { Product, Vibe } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
@@ -29,25 +28,39 @@ function isCyberpunkVibe(
   return vibe === "cyberpunk" || vibe === "futuristic";
 }
 
+function isCandylandVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "candyland";
+}
+
+function isMarketVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "market";
+}
+
 function ProductCard({
   product,
   index,
   atelier,
   expedition,
   cyberpunk,
+  candyland,
+  market,
 }: {
   product: Product;
   index: number;
   atelier: boolean;
   expedition: boolean;
   cyberpunk: boolean;
+  candyland: boolean;
+  market: boolean;
 }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
-  const quickAdd = allowsQuickAdd(product);
-  const blurb = cyberpunk
-    ? product.category?.trim() || product.description?.trim() || null
-    : atelier || expedition
+  const blurb =
+    atelier || expedition || cyberpunk || candyland || market
       ? product.description?.trim()
       : null;
 
@@ -68,6 +81,8 @@ function ProductCard({
         atelier && "catalog-atelier-card",
         expedition && "catalog-expedition-card",
         cyberpunk && "catalog-cyberpunk-card",
+        candyland && "catalog-candyland-card",
+        market && "catalog-market-card",
       )}
       style={{
         animationDelay: `${80 + index * 50}ms`,
@@ -80,6 +95,8 @@ function ProductCard({
           atelier && "catalog-atelier-image",
           expedition && "catalog-expedition-image",
           cyberpunk && "catalog-cyberpunk-image",
+          candyland && "catalog-candyland-image",
+          market && "catalog-market-image",
         )}
       >
         {product.image_url ? (
@@ -105,6 +122,8 @@ function ProductCard({
             atelier && "catalog-atelier-image-fade",
             expedition && "catalog-expedition-image-fade",
             cyberpunk && "catalog-cyberpunk-image-fade",
+            candyland && "catalog-candyland-image-fade",
+            market && "catalog-market-image-fade",
           )}
         />
       </div>
@@ -115,6 +134,8 @@ function ProductCard({
           atelier && "catalog-atelier-body",
           expedition && "catalog-expedition-body",
           cyberpunk && "catalog-cyberpunk-body",
+          candyland && "catalog-candyland-body",
+          market && "catalog-market-body",
         )}
       >
         <h3 className="catalog-card-title line-clamp-2 text-sm font-medium leading-snug text-vibe-text md:text-base">
@@ -127,30 +148,30 @@ function ProductCard({
           className={cn(
             "mt-auto flex items-center justify-between gap-2",
             atelier && "catalog-atelier-price-row",
+            candyland && "catalog-candyland-price-row",
+            market && "catalog-market-price-row",
           )}
         >
           <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
             {formatPrice(product.price_cents)}
           </p>
-          {quickAdd ? (
-            <button
-              type="button"
-              onClick={handleQuickAdd}
-              aria-label={`Add ${product.name} to cart`}
-              className={cn(
-                "catalog-card-add flex size-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 transition-colors",
-                added && "bg-vibe-primary text-vibe-primary-fg",
-              )}
-            >
-              {added ? (
-                <span className="text-[10px] font-bold">✓</span>
-              ) : cyberpunk ? (
-                <ShoppingCart className="size-4" />
-              ) : (
-                <Plus className="size-4" />
-              )}
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={handleQuickAdd}
+            aria-label={`Add ${product.name} to cart`}
+            className={cn(
+              "catalog-card-add inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 p-0 leading-none transition-colors [&_svg]:block [&_svg]:shrink-0",
+              added && "bg-vibe-primary text-vibe-primary-fg",
+            )}
+          >
+            {added ? (
+              <span className="text-[10px] leading-none font-bold">✓</span>
+            ) : cyberpunk ? (
+              <ShoppingCart className="size-4" aria-hidden />
+            ) : (
+              <Plus className="size-4" aria-hidden />
+            )}
+          </button>
         </div>
       </div>
     </Link>
@@ -169,7 +190,9 @@ export function ProductCatalog({
   const atelier = isAtelierVibe(vibe);
   const expedition = isExpeditionVibe(vibe);
   const cyberpunk = isCyberpunkVibe(vibe);
-  const pillsOnDesktop = atelier || expedition || cyberpunk;
+  const candyland = isCandylandVibe(vibe);
+  const market = isMarketVibe(vibe);
+  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market;
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of products) {
@@ -260,6 +283,8 @@ export function ProductCatalog({
               atelier={atelier}
               expedition={expedition}
               cyberpunk={cyberpunk}
+              candyland={candyland}
+              market={market}
             />
           ))
         )}

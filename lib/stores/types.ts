@@ -1,6 +1,13 @@
 import type { PayNowProxyType } from "@/lib/paynow";
 
-export type Vibe = "atelier" | "expedition" | "cyberpunk" | "epicurean";
+export type Vibe =
+  | "atelier"
+  | "expedition"
+  | "cyberpunk"
+  | "epicurean"
+  | "candyland"
+  | "gallery"
+  | "market";
 
 export type TradeHint = "general" | "food" | "handmade" | "services" | "plants";
 

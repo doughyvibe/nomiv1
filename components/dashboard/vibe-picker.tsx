@@ -77,7 +77,14 @@ export function VibePicker({
               store={store}
             />
             <div>
-              <p className="font-semibold">{vibe.name}</p>
+              <p className="font-semibold">
+                {vibe.name}
+                {vibe.provisional ? (
+                  <span className="text-muted-foreground ml-2 text-[10px] font-medium tracking-wide uppercase">
+                    Preview
+                  </span>
+                ) : null}
+              </p>
               <p className="text-muted-foreground text-xs">{vibe.tagline}</p>
             </div>
             <Button

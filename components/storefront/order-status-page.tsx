@@ -58,12 +58,16 @@ function StatusShell({
   atelier,
   expedition,
   cyberpunk,
+  candyland,
+  market,
 }: {
   title: string;
   children: React.ReactNode;
   atelier: boolean;
   expedition: boolean;
   cyberpunk: boolean;
+  candyland: boolean;
+  market: boolean;
 }) {
   return (
     <div className="flex flex-col items-center px-5 py-8 text-center sm:px-6">
@@ -73,6 +77,8 @@ function StatusShell({
           atelier && "pay-atelier-status-title",
           expedition && "pay-expedition-status-title",
           cyberpunk && "pay-cyberpunk-status-title",
+          candyland && "pay-candyland-status-title",
+          market && "pay-market-status-title",
         )}
       >
         {title}
@@ -92,6 +98,8 @@ export function OrderStatusPageContent({
   const atelier = liveStore.vibe === "atelier";
   const expedition = liveStore.vibe === "expedition";
   const cyberpunk = liveStore.vibe === "cyberpunk";
+  const candyland = liveStore.vibe === "candyland";
+  const market = liveStore.vibe === "market";
   const { order, store } = data;
   const qrRef = useRef<HTMLDivElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -149,11 +157,11 @@ export function OrderStatusPageContent({
       order.status === "completed" ? "Order completed" : "Order confirmed";
 
     return (
-      <StatusShell title={title} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
+      <StatusShell title={title} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           {store.name} has verified your payment. Your order is being prepared.
         </p>
-        <OrderReceipt data={data} showPaidLabel atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
+        <OrderReceipt data={data} showPaidLabel atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to check your order status any time.
         </p>
@@ -163,25 +171,25 @@ export function OrderStatusPageContent({
 
   if (view === "cancelled") {
     return (
-      <StatusShell title="Order cancelled" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
+      <StatusShell title="Order cancelled" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           This order was cancelled. If you have questions, contact {store.name}{" "}
           with reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
+        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} />
       </StatusShell>
     );
   }
 
   if (awaiting) {
     return (
-      <StatusShell title="Awaiting seller verification" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
+      <StatusShell title="Awaiting seller verification" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           The seller will verify your payment manually. Check back on this page
           for updates — your order is not confirmed until they verify payment.
         </p>
-        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
+        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to see when your order is confirmed.
         </p>
@@ -191,12 +199,12 @@ export function OrderStatusPageContent({
 
   if (view === "expired" || countdown.expired) {
     return (
-      <StatusShell title="Payment window expired" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk}>
+      <StatusShell title="Payment window expired" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           If you already paid, contact {store.name} with your order reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
+        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} />
       </StatusShell>
     );
   }
@@ -208,6 +216,8 @@ export function OrderStatusPageContent({
         atelier && "pay-atelier",
         expedition && "pay-expedition",
         cyberpunk && "pay-cyberpunk",
+        candyland && "pay-candyland",
+          market && "pay-market",
       )}
     >
       <div className="text-center">
@@ -217,6 +227,8 @@ export function OrderStatusPageContent({
             atelier && "checkout-atelier-section-label",
             expedition && "checkout-expedition-section-label",
             cyberpunk && "checkout-cyberpunk-section-label",
+            candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
           )}
         >
           Payment pending
@@ -227,6 +239,8 @@ export function OrderStatusPageContent({
             atelier && "pay-atelier-amount",
             expedition && "pay-expedition-amount",
             cyberpunk && "pay-cyberpunk-amount",
+            candyland && "pay-candyland-amount",
+          market && "pay-market-amount",
           )}
         >
           {formatPrice(order.total_cents)}
@@ -243,6 +257,8 @@ export function OrderStatusPageContent({
             atelier && "checkout-atelier-panel",
             expedition && "checkout-expedition-panel",
             cyberpunk && "checkout-cyberpunk-panel",
+            candyland && "checkout-candyland-panel",
+          market && "checkout-market-panel",
           )}
         >
           <div ref={qrRef} className="rounded-lg bg-white p-4">
@@ -278,6 +294,8 @@ export function OrderStatusPageContent({
               atelier && "pay-atelier-secondary",
               expedition && "pay-expedition-secondary",
               cyberpunk && "pay-cyberpunk-secondary",
+              candyland && "pay-candyland-secondary",
+          market && "pay-market-secondary",
             )}
           >
             {savingQr ? "Saving…" : "Save QR code"}
@@ -296,6 +314,8 @@ export function OrderStatusPageContent({
           atelier && "checkout-atelier-panel",
             expedition && "checkout-expedition-panel",
             cyberpunk && "checkout-cyberpunk-panel",
+            candyland && "checkout-candyland-panel",
+          market && "checkout-market-panel",
         )}
       >
         <h2
@@ -304,6 +324,8 @@ export function OrderStatusPageContent({
             atelier && "checkout-atelier-section-label",
             expedition && "checkout-expedition-section-label",
             cyberpunk && "checkout-cyberpunk-section-label",
+            candyland && "checkout-candyland-section-label",
+          market && "checkout-market-section-label",
           )}
         >
           How to pay
@@ -318,7 +340,7 @@ export function OrderStatusPageContent({
         </p>
       </section>
 
-      <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} />
+      <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} />
 
       {notifyState?.error && (
         <p className="text-sm text-red-400" role="alert">
@@ -335,6 +357,8 @@ export function OrderStatusPageContent({
           atelier && "checkout-atelier-cta",
           expedition && "checkout-expedition-cta",
           cyberpunk && "checkout-cyberpunk-cta",
+          candyland && "checkout-candyland-cta",
+          market && "checkout-market-cta",
         )}
       >
         {notifyPending ? "Notifying…" : "Notify seller to verify payment"}
@@ -369,7 +393,9 @@ export function OrderStatusPageContent({
               onChange={(e) => setChecked(e.target.checked)}
               className={cn("mt-1", atelier && "checkout-atelier-radio",
                 expedition && "checkout-expedition-radio",
-                cyberpunk && "checkout-cyberpunk-radio")}
+                cyberpunk && "checkout-cyberpunk-radio",
+                candyland && "checkout-candyland-radio",
+          market && "checkout-market-radio")}
             />
             <span>I have completed payment using the QR code above.</span>
           </label>
@@ -391,6 +417,8 @@ export function OrderStatusPageContent({
                 atelier && "checkout-atelier-cta px-5 py-2.5",
                 expedition && "checkout-expedition-cta px-5 py-2.5",
                 cyberpunk && "checkout-cyberpunk-cta px-5 py-2.5",
+                candyland && "checkout-candyland-cta px-5 py-2.5",
+          market && "checkout-market-cta px-5 py-2.5",
               )}
             >
               Yes, notify seller

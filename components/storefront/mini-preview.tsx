@@ -36,6 +36,14 @@ function isCyberpunkVibe(vibe: Vibe): boolean {
   return vibe === "cyberpunk";
 }
 
+function isCandylandVibe(vibe: Vibe): boolean {
+  return vibe === "candyland";
+}
+
+function isMarketVibe(vibe: Vibe): boolean {
+  return vibe === "market";
+}
+
 function Monogram({ name }: { name: string }) {
   return (
     <div
@@ -84,8 +92,10 @@ export function MiniPreview({
   const atelier = isAtelierVibe(vibe);
   const expedition = isExpeditionVibe(vibe);
   const cyberpunk = isCyberpunkVibe(vibe);
-  const noMonogram = noir || atelier || expedition || cyberpunk;
-  const styledHero = noir || atelier || expedition || cyberpunk;
+  const candyland = isCandylandVibe(vibe);
+  const market = isMarketVibe(vibe);
+  const noMonogram = noir || atelier || expedition || cyberpunk || candyland || market;
+  const styledHero = noir || atelier || expedition || cyberpunk || candyland || market;
   const eyebrow = hero?.eyebrow?.trim();
   const tagline = hero?.subheading?.trim();
 
@@ -106,6 +116,8 @@ export function MiniPreview({
               ? cn(
                   "storefront-hero -mx-3 -mt-3 mb-1 flex flex-col px-3 pb-2 pt-3",
                   expedition ? "items-start text-left" : "items-center text-center",
+                  candyland && "hero-candyland-band",
+                  market && "hero-market-band",
                 )
               : "flex flex-col items-center gap-1 text-center"
           }
@@ -136,7 +148,11 @@ export function MiniPreview({
                       ? "hero-expedition-eyebrow mb-1 text-[7px]"
                       : cyberpunk
                         ? "hero-cyberpunk-eyebrow mb-1 text-[7px]"
-                        : "text-[8px] uppercase tracking-widest"
+                        : candyland
+                          ? "hero-candyland-eyebrow mb-1 text-[7px]"
+                          : market
+                            ? "hero-market-eyebrow mb-1 text-[7px]"
+                            : "text-[8px] uppercase tracking-widest"
               }
               style={
                 noir
@@ -144,7 +160,7 @@ export function MiniPreview({
                       color: "rgb(var(--vibe-text-bright))",
                       fontFamily: "var(--font-display)",
                     }
-                  : atelier || expedition || cyberpunk
+                  : atelier || expedition || cyberpunk || candyland || market
                     ? undefined
                     : { color: "rgb(var(--vibe-text-muted))" }
               }
@@ -162,7 +178,11 @@ export function MiniPreview({
                     ? "hero-expedition-title text-[15px] leading-none"
                     : cyberpunk
                       ? "hero-cyberpunk-title text-[12px] leading-tight"
-                      : "font-display text-sm leading-tight font-bold"
+                      : candyland
+                        ? "hero-candyland-title text-[13px] leading-tight"
+                        : market
+                          ? "hero-market-title text-[13px] leading-tight"
+                          : "font-display text-sm leading-tight font-bold"
             }
             style={
               noir
@@ -170,7 +190,7 @@ export function MiniPreview({
                     color: "rgb(var(--vibe-primary-container))",
                     fontFamily: "var(--font-display)",
                   }
-                : atelier || expedition || cyberpunk
+                : atelier || expedition || cyberpunk || candyland || market
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
             }
@@ -188,12 +208,16 @@ export function MiniPreview({
                       ? "hero-expedition-tagline mt-1 max-w-[10rem] text-[7px]"
                       : cyberpunk
                         ? "hero-cyberpunk-tagline mt-1 max-w-[10rem] text-[8px]"
-                        : "text-[9px] leading-snug"
+                        : candyland
+                          ? "hero-candyland-tagline mt-1 max-w-[10rem] text-[8px]"
+                          : market
+                            ? "hero-market-tagline mt-1 max-w-[10rem] text-[8px]"
+                            : "text-[9px] leading-snug"
               }
               style={
                 noir
                   ? { color: "rgb(var(--vibe-text-variant))" }
-                  : atelier || expedition || cyberpunk
+                  : atelier || expedition || cyberpunk || candyland || market
                     ? undefined
                     : { color: "rgb(var(--vibe-text-muted))" }
               }
@@ -211,9 +235,11 @@ export function MiniPreview({
               atelier && "featured-atelier-card featured-atelier-section",
               expedition && "featured-expedition-card featured-expedition-section",
               cyberpunk && "featured-cyberpunk-card featured-cyberpunk-section",
+              candyland && "featured-candyland-card featured-candyland-section",
+              market && "featured-market-card featured-market-section",
             )}
             style={
-              atelier || expedition || cyberpunk
+              atelier || expedition || cyberpunk || candyland || market
                 ? undefined
                 : { backgroundColor: "rgb(var(--vibe-surface))" }
             }
@@ -225,6 +251,8 @@ export function MiniPreview({
                 atelier && "featured-atelier-header",
                 expedition && "featured-expedition-header",
                 cyberpunk && "featured-cyberpunk-header",
+                candyland && "featured-candyland-header",
+                market && "featured-market-header",
               )}
             >
               <p
@@ -234,6 +262,8 @@ export function MiniPreview({
                   atelier && "featured-atelier-header-title text-[10px]",
                   expedition && "featured-expedition-header-title text-[9px]",
                   cyberpunk && "featured-cyberpunk-header-title text-[8px]",
+                  candyland && "featured-candyland-header-title text-[8px]",
+                  market && "featured-market-header-title text-[8px]",
                 )}
               >
                 {resolveFeaturedSectionTitle(store?.featured_section_title)}
@@ -257,6 +287,8 @@ export function MiniPreview({
                 atelier && "featured-atelier-name text-[11px]",
                 expedition && "featured-expedition-name text-[10px]",
                 cyberpunk && "featured-cyberpunk-name text-[10px]",
+                candyland && "featured-candyland-name text-[10px]",
+                market && "featured-market-name text-[10px]",
               )}
             >
               {featured.name}
@@ -268,9 +300,11 @@ export function MiniPreview({
                 atelier && "featured-atelier-price text-[10px]",
                 expedition && "featured-expedition-price text-[8px]",
                 cyberpunk && "featured-cyberpunk-price text-[8px]",
+                candyland && "featured-candyland-price text-[8px]",
+                market && "featured-market-price text-[8px]",
               )}
               style={
-                noir || atelier || expedition || cyberpunk
+                noir || atelier || expedition || cyberpunk || candyland || market
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
               }
@@ -287,13 +321,13 @@ export function MiniPreview({
                 key={cat}
                 className={cn(
                   "catalog-pill shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide",
-                  (noir || atelier || expedition || cyberpunk) &&
+                  (noir || atelier || expedition || cyberpunk || candyland || market) &&
                     (i === 0
                       ? "catalog-pill-active"
                       : "catalog-pill-inactive"),
                 )}
                 style={
-                  noir || atelier || expedition || cyberpunk
+                  noir || atelier || expedition || cyberpunk || candyland || market
                     ? undefined
                     : {
                         backgroundColor:
@@ -328,9 +362,11 @@ export function MiniPreview({
                 atelier && "catalog-atelier-card",
                 expedition && "catalog-expedition-card",
                 cyberpunk && "catalog-cyberpunk-card",
+                candyland && "catalog-candyland-card",
+                market && "catalog-market-card",
               )}
               style={
-                atelier || expedition || cyberpunk
+                atelier || expedition || cyberpunk || candyland || market
                   ? undefined
                   : { backgroundColor: "rgb(var(--vibe-surface))" }
               }
@@ -338,7 +374,7 @@ export function MiniPreview({
               <p
                 className={cn(
                   "catalog-card-title line-clamp-2 text-[9px] leading-tight",
-                  noir || expedition || cyberpunk ? "font-semibold" : "font-medium",
+                  noir || expedition || cyberpunk || candyland || market ? "font-semibold" : "font-medium",
                 )}
               >
                 {p.name}
@@ -348,10 +384,10 @@ export function MiniPreview({
                   "text-[8px] font-semibold",
                   !expedition && "catalog-card-price",
                   expedition && "featured-expedition-price text-[7px]",
-                  !noir && !atelier && !expedition && !cyberpunk && "text-vibe-primary",
+                  !noir && !atelier && !expedition && !cyberpunk && !candyland && !market && "text-vibe-primary",
                 )}
                 style={
-                  noir || atelier || expedition || cyberpunk
+                  noir || atelier || expedition || cyberpunk || candyland || market
                     ? undefined
                     : { color: "rgb(var(--vibe-primary))" }
                 }

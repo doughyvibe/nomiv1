@@ -66,6 +66,18 @@ function isCyberpunkVibe(
   return vibe === "cyberpunk" || vibe === "futuristic";
 }
 
+function isCandylandVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "candyland";
+}
+
+function isMarketVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "market";
+}
+
 function NoirHero({
   title,
   hero,
@@ -216,6 +228,84 @@ function CyberpunkHero({
   );
 }
 
+/** Candyland: candy-wrapper band; no cover/CTA/monogram. */
+function CandylandHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-candyland-band mb-6 md:mb-8">
+      <div className="hero-candyland-inner flex flex-col items-center px-5 py-10 text-center sm:px-6 md:py-14">
+        {hero.logo_url ? (
+          <div className="mb-4">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-candyland-eyebrow mb-2 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-candyland-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <p className="hero-candyland-tagline mt-3 text-balance">{tagline}</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/** Market: soft peach wash, editorial serif; no cover/CTA/monogram. */
+function MarketHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-market-band mb-2 md:mb-4">
+      <div className="flex flex-col items-center px-5 pb-10 pt-10 text-center sm:px-6 md:pb-14 md:pt-14">
+        {hero.logo_url ? (
+          <div className="mb-5">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-market-eyebrow mb-3 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-market-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <p className="hero-market-tagline mt-4 text-balance">{tagline}</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function DefaultHero({
   title,
   hero,
@@ -276,6 +366,14 @@ export function StorefrontHero({
 
   if (isCyberpunkVibe(vibe)) {
     return <CyberpunkHero title={title} hero={hero} />;
+  }
+
+  if (isCandylandVibe(vibe)) {
+    return <CandylandHero title={title} hero={hero} />;
+  }
+
+  if (isMarketVibe(vibe)) {
+    return <MarketHero title={title} hero={hero} />;
   }
 
   return <DefaultHero title={title} hero={hero} />;
