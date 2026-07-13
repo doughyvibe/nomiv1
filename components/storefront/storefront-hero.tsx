@@ -78,6 +78,24 @@ function isMarketVibe(
   return vibe === "market";
 }
 
+function isGalleryVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "gallery";
+}
+
+function isStudioVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "studio";
+}
+
+function isLauraVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "laura";
+}
+
 function NoirHero({
   title,
   hero,
@@ -267,7 +285,7 @@ function CandylandHero({
   );
 }
 
-/** Market: soft peach wash, editorial serif; no cover/CTA/monogram. */
+/** Market: rich peach brand band (FLAURA-style lockup); no cover/CTA/monogram. */
 function MarketHero({
   title,
   hero,
@@ -279,10 +297,10 @@ function MarketHero({
   const tagline = hero.subheading?.trim();
 
   return (
-    <section className="storefront-hero hero-market-band mb-2 md:mb-4">
-      <div className="flex flex-col items-center px-5 pb-10 pt-10 text-center sm:px-6 md:pb-14 md:pt-14">
+    <section className="storefront-hero hero-market-band mb-6 md:mb-8">
+      <div className="hero-market-inner flex flex-col items-center px-5 py-12 text-center sm:px-6 md:py-16">
         {hero.logo_url ? (
-          <div className="mb-5">
+          <div className="hero-market-logo-wrap mb-5">
             <HeroLogo
               url={hero.logo_url}
               alt={title}
@@ -299,7 +317,127 @@ function MarketHero({
         <h1 className="hero-market-title text-balance">{title}</h1>
 
         {tagline ? (
-          <p className="hero-market-tagline mt-4 text-balance">{tagline}</p>
+          <>
+            <div className="hero-market-rule my-4" aria-hidden />
+            <p className="hero-market-tagline text-balance">{tagline}</p>
+          </>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/** Gallery: white-cube wordmark; no cover/CTA/monogram. */
+function GalleryHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-gallery-band mb-8 md:mb-12">
+      <div className="flex flex-col items-center px-5 py-14 text-center sm:px-6 md:py-20">
+        {hero.logo_url ? (
+          <div className="mb-6">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-gallery-eyebrow mb-4 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-gallery-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <p className="hero-gallery-tagline mt-5 text-balance">{tagline}</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/** Studio: loud magazine wordmark; no cover/CTA/monogram. */
+function StudioHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-studio-band mb-10 md:mb-14">
+      <div className="hero-studio-inner flex flex-col items-start px-5 py-14 text-left sm:px-6 md:px-8 md:py-20">
+        {hero.logo_url ? (
+          <div className="mb-6">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-studio-eyebrow mb-4 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-studio-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <p className="hero-studio-tagline mt-6 text-balance">{tagline}</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/** Laura: soft blush wordmark; no cover/CTA/monogram. */
+function LauraHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-laura-band mb-6 md:mb-8">
+      <div className="flex flex-col items-center px-5 py-12 text-center sm:px-6 md:py-16">
+        {hero.logo_url ? (
+          <div className="mb-5">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-laura-eyebrow mb-3 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-laura-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <p className="hero-laura-tagline mt-4 text-balance">{tagline}</p>
         ) : null}
       </div>
     </section>
@@ -374,6 +512,18 @@ export function StorefrontHero({
 
   if (isMarketVibe(vibe)) {
     return <MarketHero title={title} hero={hero} />;
+  }
+
+  if (isGalleryVibe(vibe)) {
+    return <GalleryHero title={title} hero={hero} />;
+  }
+
+  if (isStudioVibe(vibe)) {
+    return <StudioHero title={title} hero={hero} />;
+  }
+
+  if (isLauraVibe(vibe)) {
+    return <LauraHero title={title} hero={hero} />;
   }
 
   return <DefaultHero title={title} hero={hero} />;

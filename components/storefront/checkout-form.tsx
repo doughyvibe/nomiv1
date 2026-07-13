@@ -23,6 +23,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
   const cyberpunk = store.vibe === "cyberpunk";
   const candyland = store.vibe === "candyland";
   const market = store.vibe === "market";
+  const gallery = store.vibe === "gallery";
+  const studio = store.vibe === "studio";
+  const laura = store.vibe === "laura";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
   const lines = cart.items
@@ -71,6 +74,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
             cyberpunk && "checkout-cyberpunk-back",
             candyland && "checkout-candyland-back",
           market && "checkout-market-back",
+          gallery && "checkout-gallery-back",
+          studio && "checkout-studio-back",
+          laura && "checkout-laura-back",
           )}
         >
           <ArrowLeft className="size-3.5" aria-hidden />
@@ -96,6 +102,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
         cyberpunk && "checkout-cyberpunk",
         candyland && "checkout-candyland",
           market && "checkout-market",
+          gallery && "checkout-gallery",
+          studio && "checkout-studio",
+          laura && "checkout-laura",
       )}
     >
       <div>
@@ -108,6 +117,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
             cyberpunk && "checkout-cyberpunk-back",
             candyland && "checkout-candyland-back",
           market && "checkout-market-back",
+          gallery && "checkout-gallery-back",
+          studio && "checkout-studio-back",
+          laura && "checkout-laura-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -121,6 +133,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
             cyberpunk && "checkout-cyberpunk-title",
             candyland && "checkout-candyland-title",
           market && "checkout-market-title",
+          gallery && "checkout-gallery-title",
+          studio && "checkout-studio-title",
+          laura && "checkout-laura-title",
           )}
         >
           Checkout
@@ -145,6 +160,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
           cyberpunk && "checkout-cyberpunk-panel",
           candyland && "checkout-candyland-panel",
           market && "checkout-market-panel",
+          gallery && "checkout-gallery-panel",
+          studio && "checkout-studio-panel",
+          laura && "checkout-laura-panel",
         )}
       >
         <h2
@@ -155,6 +173,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
             cyberpunk && "checkout-cyberpunk-section-label",
             candyland && "checkout-candyland-section-label",
           market && "checkout-market-section-label",
+          gallery && "checkout-gallery-section-label",
+          studio && "checkout-studio-section-label",
+          laura && "checkout-laura-section-label",
           )}
         >
           Order summary
@@ -188,6 +209,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
             cyberpunk && "checkout-cyberpunk-section-label",
             candyland && "checkout-candyland-section-label",
           market && "checkout-market-section-label",
+          gallery && "checkout-gallery-section-label",
+          studio && "checkout-studio-section-label",
+          laura && "checkout-laura-section-label",
             )}
           >
             Fulfillment
@@ -201,6 +225,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 cyberpunk && "checkout-cyberpunk-option",
                 candyland && "checkout-candyland-option",
           market && "checkout-market-option",
+          gallery && "checkout-gallery-option",
+          studio && "checkout-studio-option",
+          laura && "checkout-laura-option",
               )}
             >
               <input
@@ -212,7 +239,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
                   expedition && "checkout-expedition-radio",
                   cyberpunk && "checkout-cyberpunk-radio",
                   candyland && "checkout-candyland-radio",
-          market && "checkout-market-radio")}
+          market && "checkout-market-radio",
+          gallery && "checkout-gallery-radio",
+          studio && "checkout-studio-radio",
+          laura && "checkout-laura-radio")}
               />
               <span>
                 <span
@@ -240,6 +270,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 cyberpunk && "checkout-cyberpunk-option",
                 candyland && "checkout-candyland-option",
           market && "checkout-market-option",
+          gallery && "checkout-gallery-option",
+          studio && "checkout-studio-option",
+          laura && "checkout-laura-option",
               )}
             >
               <input
@@ -251,7 +284,10 @@ export function CheckoutForm({ slug }: { slug: string }) {
                   expedition && "checkout-expedition-radio",
                   cyberpunk && "checkout-cyberpunk-radio",
                   candyland && "checkout-candyland-radio",
-          market && "checkout-market-radio")}
+          market && "checkout-market-radio",
+          gallery && "checkout-gallery-radio",
+          studio && "checkout-studio-radio",
+          laura && "checkout-laura-radio")}
               />
               <span>
                 <span
@@ -282,6 +318,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
             cyberpunk && "checkout-cyberpunk-section-label",
             candyland && "checkout-candyland-section-label",
           market && "checkout-market-section-label",
+          gallery && "checkout-gallery-section-label",
+          studio && "checkout-studio-section-label",
+          laura && "checkout-laura-section-label",
           )}
         >
           Your details
@@ -299,6 +338,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
               cyberpunk && "checkout-cyberpunk-input",
               candyland && "checkout-candyland-input",
           market && "checkout-market-input",
+          gallery && "checkout-gallery-input",
+          studio && "checkout-studio-input",
+          laura && "checkout-laura-input",
             )}
           />
         </label>
@@ -320,6 +362,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
               cyberpunk && "checkout-cyberpunk-input",
               candyland && "checkout-candyland-input",
           market && "checkout-market-input",
+          gallery && "checkout-gallery-input",
+          studio && "checkout-studio-input",
+          laura && "checkout-laura-input",
             )}
           />
         </label>
@@ -337,6 +382,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
               cyberpunk && "checkout-cyberpunk-input",
               candyland && "checkout-candyland-input",
           market && "checkout-market-input",
+          gallery && "checkout-gallery-input",
+          studio && "checkout-studio-input",
+          laura && "checkout-laura-input",
             )}
           />
         </label>
@@ -355,6 +403,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
               cyberpunk && "checkout-cyberpunk-input",
               candyland && "checkout-candyland-input",
           market && "checkout-market-input",
+          gallery && "checkout-gallery-input",
+          studio && "checkout-studio-input",
+          laura && "checkout-laura-input",
               )}
             />
           </label>
@@ -373,6 +424,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
               cyberpunk && "checkout-cyberpunk-input",
               candyland && "checkout-candyland-input",
           market && "checkout-market-input",
+          gallery && "checkout-gallery-input",
+          studio && "checkout-studio-input",
+          laura && "checkout-laura-input",
             )}
           />
         </label>
@@ -394,6 +448,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
           cyberpunk && "checkout-cyberpunk-cta",
           candyland && "checkout-candyland-cta",
           market && "checkout-market-cta",
+          gallery && "checkout-gallery-cta",
+          studio && "checkout-studio-cta",
+          laura && "checkout-laura-cta",
         )}
       >
         {pending ? "Creating order…" : "Place order & pay"}

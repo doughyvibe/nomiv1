@@ -18,9 +18,14 @@
 
 | Date | Decision | Why |
 |---|---|---|
-| 2026-07-11 | Market visual overhaul (shop home + cart/checkout/payment/PDP) | Libre Caslon + DM Sans; peach/terracotta/linen; outline featured “Add to cart”; soft linen sticky dock (not mockup charcoal); no cover/bottom nav |
+| 2026-07-13 | Laura visual overhaul (shop home + cart/checkout/payment/PDP) | Playfair + Inter; blush glass; soft mauve `#7D5B6D`; sticky keeps glassmorphism + mauve glow outline; filled soft pill CTAs |
+| 2026-07-13 | Added provisional vibes: **Laura**, **Atlantic**, **Vows**, **Strada** | Soft toned-down placeholders for quieter aesthetics; overhaul one at a time next |
+| 2026-07-12 | Studio bold magazine polish | Underline category band; `+` beside price (not on image); LOUD Hanken type; ink hero + cobalt hard shadows |
+| 2026-07-12 | Added provisional vibe: **Studio** (`studio`) | Scaffolded then overhauled same day |
+| 2026-07-11 | Gallery visual overhaul (shop home + cart/checkout/payment/PDP) | Playfair + Hanken; white cube mono; 0 radius; outline featured “Add to cart”; 1-col mobile / 2-col desktop; museum-plaque sticky bar; no cover/bottom nav |
+| 2026-07-11 | Market hero → FLAURA-style peach lockup | Solid `#FDDAC8` band; Caslon tracked wordmark + caps labels; tall logo room for brand art; no store-name initial |
 | 2026-07-11 | Candyland visual overhaul (shop home + cart/checkout/payment/PDP) | League Spartan + Satoshi; neo-brutalist pink/purple/lime; hard shadows; candy stripes hero; featured “Add to cart”; sticky lime bar; no cover/tints/bottom nav |
-| 2026-07-11 | Added provisional vibes: **Candyland**, **Gallery**, **Market** | Light placeholder tokens + picker entries; Candyland + Market overhauled since; Gallery still provisional |
+| 2026-07-11 | Added provisional vibes: **Candyland**, **Gallery**, **Market** | Light placeholder tokens + picker entries; all three overhauled since |
 | 2026-07-11 | Cyberpunk visual overhaul (shop home + cart/checkout/payment/PDP) | Orbitron + Space Grotesk; black/cyan/purple neon; sticky checkout; featured “Add to cart”; no cover/hero CTA/bottom nav/fake specs; scoped under `[data-vibe="cyberpunk"]` |
 | 2026-07-11 | Futuristic renamed → **Cyberpunk** (`vibe: "cyberpunk"`) | Display + DB id; migration remaps `futuristic` → `cyberpunk` |
 | 2026-07-09 | Noir (`epicurean`) storefront styling complete | Hero, featured, catalog, sticky bar — scoped under `[data-vibe="epicurean"]` |

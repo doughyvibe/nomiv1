@@ -11,6 +11,9 @@ export function OrderReceipt({
   cyberpunk = false,
   candyland = false,
   market = false,
+  gallery = false,
+  studio = false,
+  laura = false,
 }: {
   data: LoadedOrder;
   showPaidLabel?: boolean;
@@ -19,6 +22,9 @@ export function OrderReceipt({
   cyberpunk?: boolean;
   candyland?: boolean;
   market?: boolean;
+  gallery?: boolean;
+  studio?: boolean;
+  laura?: boolean;
 }) {
   const { order, store, items } = data;
   const fulfillmentSummary = formatFulfillmentSummary(order);
@@ -38,6 +44,9 @@ export function OrderReceipt({
         cyberpunk && "checkout-cyberpunk-panel",
         candyland && "checkout-candyland-panel",
           market && "checkout-market-panel",
+          gallery && "checkout-gallery-panel",
+          studio && "checkout-studio-panel",
+          laura && "checkout-laura-panel",
       )}
     >
       <p
@@ -48,6 +57,9 @@ export function OrderReceipt({
           cyberpunk && "checkout-cyberpunk-section-label",
           candyland && "checkout-candyland-section-label",
           market && "checkout-market-section-label",
+          gallery && "checkout-gallery-section-label",
+          studio && "checkout-studio-section-label",
+          laura && "checkout-laura-section-label",
         )}
       >
         {showPaidLabel ? "Order receipt" : "Order summary"}
@@ -96,6 +108,9 @@ export function OrderReceipt({
             cyberpunk && "pay-cyberpunk-amount",
             candyland && "pay-candyland-amount",
           market && "pay-market-amount",
+          gallery && "pay-gallery-amount",
+          studio && "pay-studio-amount",
+          laura && "pay-laura-amount",
           )}
         >
           <dt>{showPaidLabel ? "Total paid" : "Total due"}</dt>
@@ -112,6 +127,9 @@ export function OrderReceipt({
           cyberpunk && "checkout-cyberpunk-section-label",
           candyland && "checkout-candyland-section-label",
           market && "checkout-market-section-label",
+          gallery && "checkout-gallery-section-label",
+          studio && "checkout-studio-section-label",
+          laura && "checkout-laura-section-label",
           )}
         >
           Fulfillment

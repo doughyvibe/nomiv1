@@ -74,14 +74,14 @@ export const VIBES: VibeMeta[] = [
   {
     id: "gallery",
     name: "Gallery",
-    tagline: "Clean white space, art-forward.",
+    tagline: "White cube calm for curated works.",
     suitableFor: "Art, prints, photography, design, collectibles",
     swatch: {
-      bg: "rgb(250 250 252)",
-      primary: "rgb(28 28 32)",
-      secondary: "rgb(140 140 150)",
+      bg: "rgb(249 249 249)",
+      primary: "rgb(18 18 18)",
+      secondary: "rgb(116 120 120)",
     },
-    provisional: true,
+    provisional: false,
   },
   {
     id: "market",
@@ -89,11 +89,71 @@ export const VIBES: VibeMeta[] = [
     tagline: "Quiet luxury for the modern agrarian.",
     suitableFor: "Produce, bakeries, pantry goods, farm stalls",
     swatch: {
-      bg: "rgb(255 248 245)",
+      bg: "rgb(253 218 200)",
       primary: "rgb(136 69 48)",
       secondary: "rgb(115 89 75)",
     },
     provisional: false,
+  },
+  {
+    id: "studio",
+    name: "Studio",
+    tagline: "Bold, graphic, creatively fearless.",
+    suitableFor: "Design studios, brand kits, UI, creative services",
+    swatch: {
+      bg: "rgb(255 255 255)",
+      primary: "rgb(15 82 255)",
+      secondary: "rgb(12 12 12)",
+    },
+    provisional: false,
+  },
+  {
+    id: "laura",
+    name: "Laura",
+    tagline: "Soft blush glass, quietly pretty.",
+    suitableFor: "Beauty, lifestyle, florals, soft goods",
+    swatch: {
+      bg: "rgb(252 240 245)",
+      primary: "rgb(125 91 109)",
+      secondary: "rgb(149 132 139)",
+    },
+    provisional: false,
+  },
+  {
+    id: "atlantic",
+    name: "Atlantic",
+    tagline: "Cool coastal calm, easy and clear.",
+    suitableFor: "Apparel, travel, wellness, everyday retail",
+    swatch: {
+      bg: "rgb(246 249 251)",
+      primary: "rgb(74 110 140)",
+      secondary: "rgb(110 122 132)",
+    },
+    provisional: true,
+  },
+  {
+    id: "vows",
+    name: "Vows",
+    tagline: "Warm ivory, gentle and ceremonial.",
+    suitableFor: "Weddings, gifts, stationery, keepsakes",
+    swatch: {
+      bg: "rgb(252 250 246)",
+      primary: "rgb(140 118 96)",
+      secondary: "rgb(168 148 138)",
+    },
+    provisional: true,
+  },
+  {
+    id: "strada",
+    name: "Strada",
+    tagline: "Quiet stone and olive, street-simple.",
+    suitableFor: "Cafes, homewares, neighborhood shops",
+    swatch: {
+      bg: "rgb(248 247 244)",
+      primary: "rgb(96 108 88)",
+      secondary: "rgb(130 122 112)",
+    },
+    provisional: true,
   },
 ];
 

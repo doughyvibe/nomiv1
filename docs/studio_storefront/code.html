@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STUDIO VOID - Mobile Storefront</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&amp;family=Inter:wght@400&amp;family=Geist:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-container": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#474646",
+                        "surface-variant": "#e3e2e2",
+                        "error": "#ba1a1a",
+                        "outline": "#737688",
+                        "primary-fixed": "#dde1ff",
+                        "tertiary-fixed": "#ffdbd1",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#3b0900",
+                        "on-primary-fixed-variant": "#0037b9",
+                        "surface-container-low": "#f5f3f3",
+                        "inverse-on-surface": "#f2f0f0",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-primary-fixed": "#001453",
+                        "tertiary-fixed-dim": "#ffb5a0",
+                        "outline-variant": "#c3c5d9",
+                        "tertiary": "#952500",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-container": "#efeded",
+                        "primary-container": "#0f52ff",
+                        "on-secondary-container": "#656464",
+                        "primary-fixed-dim": "#b8c4ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2e2",
+                        "on-tertiary-container": "#ffded6",
+                        "on-primary-container": "#e1e4ff",
+                        "on-background": "#1b1c1c",
+                        "background": "#fbf9f9",
+                        "on-primary": "#ffffff",
+                        "primary": "#003dcb",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e9e8e7",
+                        "on-surface": "#1b1c1c",
+                        "secondary": "#5f5e5e",
+                        "surface-dim": "#dbdad9",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b8c4ff",
+                        "surface-tint": "#004af1",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#434656",
+                        "tertiary-container": "#bf3200",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed-variant": "#872100",
+                        "inverse-surface": "#303031",
+                        "surface": "#fbf9f9",
+                        "surface-bright": "#fbf9f9"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-desktop": "80px",
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "section-gap": "160px"
+                    },
+                    fontFamily: {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "display-xl": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Geist"]
+                    },
+                    fontSize: {
+                        "headline-lg-mobile": ["40px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "headline-lg": ["64px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "display-xl": ["120px", { lineHeight: "110px", letterSpacing: "-0.04em", fontWeight: "800" }],
+                        "headline-md": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "label-caps": ["12px", { lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for horizontal nav */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-lg antialiased pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-20 w-full bg-background dark:bg-background border-b border-on-background/10">
+<button class="hover:opacity-70 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">menu</span>
+</button>
+<span class="font-display-xl text-display-xl tracking-tighter uppercase text-on-background dark:text-on-background !text-3xl !leading-none">STUDIO VOID</span>
+<button class="hover:opacity-70 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">shopping_bag</span>
+</button>
+</header>
+<main class="mt-20">
+<!-- 1. Hero Splash -->
+<section class="relative w-full h-[85vh] overflow-hidden">
+<div class="absolute inset-0 bg-on-background">
+<img class="object-cover w-full h-full opacity-60 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuGl69dguDs6Ctx3aF2FUXUdK6KlbDhHplAAXkncx8Ks3IDePqgaXr7VKi-aJlPlTMLiWYiyoozxVDEaGmpobmT11rusth49KqUzKWwi_orDJ8vcz_ZeWuScqWrJd3_85F0mDNn26DotML9bdtuZ18GBp5c2rupom7blEZS2wUuuhX21Ep6IQ5Jm6rGbf_aMs9FCiooU8qJD4-T5dw0VvbZpv_aSVDfpobZZ6xqWq3k-925xsmNxxCowAVYpDssjKXP3M"/>
+</div>
+<div class="absolute inset-0 flex flex-col justify-end p-margin-mobile pb-20">
+<h1 class="font-display-xl text-display-xl tracking-tighter uppercase text-on-primary mb-4 !text-6xl !leading-none">STUDIO<br/>VOID</h1>
+<p class="font-body-lg text-body-lg text-on-primary/90 mb-8 max-w-sm">Design as a medium. Ideas as the product. Craft without compromise.</p>
+<button class="self-start bg-primary text-on-primary font-label-caps text-label-caps uppercase px-8 py-4 hover:bg-[#0039CB] transition-colors flex items-center gap-2 group">
+                    View Portfolio
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- 2. Signature Pick -->
+<section class="px-margin-mobile py-20">
+<div class="flex flex-col gap-6">
+<div class="w-full bg-surface-container aspect-[3/4] relative overflow-hidden group">
+<img class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJHDTIR7VAP4u8fF56cbHFDokWWn29KCQwE34YWb6mEt41ECPqoqAECS2tzCyELIL9AlY_TrNrm-5ud6CgrQCuzf_ebiG_D3mRzrwfpA4FYAGderEHVOEy7GgIL7--kxD_UlSsI42cdpSdX_BMpOUtVGoFaZe0JY8gKq7cswUpD7M6Rgj_z1FssOrMVHT4-Liuji9jLUtqqhO7XRTSRbGrcPdnbgDd3HkDv_n8Qks5x6nre1Bvx13NLg"/>
+<div class="absolute top-4 right-4 bg-background px-3 py-1">
+<span class="font-label-caps text-label-caps uppercase text-primary tracking-widest">Signature</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile">The Complete Identity</h2>
+<span class="font-headline-md text-headline-md text-primary">$4,500</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-background/70 mb-8">Full visual identity system designed for premium brands demanding absolute market distinction. Includes exhaustive brand guidelines, application mockups, and strategic positioning frameworks.</p>
+<button class="w-full border border-on-background text-on-background font-label-caps text-label-caps uppercase py-4 hover:bg-on-background hover:text-background transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add to Cart
+                    </button>
+</div>
+</div>
+</section>
+<!-- 3. Category Nav -->
+<section class="pl-margin-mobile py-6 border-y border-on-background/10 sticky top-20 bg-background/95 backdrop-blur z-40">
+<div class="flex gap-4 overflow-x-auto hide-scrollbar pr-margin-mobile">
+<button class="whitespace-nowrap px-4 py-2 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-full">All</button>
+<button class="whitespace-nowrap px-4 py-2 border border-on-background/20 text-on-background font-label-caps text-label-caps uppercase rounded-full hover:border-primary transition-colors">Brand Identities</button>
+<button class="whitespace-nowrap px-4 py-2 border border-on-background/20 text-on-background font-label-caps text-label-caps uppercase rounded-full hover:border-primary transition-colors">UI Kits</button>
+<button class="whitespace-nowrap px-4 py-2 border border-on-background/20 text-on-background font-label-caps text-label-caps uppercase rounded-full hover:border-primary transition-colors">Logo Packages</button>
+<button class="whitespace-nowrap px-4 py-2 border border-on-background/20 text-on-background font-label-caps text-label-caps uppercase rounded-full hover:border-primary transition-colors">Web Design</button>
+</div>
+</section>
+<!-- 4. Product Collection -->
+<section class="px-margin-mobile py-20">
+<div class="grid grid-cols-2 gap-x-4 gap-y-12">
+<!-- Product 1 -->
+<div class="flex flex-col group cursor-pointer">
+<div class="aspect-square bg-surface-container mb-4 overflow-hidden relative">
+<img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS3ILoyqshQi4o80pbrb8B3ieivXOZHo1FYh9iKYJL8WHK0ZJlAcImPH5udCHGMFUIDdLOD44u8Sf6v0xtqerZOhq9yF0-N6yORdA2-9DZiIb4TNmisxfi5gprzLLaZvmb_xTEWznkFWCJj23wsEXSa6JDzNo4HvCCDA8vT_JooGDsOgPVpVXxf3z3VTcUDsXgGlL8JoNKnbiD-IEANGWkwN4xFZT9UXOnIRhhdIcXfyQ-KdaAXBKbKg"/>
+<button class="absolute bottom-2 right-2 w-10 h-10 bg-background flex items-center justify-center rounded-full hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<span class="font-label-caps text-label-caps text-on-background/60 uppercase mb-1">UI Systems</span>
+<h3 class="font-body-lg text-body-lg font-bold leading-tight mb-2">Minimalist UI Kit Pro</h3>
+<span class="font-label-caps text-label-caps text-primary">$320</span>
+</div>
+<!-- Product 2 -->
+<div class="flex flex-col group cursor-pointer mt-12">
+<div class="aspect-square bg-surface-container mb-4 overflow-hidden relative">
+<img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIXNF1rA_GWmiLj_01Zm1ZiwKp-6rx5Fqw8poEQ1asEyXl1wr66Fg7QlC3aO5jRUU9MoxA4h00mxzfjPBKbnRKVCTwh1YdUH_G1HGiIVId_OIYISjXoHwdcke6o-XvigDyyMs6ewNwdwC-0hgUNEfMUx-YYZyEeOMUjJWKYyna_lqoQP77LvfOn_9zHsVPNnqwCq4q4JYt5P_XFNGGhiyEDve2BYeUmdQa6F69kTRpBfosrD6zWm8PgA"/>
+<button class="absolute bottom-2 right-2 w-10 h-10 bg-background flex items-center justify-center rounded-full hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<span class="font-label-caps text-label-caps text-on-background/60 uppercase mb-1">Logos</span>
+<h3 class="font-body-lg text-body-lg font-bold leading-tight mb-2">Logo Suite — Vol. 1</h3>
+<span class="font-label-caps text-label-caps text-primary">$180</span>
+</div>
+<!-- Product 3 -->
+<div class="flex flex-col group cursor-pointer">
+<div class="aspect-square bg-surface-container mb-4 overflow-hidden relative">
+<img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuSttHyAZvBWO1DboEDEcgI6yAWpoDsgwFxr2SBsYRIckLP9c9OUVIxrXM4jRJPKkgYYAH1lcwhGDfzHDiCFtoHmqouTS0qf5fYi5b0Y5jFH5HeM8hr-QgASPLSRSatp7kS94znbaF8OydncIdMyFP8lKAZkNPBw-0PA4zN15zbt0mUUAyV4QjnrzawiWF8VzxU1zdDC4MlkxsAG8NttQlza3bY9GpF9WmBwpiCF_t0YUQoKDfAjLfCg"/>
+<button class="absolute bottom-2 right-2 w-10 h-10 bg-background flex items-center justify-center rounded-full hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<span class="font-label-caps text-label-caps text-on-background/60 uppercase mb-1">Print</span>
+<h3 class="font-body-lg text-body-lg font-bold leading-tight mb-2">Editorial Brand Book</h3>
+<span class="font-label-caps text-label-caps text-primary">$1,200</span>
+</div>
+<!-- Product 4 -->
+<div class="flex flex-col group cursor-pointer mt-12">
+<div class="aspect-square bg-surface-container mb-4 overflow-hidden relative">
+<img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAZtj0WUurKFgu6anM4b_xBKZOfrF0mKTQ_1Gmx9fn0-0PM7MEwA5Bhsw8sHQHI8nKSC3K2ZhyBzsQJhJI2SIUAmhxcQ9FCiNNgENnMcJ1TYdxdtx9RL84rZ8gYMTLgsBgmmwsAXZPJofXY04ONeynoKFTP_19FXFsHFF2uEpJ1kDk0hpIc7YKiLAHRPi-aI64QGiv5wf3mHB0_5z6KsJUDPSghBbjwbWcAhNwyD8aFYcAsQtBmCC8ww"/>
+<button class="absolute bottom-2 right-2 w-10 h-10 bg-background flex items-center justify-center rounded-full hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<span class="font-label-caps text-label-caps text-on-background/60 uppercase mb-1">Social</span>
+<h3 class="font-body-lg text-body-lg font-bold leading-tight mb-2">Digital Campaign Kit</h3>
+<span class="font-label-caps text-label-caps text-primary">$650</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Sticky Cart) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile py-6 bg-primary dark:bg-primary-container">
+<button class="flex items-center gap-2 text-on-primary/80 hover:bg-on-primary/20 transition-colors active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span class="font-label-caps text-label-caps">2 ITEMS | $4,820.00</span>
+</button>
+<button class="flex items-center gap-2 bg-on-primary/10 rounded-full px-4 py-2 font-label-caps text-label-caps text-on-primary hover:bg-on-primary/20 transition-colors active:scale-[0.98] transition-transform">
+<span>CHECKOUT</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</nav>
+</body></html>

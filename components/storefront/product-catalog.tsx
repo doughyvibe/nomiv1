@@ -40,6 +40,24 @@ function isMarketVibe(
   return vibe === "market";
 }
 
+function isGalleryVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "gallery";
+}
+
+function isStudioVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "studio";
+}
+
+function isLauraVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "laura";
+}
+
 function ProductCard({
   product,
   index,
@@ -48,6 +66,9 @@ function ProductCard({
   cyberpunk,
   candyland,
   market,
+  gallery,
+  studio,
+  laura,
 }: {
   product: Product;
   index: number;
@@ -56,11 +77,15 @@ function ProductCard({
   cyberpunk: boolean;
   candyland: boolean;
   market: boolean;
+  gallery: boolean;
+  studio: boolean;
+  laura: boolean;
 }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
+  const category = normalizeCategory(product.category);
   const blurb =
-    atelier || expedition || cyberpunk || candyland || market
+    atelier || expedition || cyberpunk || candyland || market || gallery || laura
       ? product.description?.trim()
       : null;
 
@@ -72,17 +97,42 @@ function ProductCard({
     setTimeout(() => setAdded(false), 1500);
   }
 
+  const addButton = (
+    <button
+      type="button"
+      onClick={handleQuickAdd}
+      aria-label={`Add ${product.name} to cart`}
+      className={cn(
+        "catalog-card-add inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 p-0 leading-none transition-colors [&_svg]:block [&_svg]:shrink-0",
+        studio && "catalog-studio-add",
+        laura && "catalog-laura-add",
+        added && "bg-vibe-primary text-vibe-primary-fg",
+      )}
+    >
+      {added ? (
+        <span className="text-[10px] leading-none font-bold">✓</span>
+      ) : cyberpunk ? (
+        <ShoppingCart className="size-4" aria-hidden />
+      ) : (
+        <Plus className="size-4" aria-hidden />
+      )}
+    </button>
+  );
+
   return (
     <Link
       href={`/product/${product.id}`}
       className={cn(
-        "vibe-card group flex flex-col overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.98]",
+        "vibe-card group flex h-full flex-col overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.98]",
         "animate-fade-up opacity-0",
         atelier && "catalog-atelier-card",
         expedition && "catalog-expedition-card",
         cyberpunk && "catalog-cyberpunk-card",
         candyland && "catalog-candyland-card",
         market && "catalog-market-card",
+        gallery && "catalog-gallery-card",
+        studio && "catalog-studio-card",
+        laura && "catalog-laura-card",
       )}
       style={{
         animationDelay: `${80 + index * 50}ms`,
@@ -91,12 +141,16 @@ function ProductCard({
     >
       <div
         className={cn(
-          "relative aspect-square overflow-hidden",
+          "relative overflow-hidden",
+          !gallery && "aspect-square",
           atelier && "catalog-atelier-image",
           expedition && "catalog-expedition-image",
           cyberpunk && "catalog-cyberpunk-image",
           candyland && "catalog-candyland-image",
           market && "catalog-market-image",
+          gallery && "catalog-gallery-pedestal catalog-gallery-image",
+          studio && "catalog-studio-image",
+          laura && "catalog-laura-image",
         )}
       >
         {product.image_url ? (
@@ -124,6 +178,9 @@ function ProductCard({
             cyberpunk && "catalog-cyberpunk-image-fade",
             candyland && "catalog-candyland-image-fade",
             market && "catalog-market-image-fade",
+            gallery && "catalog-gallery-image-fade",
+            studio && "catalog-studio-image-fade",
+            laura && "catalog-laura-image-fade",
           )}
         />
       </div>
@@ -136,43 +193,65 @@ function ProductCard({
           cyberpunk && "catalog-cyberpunk-body",
           candyland && "catalog-candyland-body",
           market && "catalog-market-body",
+          gallery && "catalog-gallery-body",
+          studio && "catalog-studio-body",
+          laura && "catalog-laura-body",
         )}
       >
-        <h3 className="catalog-card-title line-clamp-2 text-sm font-medium leading-snug text-vibe-text md:text-base">
-          {product.name}
-        </h3>
-        {blurb ? (
-          <p className="catalog-card-desc line-clamp-1">{blurb}</p>
-        ) : null}
-        <div
-          className={cn(
-            "mt-auto flex items-center justify-between gap-2",
-            atelier && "catalog-atelier-price-row",
-            candyland && "catalog-candyland-price-row",
-            market && "catalog-market-price-row",
-          )}
-        >
-          <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
-            {formatPrice(product.price_cents)}
-          </p>
-          <button
-            type="button"
-            onClick={handleQuickAdd}
-            aria-label={`Add ${product.name} to cart`}
-            className={cn(
-              "catalog-card-add inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 p-0 leading-none transition-colors [&_svg]:block [&_svg]:shrink-0",
-              added && "bg-vibe-primary text-vibe-primary-fg",
-            )}
-          >
-            {added ? (
-              <span className="text-[10px] leading-none font-bold">✓</span>
-            ) : cyberpunk ? (
-              <ShoppingCart className="size-4" aria-hidden />
-            ) : (
-              <Plus className="size-4" aria-hidden />
-            )}
-          </button>
-        </div>
+        {gallery ? (
+          <>
+            <div className="catalog-gallery-title-row">
+              <h3 className="catalog-card-title line-clamp-2 text-sm font-medium leading-snug text-vibe-text md:text-base">
+                {product.name}
+              </h3>
+              {addButton}
+            </div>
+            {blurb ? (
+              <p className="catalog-card-desc line-clamp-2">{blurb}</p>
+            ) : null}
+            <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
+              {formatPrice(product.price_cents)}
+            </p>
+          </>
+        ) : studio ? (
+          <>
+            {category ? (
+              <span className="catalog-studio-category">{category}</span>
+            ) : null}
+            <h3 className="catalog-card-title line-clamp-3 text-sm font-medium leading-snug text-vibe-text md:text-base">
+              {product.name}
+            </h3>
+            <div className="catalog-studio-price-row mt-auto flex items-center justify-between gap-2 pt-2">
+              <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
+                {formatPrice(product.price_cents)}
+              </p>
+              {addButton}
+            </div>
+          </>
+        ) : (
+          <>
+            <h3 className="catalog-card-title line-clamp-2 text-sm font-medium leading-snug text-vibe-text md:text-base">
+              {product.name}
+            </h3>
+            {blurb ? (
+              <p className="catalog-card-desc line-clamp-1">{blurb}</p>
+            ) : null}
+            <div
+              className={cn(
+                "mt-auto flex items-center justify-between gap-2",
+                atelier && "catalog-atelier-price-row",
+                candyland && "catalog-candyland-price-row",
+                market && "catalog-market-price-row",
+                laura && "catalog-laura-price-row",
+              )}
+            >
+              <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
+                {formatPrice(product.price_cents)}
+              </p>
+              {addButton}
+            </div>
+          </>
+        )}
       </div>
     </Link>
   );
@@ -192,7 +271,11 @@ export function ProductCatalog({
   const cyberpunk = isCyberpunkVibe(vibe);
   const candyland = isCandylandVibe(vibe);
   const market = isMarketVibe(vibe);
-  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market;
+  const gallery = isGalleryVibe(vibe);
+  const studio = isStudioVibe(vibe);
+  const laura = isLauraVibe(vibe);
+  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market || laura;
+  const textFilters = gallery || studio;
   const categories = useMemo(() => {
     const set = new Set<string>();
     for (const p of products) {
@@ -236,26 +319,39 @@ export function ProductCatalog({
     <section id="catalog" className="catalog-section px-5 pb-8 pt-6 sm:px-6 md:pb-12 md:pt-10">
       {showFilters ? (
         <>
-          {/* Mobile pills; Atelier + Expedition keep pills on desktop too */}
-          <div
-            className={cn(
-              "mb-6 flex gap-3 overflow-x-auto pb-1",
-              pillsOnDesktop ? "md:mb-8" : "md:hidden",
-            )}
-          >
-            {pillButtons}
-          </div>
+          {/* Mobile pills; some vibes keep pills on desktop too. Gallery uses text links. */}
+          {!textFilters ? (
+            <div
+              className={cn(
+                "mb-6 flex gap-3 overflow-x-auto pb-1",
+                pillsOnDesktop ? "md:mb-8" : "md:hidden",
+              )}
+            >
+              {pillButtons}
+            </div>
+          ) : null}
 
-          {/* Desktop underline tabs — skipped when vibe uses pills */}
-          {!pillsOnDesktop ? (
-            <div className="catalog-tabs mb-8 hidden gap-6 border-b border-vibe-border/30 md:flex">
+          {/* Underline tabs — Gallery always; others on desktop when not pill vibes */}
+          {textFilters || !pillsOnDesktop ? (
+            <div
+              className={cn(
+                "catalog-tabs mb-8 gap-6 overflow-x-auto",
+                textFilters
+                  ? cn(
+                      "flex",
+                      gallery && "catalog-gallery-filters",
+                      studio && "catalog-studio-filters",
+                    )
+                  : "hidden border-b border-vibe-border/30 md:flex",
+              )}
+            >
               {["All", ...categories].map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setActive(cat)}
                   className={cn(
-                    "catalog-tab min-h-11 border-b-2 border-transparent pb-3 text-sm font-medium transition-colors",
+                    "catalog-tab shrink-0 min-h-11 border-b-2 border-transparent pb-3 text-sm font-medium transition-colors",
                     active === cat
                       ? "catalog-tab-active border-vibe-primary text-vibe-primary"
                       : "catalog-tab-inactive text-vibe-text-muted hover:text-vibe-text",
@@ -269,7 +365,13 @@ export function ProductCatalog({
         </>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-4 gap-y-10 md:grid-cols-4 md:gap-6 md:gap-y-12">
+      <div
+        className={
+          gallery
+            ? "catalog-gallery-grid grid"
+            : "grid grid-cols-2 gap-4 gap-y-10 md:grid-cols-4 md:gap-6 md:gap-y-12"
+        }
+      >
         {filtered.length === 0 ? (
           <p className="col-span-full py-8 text-center text-sm text-vibe-text-muted">
             No products in this category.
@@ -285,6 +387,9 @@ export function ProductCatalog({
               cyberpunk={cyberpunk}
               candyland={candyland}
               market={market}
+              gallery={gallery}
+              studio={studio}
+              laura={laura}
             />
           ))
         )}

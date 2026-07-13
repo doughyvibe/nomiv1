@@ -52,6 +52,24 @@ function isMarketVibe(
   return vibe === "market";
 }
 
+function isGalleryVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "gallery";
+}
+
+function isStudioVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "studio";
+}
+
+function isLauraVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "laura";
+}
+
 export function FeaturedProduct({
   product,
   sectionTitle,
@@ -65,8 +83,11 @@ export function FeaturedProduct({
   const cyberpunk = isCyberpunkVibe(vibe);
   const candyland = isCandylandVibe(vibe);
   const market = isMarketVibe(vibe);
+  const gallery = isGalleryVibe(vibe);
+  const studio = isStudioVibe(vibe);
+  const laura = isLauraVibe(vibe);
   const heading = resolveFeaturedSectionTitle(sectionTitle);
-  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market;
+  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -86,6 +107,9 @@ export function FeaturedProduct({
         cyberpunk && "featured-cyberpunk-section",
         candyland && "featured-candyland-section",
         market && "featured-market-section",
+        gallery && "featured-gallery-section",
+        studio && "featured-studio-section",
+        laura && "featured-laura-section",
       )}
     >
       <div
@@ -97,6 +121,9 @@ export function FeaturedProduct({
           cyberpunk && "featured-cyberpunk-header",
           candyland && "featured-candyland-header",
           market && "featured-market-header",
+          gallery && "featured-gallery-header",
+          studio && "featured-studio-header",
+          laura && "featured-laura-header",
         )}
       >
         <h2
@@ -108,6 +135,9 @@ export function FeaturedProduct({
             cyberpunk && "featured-cyberpunk-header-title",
             candyland && "featured-candyland-header-title",
             market && "featured-market-header-title",
+            gallery && "featured-gallery-header-title",
+            studio && "featured-studio-header-title",
+            laura && "featured-laura-header-title",
           )}
         >
           {heading}
@@ -132,6 +162,9 @@ export function FeaturedProduct({
           cyberpunk && "featured-cyberpunk-card",
           candyland && "featured-candyland-card",
           market && "featured-market-card",
+          gallery && "featured-gallery-card",
+          studio && "featured-studio-card",
+          laura && "featured-laura-card",
         )}
       >
         <div
@@ -143,6 +176,9 @@ export function FeaturedProduct({
             cyberpunk && "featured-cyberpunk-image-wrap",
             candyland && "featured-candyland-image-wrap",
             market && "featured-market-image-wrap",
+            gallery && "featured-gallery-image-wrap",
+            studio && "featured-studio-image-wrap",
+            laura && "featured-laura-image-wrap",
           )}
         >
           {product.image_url ? (
@@ -168,7 +204,13 @@ export function FeaturedProduct({
                             ? "featured-candyland-image-fade"
                             : market
                               ? "featured-market-image-fade"
-                              : "bg-gradient-to-t from-vibe-surface to-transparent",
+                              : gallery
+                                ? "featured-gallery-image-fade"
+                                : studio
+                                  ? "featured-studio-image-fade"
+                                  : laura
+                                    ? "featured-laura-image-fade"
+                                    : "bg-gradient-to-t from-vibe-surface to-transparent",
                 )}
               />
             </>
@@ -186,6 +228,9 @@ export function FeaturedProduct({
             cyberpunk && "featured-cyberpunk-body",
             candyland && "featured-candyland-body",
             market && "featured-market-body",
+            gallery && "featured-gallery-body",
+            studio && "featured-studio-body",
+            laura && "featured-laura-body",
           )}
         >
           {atelier ? (
@@ -211,6 +256,9 @@ export function FeaturedProduct({
                 cyberpunk && "featured-cyberpunk-name",
                 candyland && "featured-candyland-name",
                 market && "featured-market-name",
+                gallery && "featured-gallery-name",
+                studio && "featured-studio-name",
+                laura && "featured-laura-name",
               )}
             >
               {product.name}
@@ -227,6 +275,9 @@ export function FeaturedProduct({
                 cyberpunk && "featured-cyberpunk-desc",
                 candyland && "featured-candyland-desc",
                 market && "featured-market-desc",
+                gallery && "featured-gallery-desc",
+                studio && "featured-studio-desc",
+                laura && "featured-laura-desc",
               )}
             >
               {product.description}
@@ -242,6 +293,9 @@ export function FeaturedProduct({
               cyberpunk && "featured-cyberpunk-price-row",
               candyland && "featured-candyland-price-row",
               market && "featured-market-price-row",
+              gallery && "featured-gallery-price-row",
+              studio && "featured-studio-price-row",
+              laura && "featured-laura-price-row",
             )}
           >
             {!expedition ? (
@@ -253,6 +307,9 @@ export function FeaturedProduct({
                   cyberpunk && "featured-cyberpunk-price",
                   candyland && "featured-candyland-price",
                   market && "featured-market-price",
+                  gallery && "featured-gallery-price",
+                  studio && "featured-studio-price",
+                  laura && "featured-laura-price",
                 )}
               >
                 {formatPrice(product.price_cents)}
@@ -271,6 +328,9 @@ export function FeaturedProduct({
                 cyberpunk && "featured-cyberpunk-add",
                 candyland && "featured-candyland-add",
                 market && "featured-market-add",
+                  gallery && "featured-gallery-add",
+                  studio && "featured-studio-add",
+                  laura && "featured-laura-add",
                 added && "bg-vibe-primary text-vibe-primary-fg",
               )}
             >
@@ -278,7 +338,7 @@ export function FeaturedProduct({
                 added ? (
                   <span>Added</span>
                 ) : (
-                  <span>{expedition || cyberpunk || candyland || market ? "Add to cart" : "Add to Cart"}</span>
+                  <span>{expedition || cyberpunk || candyland || market || gallery || studio || laura ? "Add to cart" : "Add to Cart"}</span>
                 )
               ) : added ? (
                 <span className="text-xs font-semibold">✓</span>

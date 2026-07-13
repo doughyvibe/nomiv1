@@ -7,7 +7,12 @@ export type Vibe =
   | "epicurean"
   | "candyland"
   | "gallery"
-  | "market";
+  | "market"
+  | "studio"
+  | "laura"
+  | "atlantic"
+  | "vows"
+  | "strada";
 
 export type TradeHint = "general" | "food" | "handmade" | "services" | "plants";
 

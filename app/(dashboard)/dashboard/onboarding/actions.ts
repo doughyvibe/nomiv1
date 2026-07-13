@@ -132,6 +132,11 @@ const VALID_VIBES: Vibe[] = [
   "candyland",
   "gallery",
   "market",
+  "studio",
+  "laura",
+  "atlantic",
+  "vows",
+  "strada",
 ];
 
 export async function saveVibe(vibe: Vibe): Promise<ActionResult> {

@@ -9,6 +9,7 @@ import {
   League_Spartan,
   Libre_Caslon_Text,
   Orbitron,
+  Playfair_Display,
   Plus_Jakarta_Sans,
   Space_Grotesk,
 } from "next/font/google";
@@ -96,6 +97,14 @@ export const libreCaslonText = Libre_Caslon_Text({
   variable: "--font-libre-caslon",
   weight: ["400", "700"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+/** Gallery — museum display serif (docs/gallery_storefront/DESIGN.md) */
+export const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 

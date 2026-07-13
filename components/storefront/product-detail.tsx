@@ -20,6 +20,9 @@ export function ProductDetail({ product }: { product: Product }) {
   const cyberpunk = store.vibe === "cyberpunk";
   const candyland = store.vibe === "candyland";
   const market = store.vibe === "market";
+  const gallery = store.vibe === "gallery";
+  const studio = store.vibe === "studio";
+  const laura = store.vibe === "laura";
 
   function handleAdd() {
     addToCart(product.id, quantity);
@@ -36,6 +39,9 @@ export function ProductDetail({ product }: { product: Product }) {
         cyberpunk && "pdp-cyberpunk",
         candyland && "pdp-candyland",
           market && "pdp-market",
+          gallery && "pdp-gallery",
+          studio && "pdp-studio",
+          laura && "pdp-laura",
       )}
     >
       <div className="px-5 pt-4 sm:px-6">
@@ -48,6 +54,9 @@ export function ProductDetail({ product }: { product: Product }) {
             cyberpunk && "pdp-cyberpunk-back",
             candyland && "pdp-candyland-back",
           market && "pdp-market-back",
+          gallery && "pdp-gallery-back",
+          studio && "pdp-studio-back",
+          laura && "pdp-laura-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -102,6 +111,9 @@ export function ProductDetail({ product }: { product: Product }) {
               cyberpunk && "pdp-cyberpunk-title",
               candyland && "pdp-candyland-title",
           market && "pdp-market-title",
+          gallery && "pdp-gallery-title",
+          studio && "pdp-studio-title",
+          laura && "pdp-laura-title",
             )}
           >
             {product.name}
@@ -115,6 +127,9 @@ export function ProductDetail({ product }: { product: Product }) {
               cyberpunk && "pdp-cyberpunk-price",
               candyland && "pdp-candyland-price",
           market && "pdp-market-price",
+          gallery && "pdp-gallery-price",
+          studio && "pdp-studio-price",
+          laura && "pdp-laura-price",
             )}
           >
             {formatPrice(product.price_cents)}
@@ -178,6 +193,9 @@ export function ProductDetail({ product }: { product: Product }) {
             cyberpunk && "pdp-cyberpunk-add",
             candyland && "pdp-candyland-add",
           market && "pdp-market-add",
+          gallery && "pdp-gallery-add",
+          studio && "pdp-studio-add",
+          laura && "pdp-laura-add",
             added
               ? "bg-vibe-secondary text-vibe-bg"
               : "bg-vibe-primary text-vibe-primary-fg",

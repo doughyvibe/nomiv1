@@ -16,6 +16,9 @@ export function CartPageContent() {
   const cyberpunk = store.vibe === "cyberpunk";
   const candyland = store.vibe === "candyland";
   const market = store.vibe === "market";
+  const gallery = store.vibe === "gallery";
+  const studio = store.vibe === "studio";
+  const laura = store.vibe === "laura";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -45,6 +48,9 @@ export function CartPageContent() {
           cyberpunk && "cart-cyberpunk-empty",
           candyland && "cart-candyland-empty",
           market && "cart-market-empty",
+          gallery && "cart-gallery-empty",
+          studio && "cart-studio-empty",
+          laura && "cart-laura-empty",
         )}
       >
         <p
@@ -55,6 +61,9 @@ export function CartPageContent() {
             cyberpunk && "cart-cyberpunk-title",
             candyland && "cart-candyland-title",
           market && "cart-market-title",
+          gallery && "cart-gallery-title",
+          studio && "cart-studio-title",
+          laura && "cart-laura-title",
           )}
         >
           Your cart is empty
@@ -71,6 +80,9 @@ export function CartPageContent() {
             cyberpunk && "cart-cyberpunk-cta",
             candyland && "cart-candyland-cta",
           market && "cart-market-cta",
+          gallery && "cart-gallery-cta",
+          studio && "cart-studio-cta",
+          laura && "cart-laura-cta",
           )}
         >
           Continue shopping
@@ -88,6 +100,9 @@ export function CartPageContent() {
         cyberpunk && "cart-cyberpunk",
         candyland && "cart-candyland",
           market && "cart-market",
+          gallery && "cart-gallery",
+          studio && "cart-studio",
+          laura && "cart-laura",
       )}
     >
       <div className="flex items-center justify-between gap-4">
@@ -99,11 +114,14 @@ export function CartPageContent() {
             cyberpunk && "cart-cyberpunk-title",
             candyland && "cart-candyland-title",
           market && "cart-market-title",
+          gallery && "cart-gallery-title",
+          studio && "cart-studio-title",
+          laura && "cart-laura-title",
           )}
         >
           Cart
         </h1>
-        {atelier || expedition || cyberpunk || candyland || market ? (
+        {atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura ? (
           <Link
             href="/"
             className={cn(
@@ -113,6 +131,9 @@ export function CartPageContent() {
               cyberpunk && "cart-cyberpunk-back",
               candyland && "cart-candyland-back",
           market && "cart-market-back",
+          gallery && "cart-gallery-back",
+          studio && "cart-studio-back",
+          laura && "cart-laura-back",
             )}
           >
             <ArrowLeft className="size-3.5" aria-hidden />
@@ -132,6 +153,9 @@ export function CartPageContent() {
               cyberpunk && "cart-cyberpunk-line",
               candyland && "cart-candyland-line",
           market && "cart-market-line",
+          gallery && "cart-gallery-line",
+          studio && "cart-studio-line",
+          laura && "cart-laura-line",
             )}
           >
             {product.image_url ? (
@@ -249,6 +273,9 @@ export function CartPageContent() {
             cyberpunk && "cart-cyberpunk-cta",
             candyland && "cart-candyland-cta",
           market && "cart-market-cta",
+          gallery && "cart-gallery-cta",
+          studio && "cart-studio-cta",
+          laura && "cart-laura-cta",
         )}
       >
         Checkout
