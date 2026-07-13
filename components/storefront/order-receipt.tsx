@@ -14,6 +14,8 @@ export function OrderReceipt({
   gallery = false,
   studio = false,
   laura = false,
+  atlantic = false,
+  strada = false,
 }: {
   data: LoadedOrder;
   showPaidLabel?: boolean;
@@ -25,6 +27,8 @@ export function OrderReceipt({
   gallery?: boolean;
   studio?: boolean;
   laura?: boolean;
+  atlantic?: boolean;
+  strada?: boolean;
 }) {
   const { order, store, items } = data;
   const fulfillmentSummary = formatFulfillmentSummary(order);
@@ -47,6 +51,8 @@ export function OrderReceipt({
           gallery && "checkout-gallery-panel",
           studio && "checkout-studio-panel",
           laura && "checkout-laura-panel",
+          atlantic && "checkout-atlantic-panel",
+          strada && "checkout-strada-panel",
       )}
     >
       <p
@@ -60,6 +66,8 @@ export function OrderReceipt({
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
         )}
       >
         {showPaidLabel ? "Order receipt" : "Order summary"}
@@ -111,6 +119,8 @@ export function OrderReceipt({
           gallery && "pay-gallery-amount",
           studio && "pay-studio-amount",
           laura && "pay-laura-amount",
+          atlantic && "pay-atlantic-amount",
+          strada && "pay-strada-amount",
           )}
         >
           <dt>{showPaidLabel ? "Total paid" : "Total due"}</dt>
@@ -130,6 +140,8 @@ export function OrderReceipt({
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
           )}
         >
           Fulfillment

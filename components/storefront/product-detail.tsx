@@ -23,6 +23,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const gallery = store.vibe === "gallery";
   const studio = store.vibe === "studio";
   const laura = store.vibe === "laura";
+  const atlantic = store.vibe === "atlantic";
+  const strada = store.vibe === "strada";
 
   function handleAdd() {
     addToCart(product.id, quantity);
@@ -42,6 +44,8 @@ export function ProductDetail({ product }: { product: Product }) {
           gallery && "pdp-gallery",
           studio && "pdp-studio",
           laura && "pdp-laura",
+          atlantic && "pdp-atlantic",
+          strada && "pdp-strada",
       )}
     >
       <div className="px-5 pt-4 sm:px-6">
@@ -57,6 +61,8 @@ export function ProductDetail({ product }: { product: Product }) {
           gallery && "pdp-gallery-back",
           studio && "pdp-studio-back",
           laura && "pdp-laura-back",
+          atlantic && "pdp-atlantic-back",
+          strada && "pdp-strada-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -114,6 +120,8 @@ export function ProductDetail({ product }: { product: Product }) {
           gallery && "pdp-gallery-title",
           studio && "pdp-studio-title",
           laura && "pdp-laura-title",
+          atlantic && "pdp-atlantic-title",
+          strada && "pdp-strada-title",
             )}
           >
             {product.name}
@@ -130,6 +138,8 @@ export function ProductDetail({ product }: { product: Product }) {
           gallery && "pdp-gallery-price",
           studio && "pdp-studio-price",
           laura && "pdp-laura-price",
+          atlantic && "pdp-atlantic-price",
+          strada && "pdp-strada-price",
             )}
           >
             {formatPrice(product.price_cents)}
@@ -196,6 +206,8 @@ export function ProductDetail({ product }: { product: Product }) {
           gallery && "pdp-gallery-add",
           studio && "pdp-studio-add",
           laura && "pdp-laura-add",
+          atlantic && "pdp-atlantic-add",
+          strada && "pdp-strada-add",
             added
               ? "bg-vibe-secondary text-vibe-bg"
               : "bg-vibe-primary text-vibe-primary-fg",

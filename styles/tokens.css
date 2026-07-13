@@ -4866,67 +4866,498 @@
 }
 
 /* --------------------------------------------------------------------------
- * Atlantic — provisional cool coastal placeholder
- * Soft sea blue-gray + mist. Calm retail; full overhaul later.
+ * Atlantic — two-ink heritage
+ * Libre Caslon + Inter. Strict duo: indigo #121F4B + cream #F7F3F0.
  * ------------------------------------------------------------------------ */
 [data-vibe="atlantic"] {
-  --vibe-bg: 246 249 251;
-  --vibe-primary: 74 110 140;
-  --vibe-primary-fg: 255 255 255;
-  --vibe-secondary: 110 122 132;
-  --vibe-surface: 255 255 255;
-  --vibe-border: 212 222 230;
-  --vibe-text: 42 52 60;
-  --vibe-text-muted: 106 118 128;
-  --vibe-text-bright: 28 38 46;
-  --vibe-radius: 0.5rem;
-  --font-display: var(--font-hanken), var(--font-body);
+  --vibe-bg: 247 243 240;
+  --vibe-primary: 18 31 75;
+  --vibe-primary-fg: 247 243 240;
+  --vibe-secondary: 18 31 75;
+  --vibe-surface: 247 243 240;
+  --vibe-border: 18 31 75;
+  --vibe-text: 18 31 75;
+  --vibe-text-muted: 18 31 75;
+  --vibe-text-bright: 18 31 75;
+  --vibe-radius: 0.25rem;
+  --font-display: var(--font-libre-caslon), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   background-color: rgb(var(--vibe-bg));
   color: rgb(var(--vibe-text));
+  font-family: var(--font-body);
 }
 
 [data-vibe="atlantic"] .vibe-card,
 [data-vibe="atlantic"] .metal-panel {
   background: rgb(var(--vibe-surface));
-  border: 1px solid rgb(var(--vibe-border));
+  border: 1px solid rgb(var(--vibe-border) / 0.18);
   border-radius: var(--vibe-radius);
-  box-shadow: 0 4px 16px rgb(42 52 60 / 0.05);
+  box-shadow: 0 8px 28px rgb(18 31 75 / 0.06);
+}
+
+[data-vibe="atlantic"] .rust-edge {
+  box-shadow: 0 8px 28px rgb(18 31 75 / 0.06);
 }
 
 [data-vibe="atlantic"] .vibe-display {
   font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  text-transform: none;
+}
+
+[data-vibe="atlantic"] .text-vibe-text-muted {
+  color: rgb(var(--vibe-text) / 0.62);
+}
+
+/* Atlantic hero — cream editorial wordmark */
+[data-vibe="atlantic"] .hero-atlantic-band {
+  background: rgb(var(--vibe-bg));
+  border-bottom: 1px solid rgb(var(--vibe-border) / 0.14);
+}
+
+[data-vibe="atlantic"] .hero-atlantic-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.72);
+}
+
+[data-vibe="atlantic"] .hero-atlantic-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 12vw, 4rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .hero-atlantic-tagline {
+  max-width: 24rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgb(var(--vibe-text) / 0.62);
+}
+
+[data-vibe="atlantic"] .hero-atlantic-rule {
+  width: 2.5rem;
+  height: 2px;
+  background: rgb(var(--vibe-primary));
+  margin-inline: auto;
+}
+
+/* Atlantic featured */
+[data-vibe="atlantic"] .featured-atlantic-header-title {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
   font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.72);
+}
+
+[data-vibe="atlantic"] .vibe-card.featured-atlantic-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.18);
+  border-radius: 0.35rem;
+  box-shadow: 0 12px 36px rgb(18 31 75 / 0.07);
+}
+
+[data-vibe="atlantic"] .featured-atlantic-image-wrap {
+  aspect-ratio: 4 / 3;
+  background: rgb(var(--vibe-bg));
+  border-radius: 0.35rem 0.35rem 0 0;
+  border-bottom: 1px solid rgb(var(--vibe-border) / 0.14);
+}
+
+@media (min-width: 768px) {
+  [data-vibe="atlantic"] .featured-atlantic-image-wrap {
+    aspect-ratio: auto;
+    min-height: 18rem;
+    border-radius: 0.35rem 0 0 0.35rem;
+    border-bottom: none;
+    border-right: 1px solid rgb(var(--vibe-border) / 0.14);
+  }
+}
+
+[data-vibe="atlantic"] .featured-atlantic-image-fade {
+  display: none;
+}
+
+[data-vibe="atlantic"] .featured-atlantic-body {
+  gap: 0.65rem;
+  padding: 1.35rem 1.35rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="atlantic"] .featured-atlantic-body {
+    padding: 1.75rem 2rem;
+  }
+}
+
+[data-vibe="atlantic"] .featured-atlantic-name {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .featured-atlantic-desc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: rgb(var(--vibe-text) / 0.62);
+}
+
+[data-vibe="atlantic"] .featured-atlantic-price-row {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+[data-vibe="atlantic"] .featured-atlantic-price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .featured-atlantic-add {
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: rgb(var(--vibe-primary-fg));
+  color: rgb(var(--vibe-primary));
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+[data-vibe="atlantic"] .featured-atlantic-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  border-color: rgb(var(--vibe-primary));
+  outline: none;
+}
+
+/* Atlantic catalog */
+[data-vibe="atlantic"] .catalog-pill-active {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid rgb(var(--vibe-primary));
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  padding-inline: 0.15rem;
+  padding-bottom: 0.35rem;
+}
+
+[data-vibe="atlantic"] .catalog-pill-inactive {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgb(var(--vibe-text) / 0.55);
+  letter-spacing: 0.12em;
+  padding-inline: 0.15rem;
+  padding-bottom: 0.35rem;
+}
+
+[data-vibe="atlantic"] .catalog-tab-active {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid rgb(var(--vibe-primary));
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[data-vibe="atlantic"] .catalog-tab-inactive {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgb(var(--vibe-text) / 0.55);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[data-vibe="atlantic"] .vibe-card.catalog-atlantic-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.18);
+  border-radius: 0.35rem;
+  box-shadow: 0 8px 24px rgb(18 31 75 / 0.05);
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-image {
+  border-radius: 0.35rem 0.35rem 0 0;
+  background: rgb(var(--vibe-bg));
+  border-bottom: 1px solid rgb(var(--vibe-border) / 0.14);
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-image-fade {
+  display: none;
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-body {
+  gap: 0.35rem;
+  padding: 0.85rem 0.9rem 1rem;
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-card .catalog-card-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
   letter-spacing: -0.01em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-card .catalog-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgb(var(--vibe-text) / 0.62);
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-card .catalog-card-price {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-price-row {
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-add {
+  border-radius: 0.2rem;
+  border: 1px solid rgb(var(--vibe-border) / 0.28);
+  background: transparent;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .catalog-atlantic-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  border-color: transparent;
+}
+
+/*
+ * Atlantic sticky — cream glass + indigo outline (matches Add to cart).
+ */
+[data-vibe="atlantic"] .checkout-bar {
+  max-width: 26rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: rgb(247 243 240 / 0.55);
+  box-shadow:
+    0 1px 0 rgb(247 243 240 / 0.65) inset,
+    0 12px 36px rgb(18 31 75 / 0.1);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  padding: 0.55rem 0.65rem 0.55rem 1rem;
+}
+
+[data-vibe="atlantic"] .checkout-bar-icon-active {
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="atlantic"] .checkout-bar a:not(.checkout-bar-cta),
+[data-vibe="atlantic"] .checkout-bar .text-vibe-text-muted,
+[data-vibe="atlantic"] .checkout-bar .font-display {
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="atlantic"] .checkout-bar a.checkout-bar-cta {
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-inline: 1.15rem;
+  box-shadow: none;
+}
+
+[data-vibe="atlantic"] .checkout-bar .font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-size: 1.2rem;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="atlantic"] .checkout-bar .text-vibe-text-muted {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-primary) / 0.7);
+}
+
+/* Atlantic PDP / cart / checkout / payment */
+[data-vibe="atlantic"] .pdp-atlantic-back,
+[data-vibe="atlantic"] .cart-atlantic-back,
+[data-vibe="atlantic"] .checkout-atlantic-back {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.62);
+}
+
+[data-vibe="atlantic"] .pdp-atlantic-title,
+[data-vibe="atlantic"] .cart-atlantic-title,
+[data-vibe="atlantic"] .checkout-atlantic-title,
+[data-vibe="atlantic"] .pay-atlantic-status-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .pdp-atlantic-title {
+  font-size: clamp(1.85rem, 7vw, 2.65rem);
+  line-height: 1.08;
+}
+
+[data-vibe="atlantic"] .pdp-atlantic-price {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 400;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="atlantic"] .pdp-atlantic-add,
+[data-vibe="atlantic"] .cart-atlantic-cta,
+[data-vibe="atlantic"] .checkout-atlantic-cta {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  box-shadow: none;
+}
+
+[data-vibe="atlantic"] .metal-panel.cart-atlantic-line,
+[data-vibe="atlantic"] .metal-panel.checkout-atlantic-panel,
+[data-vibe="atlantic"] .metal-panel.checkout-atlantic-option {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.18);
+  border-radius: 0.35rem;
+  box-shadow: 0 8px 24px rgb(18 31 75 / 0.05);
+}
+
+[data-vibe="atlantic"] .checkout-atlantic-input {
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--vibe-border) / 0.22);
+  background: rgb(var(--vibe-surface));
+  font-family: var(--font-body);
+  color: rgb(var(--vibe-text));
+}
+
+[data-vibe="atlantic"] .checkout-atlantic-input:focus {
+  border-color: rgb(var(--vibe-primary));
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(18 31 75 / 0.14);
+}
+
+[data-vibe="atlantic"] .checkout-atlantic-radio {
+  accent-color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="atlantic"] .checkout-atlantic-section-label {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.72);
+}
+
+[data-vibe="atlantic"] .pay-atlantic-secondary {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="atlantic"] .pay-atlantic-amount {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
 }
 
 /* --------------------------------------------------------------------------
- * Vows — provisional warm ivory placeholder
- * Soft sand + muted taupe. Ceremonial quiet; full overhaul later.
+ * Vows — light slate + Poppins
+ * Predominant cool slate; accents charcoal #241F21 + lime #E9E778.
  * ------------------------------------------------------------------------ */
 [data-vibe="vows"] {
-  --vibe-bg: 252 250 246;
-  --vibe-primary: 140 118 96;
-  --vibe-primary-fg: 255 255 255;
-  --vibe-secondary: 168 148 138;
-  --vibe-surface: 255 255 255;
-  --vibe-border: 228 220 208;
-  --vibe-text: 58 50 42;
-  --vibe-text-muted: 122 110 98;
-  --vibe-text-bright: 42 36 30;
-  --vibe-radius: 0.625rem;
-  --font-display: var(--font-eb-garamond), var(--font-body);
+  --vibe-bg: 242 243 245;
+  --vibe-primary: 233 231 120;
+  --vibe-primary-fg: 36 31 33;
+  --vibe-secondary: 36 31 33;
+  --vibe-surface: 250 251 252;
+  --vibe-border: 36 31 33;
+  --vibe-text: 36 31 33;
+  --vibe-text-muted: 36 31 33;
+  --vibe-text-bright: 36 31 33;
+  --vibe-radius: 0.875rem;
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
   background-color: rgb(var(--vibe-bg));
   color: rgb(var(--vibe-text));
+  font-family: var(--font-body);
+}
+
+[data-vibe="vows"] .text-vibe-text-muted {
+  color: rgb(var(--vibe-text) / 0.58);
 }
 
 [data-vibe="vows"] .vibe-card,
 [data-vibe="vows"] .metal-panel {
   background: rgb(var(--vibe-surface));
-  border: 1px solid rgb(var(--vibe-border));
+  border: 1px solid rgb(var(--vibe-border) / 0.1);
   border-radius: var(--vibe-radius);
-  box-shadow: 0 4px 16px rgb(58 50 42 / 0.05);
+  box-shadow: 0 6px 20px rgb(36 31 33 / 0.05);
 }
 
 [data-vibe="vows"] .vibe-display {
@@ -4935,37 +5366,543 @@
   letter-spacing: -0.01em;
 }
 
+/* Featured title — centered on mobile */
+@media (max-width: 767px) {
+  [data-vibe="vows"] .featured-vows-header {
+    justify-content: center;
+  }
+
+  [data-vibe="vows"] .featured-vows-header-title {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* Vows category — underline only; restore readable size (was text-xs pills) */
+[data-vibe="vows"] .catalog-tabs {
+  border-bottom: none;
+}
+
+[data-vibe="vows"] .catalog-pill-active,
+[data-vibe="vows"] .catalog-tab-active {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid rgb(var(--vibe-text-bright));
+  background: transparent;
+  color: rgb(var(--vibe-text-bright));
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  padding-inline: 0.15rem;
+  padding-bottom: 0.4rem;
+  min-height: auto;
+}
+
+[data-vibe="vows"] .catalog-pill-inactive,
+[data-vibe="vows"] .catalog-tab-inactive {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgb(var(--vibe-text) / 0.45);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  padding-inline: 0.15rem;
+  padding-bottom: 0.4rem;
+  min-height: auto;
+}
+
+/*
+ * Vows sticky — slate glass + lime CTA (charcoal on lime).
+ */
+[data-vibe="vows"] .checkout-bar {
+  max-width: 26rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgb(var(--vibe-border) / 0.12);
+  background: rgb(250 251 252 / 0.72);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.8) inset,
+    0 12px 32px rgb(36 31 33 / 0.08);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  padding: 0.55rem 0.65rem 0.55rem 1rem;
+}
+
+[data-vibe="vows"] .checkout-bar-icon-active {
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .checkout-bar a:not(.checkout-bar-cta),
+[data-vibe="vows"] .checkout-bar .text-vibe-text-muted,
+[data-vibe="vows"] .checkout-bar .font-display {
+  color: rgb(var(--vibe-text-bright));
+  font-family: var(--font-poppins), var(--font-body);
+}
+
+[data-vibe="vows"] .checkout-bar a.checkout-bar-cta {
+  border-radius: 9999px;
+  border: none;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-poppins), var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding-inline: 1.2rem;
+  box-shadow: 0 6px 16px rgb(233 231 120 / 0.45);
+}
+
+[data-vibe="vows"] .checkout-bar .font-display {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 1.2rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .checkout-bar .text-vibe-text-muted {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(var(--vibe-text) / 0.58);
+}
+
 /* --------------------------------------------------------------------------
- * Strada — provisional quiet stone placeholder
- * Olive + warm stone. Street-simple; full overhaul later.
+ * Strada — black & white default
+ * Inter only. Strict duo: white canvas + #111 ink. Type + layout carry identity.
  * ------------------------------------------------------------------------ */
 [data-vibe="strada"] {
-  --vibe-bg: 248 247 244;
-  --vibe-primary: 96 108 88;
+  --vibe-bg: 255 255 255;
+  --vibe-primary: 17 17 17;
   --vibe-primary-fg: 255 255 255;
-  --vibe-secondary: 130 122 112;
+  --vibe-secondary: 17 17 17;
   --vibe-surface: 255 255 255;
-  --vibe-border: 220 216 208;
-  --vibe-text: 48 48 44;
-  --vibe-text-muted: 112 108 100;
-  --vibe-text-bright: 34 34 30;
+  --vibe-border: 17 17 17;
+  --vibe-text: 17 17 17;
+  --vibe-text-muted: 17 17 17;
+  --vibe-text-bright: 17 17 17;
   --vibe-radius: 0.5rem;
-  --font-display: var(--font-dm-sans), var(--font-body);
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   background-color: rgb(var(--vibe-bg));
   color: rgb(var(--vibe-text));
+  font-family: var(--font-body);
+}
+
+[data-vibe="strada"] .text-vibe-text-muted {
+  color: rgb(var(--vibe-text) / 0.55);
 }
 
 [data-vibe="strada"] .vibe-card,
 [data-vibe="strada"] .metal-panel {
   background: rgb(var(--vibe-surface));
-  border: 1px solid rgb(var(--vibe-border));
+  border: 1px solid rgb(var(--vibe-border) / 0.12);
   border-radius: var(--vibe-radius);
-  box-shadow: 0 4px 16px rgb(48 48 44 / 0.05);
+  box-shadow: 0 8px 24px rgb(17 17 17 / 0.04);
+}
+
+[data-vibe="strada"] .rust-edge {
+  box-shadow: 0 8px 24px rgb(17 17 17 / 0.04);
 }
 
 [data-vibe="strada"] .vibe-display {
   font-family: var(--font-display);
   font-weight: 600;
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+
+/* Hero — centered wordmark, type-led */
+[data-vibe="strada"] .hero-strada-band {
+  background: rgb(var(--vibe-bg));
+}
+
+[data-vibe="strada"] .hero-strada-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+[data-vibe="strada"] .hero-strada-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 10vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .hero-strada-tagline {
+  max-width: 24rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+/* Featured */
+@media (max-width: 767px) {
+  [data-vibe="strada"] .featured-strada-header {
+    justify-content: center;
+  }
+
+  [data-vibe="strada"] .featured-strada-header-title {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+[data-vibe="strada"] .featured-strada-header-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .vibe-card.featured-strada-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.12);
+  border-radius: 0.625rem;
+  box-shadow: 0 10px 28px rgb(17 17 17 / 0.05);
+}
+
+[data-vibe="strada"] .featured-strada-image-wrap {
+  aspect-ratio: 4 / 3;
+  background: rgb(245 245 245);
+  border-radius: 0.625rem 0.625rem 0 0;
+  border-bottom: 1px solid rgb(var(--vibe-border) / 0.1);
+}
+
+@media (min-width: 768px) {
+  [data-vibe="strada"] .featured-strada-image-wrap {
+    aspect-ratio: auto;
+    min-height: 18rem;
+    border-radius: 0.625rem 0 0 0.625rem;
+    border-bottom: none;
+    border-right: 1px solid rgb(var(--vibe-border) / 0.1);
+  }
+}
+
+[data-vibe="strada"] .featured-strada-image-fade {
+  display: none;
+}
+
+[data-vibe="strada"] .featured-strada-body {
+  gap: 0.65rem;
+  padding: 1.35rem 1.35rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="strada"] .featured-strada-body {
+    padding: 1.75rem 2rem;
+  }
+}
+
+[data-vibe="strada"] .featured-strada-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .featured-strada-desc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+[data-vibe="strada"] .featured-strada-price-row {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+[data-vibe="strada"] .featured-strada-price {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .featured-strada-add {
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
+  box-shadow: none;
+}
+
+[data-vibe="strada"] .featured-strada-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  outline: 2px solid rgb(var(--vibe-primary-fg));
+  outline-offset: -4px;
+}
+
+/* Catalog — underline filters */
+[data-vibe="strada"] .catalog-pill-active,
+[data-vibe="strada"] .catalog-tab-active {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid rgb(var(--vibe-text-bright));
+  background: transparent;
+  color: rgb(var(--vibe-text-bright));
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  padding-inline: 0.15rem;
+  padding-bottom: 0.4rem;
+  min-height: auto;
+}
+
+[data-vibe="strada"] .catalog-pill-inactive,
+[data-vibe="strada"] .catalog-tab-inactive {
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: rgb(var(--vibe-text) / 0.45);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  padding-inline: 0.15rem;
+  padding-bottom: 0.4rem;
+  min-height: auto;
+}
+
+[data-vibe="strada"] .vibe-card.catalog-strada-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.12);
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 20px rgb(17 17 17 / 0.04);
+}
+
+[data-vibe="strada"] .catalog-strada-image {
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: rgb(245 245 245);
+  border-bottom: 1px solid rgb(var(--vibe-border) / 0.1);
+}
+
+[data-vibe="strada"] .catalog-strada-image-fade {
+  display: none;
+}
+
+[data-vibe="strada"] .catalog-strada-body {
+  gap: 0.35rem;
+  padding: 0.85rem 0.9rem 1rem;
+}
+
+[data-vibe="strada"] .catalog-strada-card .catalog-card-title {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .catalog-strada-card .catalog-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+[data-vibe="strada"] .catalog-strada-card .catalog-card-price {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .catalog-strada-price-row {
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+[data-vibe="strada"] .catalog-strada-add {
+  border-radius: 9999px;
+  border: 1px solid rgb(var(--vibe-border) / 0.2);
+  background: transparent;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .catalog-strada-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  border-color: transparent;
+}
+
+/*
+ * Strada sticky — white glass + black CTA.
+ */
+[data-vibe="strada"] .checkout-bar {
+  max-width: 26rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgb(var(--vibe-border) / 0.14);
+  background: rgb(255 255 255 / 0.78);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 12px 32px rgb(17 17 17 / 0.08);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  padding: 0.55rem 0.65rem 0.55rem 1rem;
+}
+
+[data-vibe="strada"] .checkout-bar-icon-active {
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .checkout-bar a:not(.checkout-bar-cta),
+[data-vibe="strada"] .checkout-bar .text-vibe-text-muted,
+[data-vibe="strada"] .checkout-bar .font-display {
+  color: rgb(var(--vibe-text-bright));
+  font-family: var(--font-inter), var(--font-body);
+}
+
+[data-vibe="strada"] .checkout-bar a.checkout-bar-cta {
+  border-radius: 0.5rem;
+  border: none;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-inter), var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-inline: 1.2rem;
+  box-shadow: none;
+}
+
+[data-vibe="strada"] .checkout-bar .font-display {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-size: 1.2rem;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .checkout-bar .text-vibe-text-muted {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+/* PDP / cart / checkout / payment */
+[data-vibe="strada"] .pdp-strada-back,
+[data-vibe="strada"] .cart-strada-back,
+[data-vibe="strada"] .checkout-strada-back {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+[data-vibe="strada"] .pdp-strada-title,
+[data-vibe="strada"] .cart-strada-title,
+[data-vibe="strada"] .checkout-strada-title,
+[data-vibe="strada"] .pay-strada-status-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .pdp-strada-title {
+  font-size: clamp(1.85rem, 7vw, 2.5rem);
+  line-height: 1.08;
+}
+
+[data-vibe="strada"] .pdp-strada-price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="strada"] .pdp-strada-add,
+[data-vibe="strada"] .cart-strada-cta,
+[data-vibe="strada"] .checkout-strada-cta {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  border-radius: 0.5rem;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  box-shadow: none;
+}
+
+[data-vibe="strada"] .metal-panel.cart-strada-line,
+[data-vibe="strada"] .metal-panel.checkout-strada-panel,
+[data-vibe="strada"] .metal-panel.checkout-strada-option {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.12);
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 20px rgb(17 17 17 / 0.04);
+}
+
+[data-vibe="strada"] .checkout-strada-input {
+  border-radius: 0.5rem;
+  border: 1px solid rgb(var(--vibe-border) / 0.18);
+  background: rgb(var(--vibe-surface));
+  font-family: var(--font-body);
+  color: rgb(var(--vibe-text));
+}
+
+[data-vibe="strada"] .checkout-strada-input:focus {
+  border-color: rgb(var(--vibe-primary));
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(17 17 17 / 0.12);
+}
+
+[data-vibe="strada"] .checkout-strada-radio {
+  accent-color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="strada"] .checkout-strada-section-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+[data-vibe="strada"] .pay-strada-secondary {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(var(--vibe-primary));
+  background: transparent;
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="strada"] .pay-strada-amount {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
 }

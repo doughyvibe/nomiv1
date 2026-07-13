@@ -70,10 +70,28 @@ function isLauraVibe(
   return vibe === "laura";
 }
 
+function isAtlanticVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "atlantic";
+}
+
+function isVowsVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "vows";
+}
+
+function isStradaVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "strada";
+}
+
 export function FeaturedProduct({
   product,
   sectionTitle,
-  vibe = "epicurean",
+  vibe = "strada",
 }: FeaturedProductProps) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
@@ -86,8 +104,11 @@ export function FeaturedProduct({
   const gallery = isGalleryVibe(vibe);
   const studio = isStudioVibe(vibe);
   const laura = isLauraVibe(vibe);
+  const atlantic = isAtlanticVibe(vibe);
+  const vows = isVowsVibe(vibe);
+  const strada = isStradaVibe(vibe);
   const heading = resolveFeaturedSectionTitle(sectionTitle);
-  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura;
+  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -110,6 +131,9 @@ export function FeaturedProduct({
         gallery && "featured-gallery-section",
         studio && "featured-studio-section",
         laura && "featured-laura-section",
+        atlantic && "featured-atlantic-section",
+        vows && "featured-vows-section",
+        strada && "featured-strada-section",
       )}
     >
       <div
@@ -124,6 +148,9 @@ export function FeaturedProduct({
           gallery && "featured-gallery-header",
           studio && "featured-studio-header",
           laura && "featured-laura-header",
+          atlantic && "featured-atlantic-header",
+          vows && "featured-vows-header",
+          strada && "featured-strada-header",
         )}
       >
         <h2
@@ -138,6 +165,9 @@ export function FeaturedProduct({
             gallery && "featured-gallery-header-title",
             studio && "featured-studio-header-title",
             laura && "featured-laura-header-title",
+            atlantic && "featured-atlantic-header-title",
+            vows && "featured-vows-header-title",
+            strada && "featured-strada-header-title",
           )}
         >
           {heading}
@@ -165,6 +195,8 @@ export function FeaturedProduct({
           gallery && "featured-gallery-card",
           studio && "featured-studio-card",
           laura && "featured-laura-card",
+          atlantic && "featured-atlantic-card",
+          strada && "featured-strada-card",
         )}
       >
         <div
@@ -179,6 +211,8 @@ export function FeaturedProduct({
             gallery && "featured-gallery-image-wrap",
             studio && "featured-studio-image-wrap",
             laura && "featured-laura-image-wrap",
+            atlantic && "featured-atlantic-image-wrap",
+            strada && "featured-strada-image-wrap",
           )}
         >
           {product.image_url ? (
@@ -210,7 +244,11 @@ export function FeaturedProduct({
                                   ? "featured-studio-image-fade"
                                   : laura
                                     ? "featured-laura-image-fade"
-                                    : "bg-gradient-to-t from-vibe-surface to-transparent",
+                                    : atlantic
+                                      ? "featured-atlantic-image-fade"
+                                      : strada
+                                        ? "featured-strada-image-fade"
+                                        : "bg-gradient-to-t from-vibe-surface to-transparent",
                 )}
               />
             </>
@@ -231,6 +269,8 @@ export function FeaturedProduct({
             gallery && "featured-gallery-body",
             studio && "featured-studio-body",
             laura && "featured-laura-body",
+            atlantic && "featured-atlantic-body",
+            strada && "featured-strada-body",
           )}
         >
           {atelier ? (
@@ -259,6 +299,8 @@ export function FeaturedProduct({
                 gallery && "featured-gallery-name",
                 studio && "featured-studio-name",
                 laura && "featured-laura-name",
+                atlantic && "featured-atlantic-name",
+                strada && "featured-strada-name",
               )}
             >
               {product.name}
@@ -278,6 +320,8 @@ export function FeaturedProduct({
                 gallery && "featured-gallery-desc",
                 studio && "featured-studio-desc",
                 laura && "featured-laura-desc",
+                atlantic && "featured-atlantic-desc",
+                strada && "featured-strada-desc",
               )}
             >
               {product.description}
@@ -296,6 +340,8 @@ export function FeaturedProduct({
               gallery && "featured-gallery-price-row",
               studio && "featured-studio-price-row",
               laura && "featured-laura-price-row",
+              atlantic && "featured-atlantic-price-row",
+              strada && "featured-strada-price-row",
             )}
           >
             {!expedition ? (
@@ -310,6 +356,8 @@ export function FeaturedProduct({
                   gallery && "featured-gallery-price",
                   studio && "featured-studio-price",
                   laura && "featured-laura-price",
+                  atlantic && "featured-atlantic-price",
+                  strada && "featured-strada-price",
                 )}
               >
                 {formatPrice(product.price_cents)}
@@ -331,6 +379,8 @@ export function FeaturedProduct({
                   gallery && "featured-gallery-add",
                   studio && "featured-studio-add",
                   laura && "featured-laura-add",
+                  atlantic && "featured-atlantic-add",
+                  strada && "featured-strada-add",
                 added && "bg-vibe-primary text-vibe-primary-fg",
               )}
             >
@@ -338,7 +388,7 @@ export function FeaturedProduct({
                 added ? (
                   <span>Added</span>
                 ) : (
-                  <span>{expedition || cyberpunk || candyland || market || gallery || studio || laura ? "Add to cart" : "Add to Cart"}</span>
+                  <span>{expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada ? "Add to cart" : "Add to Cart"}</span>
                 )
               ) : added ? (
                 <span className="text-xs font-semibold">✓</span>

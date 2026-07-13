@@ -56,6 +56,14 @@ function isLauraVibe(vibe: Vibe): boolean {
   return vibe === "laura";
 }
 
+function isAtlanticVibe(vibe: Vibe): boolean {
+  return vibe === "atlantic";
+}
+
+function isStradaVibe(vibe: Vibe): boolean {
+  return vibe === "strada";
+}
+
 function Monogram({ name }: { name: string }) {
   return (
     <div
@@ -109,8 +117,10 @@ export function MiniPreview({
   const gallery = isGalleryVibe(vibe);
   const studio = isStudioVibe(vibe);
   const laura = isLauraVibe(vibe);
-  const noMonogram = noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura;
-  const styledHero = noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura;
+  const atlantic = isAtlanticVibe(vibe);
+  const strada = isStradaVibe(vibe);
+  const noMonogram = noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic;
+  const styledHero = noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic;
   const eyebrow = hero?.eyebrow?.trim();
   const tagline = hero?.subheading?.trim();
 
@@ -136,6 +146,8 @@ export function MiniPreview({
                   gallery && "hero-gallery-band",
                   studio && "hero-studio-band",
                   laura && "hero-laura-band",
+                  atlantic && "hero-atlantic-band",
+                  strada && "hero-strada-band",
                 )
               : "flex flex-col items-center gap-1 text-center"
           }
@@ -177,6 +189,10 @@ export function MiniPreview({
                                 ? "hero-studio-eyebrow mb-1 text-[7px]"
                                 : laura
                                   ? "hero-laura-eyebrow mb-1 text-[7px]"
+                                  : atlantic
+                                    ? "hero-atlantic-eyebrow mb-1 text-[7px]"
+                                    : strada
+                                      ? "hero-strada-eyebrow mb-1 text-[7px]"
                                   : "text-[8px] uppercase tracking-widest"
               }
               style={
@@ -185,7 +201,7 @@ export function MiniPreview({
                       color: "rgb(var(--vibe-text-bright))",
                       fontFamily: "var(--font-display)",
                     }
-                  : atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                  : atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                     ? undefined
                     : { color: "rgb(var(--vibe-text-muted))" }
               }
@@ -213,6 +229,10 @@ export function MiniPreview({
                               ? "hero-studio-title text-[14px] leading-none"
                               : laura
                                 ? "hero-laura-title text-[13px] leading-tight"
+                                : atlantic
+                                  ? "hero-atlantic-title text-[13px] leading-tight"
+                                  : strada
+                                    ? "hero-strada-title text-[13px] leading-tight"
                               : "font-display text-sm leading-tight font-bold"
             }
             style={
@@ -221,7 +241,7 @@ export function MiniPreview({
                     color: "rgb(var(--vibe-primary-container))",
                     fontFamily: "var(--font-display)",
                   }
-                : atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                : atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
             }
@@ -249,12 +269,16 @@ export function MiniPreview({
                                 ? "hero-studio-tagline mt-1 max-w-[10rem] text-[8px]"
                                 : laura
                                   ? "hero-laura-tagline mt-1 max-w-[10rem] text-[8px]"
+                                  : atlantic
+                                    ? "hero-atlantic-tagline mt-1 max-w-[10rem] text-[8px]"
+                                    : strada
+                                      ? "hero-strada-tagline mt-1 max-w-[10rem] text-[8px]"
                                 : "text-[9px] leading-snug"
               }
               style={
                 noir
                   ? { color: "rgb(var(--vibe-text-variant))" }
-                  : atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                  : atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                     ? undefined
                     : { color: "rgb(var(--vibe-text-muted))" }
               }
@@ -277,9 +301,11 @@ export function MiniPreview({
               gallery && "featured-gallery-card featured-gallery-section",
               studio && "featured-studio-card featured-studio-section",
               laura && "featured-laura-card featured-laura-section",
+              atlantic && "featured-atlantic-card featured-atlantic-section",
+              strada && "featured-strada-card featured-strada-section",
             )}
             style={
-              atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+              atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                 ? undefined
                 : { backgroundColor: "rgb(var(--vibe-surface))" }
             }
@@ -296,6 +322,8 @@ export function MiniPreview({
                 gallery && "featured-gallery-header",
                 studio && "featured-studio-header",
                 laura && "featured-laura-header",
+                atlantic && "featured-atlantic-header",
+                strada && "featured-strada-header",
               )}
             >
               <p
@@ -310,6 +338,8 @@ export function MiniPreview({
                   gallery && "featured-gallery-header-title text-[8px]",
                   studio && "featured-studio-header-title text-[8px]",
                   laura && "featured-laura-header-title text-[8px]",
+                  atlantic && "featured-atlantic-header-title text-[8px]",
+                  strada && "featured-strada-header-title text-[8px]",
                 )}
               >
                 {resolveFeaturedSectionTitle(store?.featured_section_title)}
@@ -338,6 +368,8 @@ export function MiniPreview({
                 gallery && "featured-gallery-name text-[10px]",
                 studio && "featured-studio-name text-[10px]",
                 laura && "featured-laura-name text-[10px]",
+                atlantic && "featured-atlantic-name text-[10px]",
+                strada && "featured-strada-name text-[10px]",
               )}
             >
               {featured.name}
@@ -354,9 +386,11 @@ export function MiniPreview({
                 gallery && "featured-gallery-price text-[8px]",
                 studio && "featured-studio-price text-[8px]",
                 laura && "featured-laura-price text-[8px]",
+                atlantic && "featured-atlantic-price text-[8px]",
+                strada && "featured-strada-price text-[8px]",
               )}
               style={
-                noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                   ? undefined
                   : { color: "rgb(var(--vibe-primary))" }
               }
@@ -373,13 +407,13 @@ export function MiniPreview({
                 key={cat}
                 className={cn(
                   "catalog-pill shrink-0 rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide",
-                  (noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura) &&
+                  (noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada) &&
                     (i === 0
                       ? "catalog-pill-active"
                       : "catalog-pill-inactive"),
                 )}
                 style={
-                  noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                  noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                     ? undefined
                     : {
                         backgroundColor:
@@ -419,9 +453,11 @@ export function MiniPreview({
                 gallery && "catalog-gallery-card",
                 studio && "catalog-studio-card",
                 laura && "catalog-laura-card",
+                atlantic && "catalog-atlantic-card",
+                strada && "catalog-strada-card",
               )}
               style={
-                atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                   ? undefined
                   : { backgroundColor: "rgb(var(--vibe-surface))" }
               }
@@ -429,7 +465,7 @@ export function MiniPreview({
               <p
                 className={cn(
                   "catalog-card-title line-clamp-2 text-[9px] leading-tight",
-                  noir || expedition || cyberpunk || candyland || market || gallery || studio || laura ? "font-semibold" : "font-medium",
+                  noir || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic ? "font-semibold" : "font-medium",
                 )}
               >
                 {p.name}
@@ -439,10 +475,10 @@ export function MiniPreview({
                   "text-[8px] font-semibold",
                   !expedition && "catalog-card-price",
                   expedition && "featured-expedition-price text-[7px]",
-                  !noir && !atelier && !expedition && !cyberpunk && !candyland && !market && !gallery && !studio && !laura && "text-vibe-primary",
+                  !noir && !atelier && !expedition && !cyberpunk && !candyland && !market && !gallery && !studio && !laura && !atlantic && !strada && "text-vibe-primary",
                 )}
                 style={
-                  noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura
+                  noir || atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada
                     ? undefined
                     : { color: "rgb(var(--vibe-primary))" }
                 }

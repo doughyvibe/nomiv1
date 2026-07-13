@@ -63,6 +63,8 @@ function StatusShell({
   gallery,
   studio,
   laura,
+  atlantic,
+  strada,
 }: {
   title: string;
   children: React.ReactNode;
@@ -74,6 +76,8 @@ function StatusShell({
   gallery: boolean;
   studio: boolean;
   laura: boolean;
+  atlantic: boolean;
+  strada: boolean;
 }) {
   return (
     <div className="flex flex-col items-center px-5 py-8 text-center sm:px-6">
@@ -88,6 +92,8 @@ function StatusShell({
           gallery && "pay-gallery-status-title",
           studio && "pay-studio-status-title",
           laura && "pay-laura-status-title",
+          atlantic && "pay-atlantic-status-title",
+          strada && "pay-strada-status-title",
         )}
       >
         {title}
@@ -111,6 +117,8 @@ export function OrderStatusPageContent({
   const market = liveStore.vibe === "market";
   const gallery = liveStore.vibe === "gallery";
   const laura = liveStore.vibe === "laura";
+  const atlantic = liveStore.vibe === "atlantic";
+  const strada = liveStore.vibe === "strada";
   const studio = liveStore.vibe === "studio";
   const { order, store } = data;
   const qrRef = useRef<HTMLDivElement>(null);
@@ -169,11 +177,11 @@ export function OrderStatusPageContent({
       order.status === "completed" ? "Order completed" : "Order confirmed";
 
     return (
-      <StatusShell title={title} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura}>
+      <StatusShell title={title} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           {store.name} has verified your payment. Your order is being prepared.
         </p>
-        <OrderReceipt data={data} showPaidLabel atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} />
+        <OrderReceipt data={data} showPaidLabel atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to check your order status any time.
         </p>
@@ -183,25 +191,25 @@ export function OrderStatusPageContent({
 
   if (view === "cancelled") {
     return (
-      <StatusShell title="Order cancelled" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura}>
+      <StatusShell title="Order cancelled" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           This order was cancelled. If you have questions, contact {store.name}{" "}
           with reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} />
+        <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
       </StatusShell>
     );
   }
 
   if (awaiting) {
     return (
-      <StatusShell title="Awaiting seller verification" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura}>
+      <StatusShell title="Awaiting seller verification" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           The seller will verify your payment manually. Check back on this page
           for updates — your order is not confirmed until they verify payment.
         </p>
-        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} />
+        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to see when your order is confirmed.
         </p>
@@ -211,12 +219,12 @@ export function OrderStatusPageContent({
 
   if (view === "expired" || countdown.expired) {
     return (
-      <StatusShell title="Payment window expired" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura}>
+      <StatusShell title="Payment window expired" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
           If you already paid, contact {store.name} with your order reference{" "}
           <strong className="text-vibe-text">{order.reference}</strong>.
         </p>
-        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} />
+        <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
       </StatusShell>
     );
   }
@@ -233,6 +241,8 @@ export function OrderStatusPageContent({
           gallery && "pay-gallery",
           studio && "pay-studio",
           laura && "pay-laura",
+          atlantic && "pay-atlantic",
+          strada && "pay-strada",
       )}
     >
       <div className="text-center">
@@ -247,6 +257,8 @@ export function OrderStatusPageContent({
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
           )}
         >
           Payment pending
@@ -262,6 +274,8 @@ export function OrderStatusPageContent({
           gallery && "pay-gallery-amount",
           studio && "pay-studio-amount",
           laura && "pay-laura-amount",
+          atlantic && "pay-atlantic-amount",
+          strada && "pay-strada-amount",
           )}
         >
           {formatPrice(order.total_cents)}
@@ -283,6 +297,8 @@ export function OrderStatusPageContent({
           gallery && "checkout-gallery-panel",
           studio && "checkout-studio-panel",
           laura && "checkout-laura-panel",
+          atlantic && "checkout-atlantic-panel",
+          strada && "checkout-strada-panel",
           )}
         >
           <div ref={qrRef} className="rounded-lg bg-white p-4">
@@ -323,6 +339,8 @@ export function OrderStatusPageContent({
           gallery && "pay-gallery-secondary",
           studio && "pay-studio-secondary",
           laura && "pay-laura-secondary",
+          atlantic && "pay-atlantic-secondary",
+          strada && "pay-strada-secondary",
             )}
           >
             {savingQr ? "Saving…" : "Save QR code"}
@@ -346,6 +364,8 @@ export function OrderStatusPageContent({
           gallery && "checkout-gallery-panel",
           studio && "checkout-studio-panel",
           laura && "checkout-laura-panel",
+          atlantic && "checkout-atlantic-panel",
+          strada && "checkout-strada-panel",
         )}
       >
         <h2
@@ -359,6 +379,8 @@ export function OrderStatusPageContent({
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
           )}
         >
           How to pay
@@ -373,7 +395,7 @@ export function OrderStatusPageContent({
         </p>
       </section>
 
-      <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} />
+      <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
 
       {notifyState?.error && (
         <p className="text-sm text-red-400" role="alert">
@@ -395,6 +417,8 @@ export function OrderStatusPageContent({
           gallery && "checkout-gallery-cta",
           studio && "checkout-studio-cta",
           laura && "checkout-laura-cta",
+          atlantic && "checkout-atlantic-cta",
+          strada && "checkout-strada-cta",
         )}
       >
         {notifyPending ? "Notifying…" : "Notify seller to verify payment"}
@@ -434,7 +458,9 @@ export function OrderStatusPageContent({
           market && "checkout-market-radio",
           gallery && "checkout-gallery-radio",
           studio && "checkout-studio-radio",
-          laura && "checkout-laura-radio")}
+          laura && "checkout-laura-radio",
+          atlantic && "checkout-atlantic-radio",
+          strada && "checkout-strada-radio")}
             />
             <span>I have completed payment using the QR code above.</span>
           </label>
@@ -461,6 +487,8 @@ export function OrderStatusPageContent({
           gallery && "checkout-gallery-cta px-5 py-2.5",
           studio && "checkout-studio-cta px-5 py-2.5",
           laura && "checkout-laura-cta px-5 py-2.5",
+          atlantic && "checkout-atlantic-cta px-5 py-2.5",
+          strada && "checkout-strada-cta px-5 py-2.5",
               )}
             >
               Yes, notify seller

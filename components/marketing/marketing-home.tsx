@@ -10,7 +10,7 @@ import { getLoginUrl, getStorefrontUrl } from "@/lib/host";
 import { getDemoStoreSlug } from "@/lib/marketing/demo-store";
 import type { Vibe } from "@/lib/stores/types";
 
-const PREVIEW_VIBE: Vibe = "epicurean";
+const PREVIEW_VIBE: Vibe = "strada";
 
 const PREVIEW_PRODUCTS = [
   {

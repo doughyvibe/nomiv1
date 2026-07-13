@@ -18,6 +18,12 @@
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-07-14 | Strada = system default (B&W + Inter) | Strict white/`#111`; solid black CTAs; picker first; storefront/marketing fallbacks `epicurean`→`strada` |
+| 2026-07-14 | Vows: Poppins + category underline fix | Swapped Fredoka→Poppins; desktop no longer uses full-width tab rule (pillsOnDesktop + short underline) |
+| 2026-07-14 | Vows palette → light slate + charcoal + lime | BG `#F2F3F5`; text/border `#241F21`; CTA `#E9E778` with charcoal type; Fredoka kept |
+| 2026-07-13 | Vows: Fredoka type + readable sticky | Whole vibe on Fredoka; ivory glass dock + taupe Checkout with cream type |
+| 2026-07-13 | Atlantic → strict 2-color | Indigo `#121F4B` + cream `#F7F3F0` only; terracotta/grey dropped; muted via indigo opacity |
+| 2026-07-13 | Atlantic visual overhaul (shop home + cart/checkout/payment/PDP) | Libre Caslon + Inter; cream `#F5EEE6` / indigo `#121F4B` / terracotta `#AC572D`; indigo sticky + terracotta CTA; no image fades |
 | 2026-07-13 | Laura visual overhaul (shop home + cart/checkout/payment/PDP) | Playfair + Inter; blush glass; soft mauve `#7D5B6D`; sticky keeps glassmorphism + mauve glow outline; filled soft pill CTAs |
 | 2026-07-13 | Added provisional vibes: **Laura**, **Atlantic**, **Vows**, **Strada** | Soft toned-down placeholders for quieter aesthetics; overhaul one at a time next |
 | 2026-07-12 | Studio bold magazine polish | Underline category band; `+` beside price (not on image); LOUD Hanken type; ink hero + cobalt hard shadows |

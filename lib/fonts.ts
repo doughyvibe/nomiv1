@@ -10,6 +10,7 @@ import {
   Libre_Caslon_Text,
   Orbitron,
   Playfair_Display,
+  Poppins,
   Plus_Jakarta_Sans,
   Space_Grotesk,
 } from "next/font/google";
@@ -104,6 +105,14 @@ export const libreCaslonText = Libre_Caslon_Text({
 export const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/** Vows — clean geometric sans */
+export const poppins = Poppins({
+  subsets: ["latin"],
+  variable: "--font-poppins",
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });

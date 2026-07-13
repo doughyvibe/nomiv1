@@ -12,6 +12,18 @@ export type VibeMeta = {
 
 export const VIBES: VibeMeta[] = [
   {
+    id: "strada",
+    name: "Strada",
+    tagline: "Black, white, and type that works everywhere.",
+    suitableFor: "Any trade — the Nomi default",
+    swatch: {
+      bg: "rgb(255 255 255)",
+      primary: "rgb(17 17 17)",
+      secondary: "rgb(17 17 17)",
+    },
+    provisional: false,
+  },
+  {
     id: "epicurean",
     name: "Noir",
     tagline: "Dark, premium, cinematic.",
@@ -122,36 +134,24 @@ export const VIBES: VibeMeta[] = [
   {
     id: "atlantic",
     name: "Atlantic",
-    tagline: "Cool coastal calm, easy and clear.",
-    suitableFor: "Apparel, travel, wellness, everyday retail",
+    tagline: "Indigo and cream, nothing else.",
+    suitableFor: "Apparel, travel, denim, everyday retail",
     swatch: {
-      bg: "rgb(246 249 251)",
-      primary: "rgb(74 110 140)",
-      secondary: "rgb(110 122 132)",
+      bg: "rgb(247 243 240)",
+      primary: "rgb(18 31 75)",
+      secondary: "rgb(18 31 75)",
     },
-    provisional: true,
+    provisional: false,
   },
   {
     id: "vows",
     name: "Vows",
-    tagline: "Warm ivory, gentle and ceremonial.",
+    tagline: "Light slate, charcoal and lime.",
     suitableFor: "Weddings, gifts, stationery, keepsakes",
     swatch: {
-      bg: "rgb(252 250 246)",
-      primary: "rgb(140 118 96)",
-      secondary: "rgb(168 148 138)",
-    },
-    provisional: true,
-  },
-  {
-    id: "strada",
-    name: "Strada",
-    tagline: "Quiet stone and olive, street-simple.",
-    suitableFor: "Cafes, homewares, neighborhood shops",
-    swatch: {
-      bg: "rgb(248 247 244)",
-      primary: "rgb(96 108 88)",
-      secondary: "rgb(130 122 112)",
+      bg: "rgb(242 243 245)",
+      primary: "rgb(233 231 120)",
+      secondary: "rgb(36 31 33)",
     },
     provisional: true,
   },

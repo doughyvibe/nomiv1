@@ -19,6 +19,8 @@ export function CartPageContent() {
   const gallery = store.vibe === "gallery";
   const studio = store.vibe === "studio";
   const laura = store.vibe === "laura";
+  const atlantic = store.vibe === "atlantic";
+  const strada = store.vibe === "strada";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -51,6 +53,8 @@ export function CartPageContent() {
           gallery && "cart-gallery-empty",
           studio && "cart-studio-empty",
           laura && "cart-laura-empty",
+          atlantic && "cart-atlantic-empty",
+          strada && "cart-strada-empty",
         )}
       >
         <p
@@ -64,6 +68,8 @@ export function CartPageContent() {
           gallery && "cart-gallery-title",
           studio && "cart-studio-title",
           laura && "cart-laura-title",
+          atlantic && "cart-atlantic-title",
+          strada && "cart-strada-title",
           )}
         >
           Your cart is empty
@@ -83,6 +89,8 @@ export function CartPageContent() {
           gallery && "cart-gallery-cta",
           studio && "cart-studio-cta",
           laura && "cart-laura-cta",
+          atlantic && "cart-atlantic-cta",
+          strada && "cart-strada-cta",
           )}
         >
           Continue shopping
@@ -103,6 +111,8 @@ export function CartPageContent() {
           gallery && "cart-gallery",
           studio && "cart-studio",
           laura && "cart-laura",
+          atlantic && "cart-atlantic",
+          strada && "cart-strada",
       )}
     >
       <div className="flex items-center justify-between gap-4">
@@ -117,11 +127,13 @@ export function CartPageContent() {
           gallery && "cart-gallery-title",
           studio && "cart-studio-title",
           laura && "cart-laura-title",
+          atlantic && "cart-atlantic-title",
+          strada && "cart-strada-title",
           )}
         >
           Cart
         </h1>
-        {atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura ? (
+        {atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada ? (
           <Link
             href="/"
             className={cn(
@@ -134,6 +146,8 @@ export function CartPageContent() {
           gallery && "cart-gallery-back",
           studio && "cart-studio-back",
           laura && "cart-laura-back",
+          atlantic && "cart-atlantic-back",
+          strada && "cart-strada-back",
             )}
           >
             <ArrowLeft className="size-3.5" aria-hidden />
@@ -156,6 +170,8 @@ export function CartPageContent() {
           gallery && "cart-gallery-line",
           studio && "cart-studio-line",
           laura && "cart-laura-line",
+          atlantic && "cart-atlantic-line",
+          strada && "cart-strada-line",
             )}
           >
             {product.image_url ? (
@@ -276,6 +292,8 @@ export function CartPageContent() {
           gallery && "cart-gallery-cta",
           studio && "cart-studio-cta",
           laura && "cart-laura-cta",
+          atlantic && "cart-atlantic-cta",
+          strada && "cart-strada-cta",
         )}
       >
         Checkout

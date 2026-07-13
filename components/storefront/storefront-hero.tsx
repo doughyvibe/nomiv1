@@ -96,6 +96,18 @@ function isLauraVibe(
   return vibe === "laura";
 }
 
+function isStradaVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "strada";
+}
+
+function isAtlanticVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "atlantic";
+}
+
 function NoirHero({
   title,
   hero,
@@ -444,6 +456,87 @@ function LauraHero({
   );
 }
 
+/** Atlantic: cream editorial wordmark; no cover/CTA/monogram. */
+function AtlanticHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-atlantic-band mb-6 md:mb-8">
+      <div className="flex flex-col items-center px-5 py-12 text-center sm:px-6 md:py-16">
+        {hero.logo_url ? (
+          <div className="mb-5">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-atlantic-eyebrow mb-3 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-atlantic-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <>
+            <div className="hero-atlantic-rule my-4" aria-hidden />
+            <p className="hero-atlantic-tagline text-balance">{tagline}</p>
+          </>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/** Strada: centered B&W wordmark; no cover/CTA/monogram. */
+function StradaHero({
+  title,
+  hero,
+}: {
+  title: string;
+  hero: Partial<HeroConfig>;
+}) {
+  const eyebrow = hero.eyebrow?.trim();
+  const tagline = hero.subheading?.trim();
+
+  return (
+    <section className="storefront-hero hero-strada-band mb-6 md:mb-8">
+      <div className="flex flex-col items-center px-5 py-12 text-center sm:px-6 md:py-16">
+        {hero.logo_url ? (
+          <div className="mb-5">
+            <HeroLogo
+              url={hero.logo_url}
+              alt={title}
+              size={hero.logo_size}
+              style={hero.logo_style}
+            />
+          </div>
+        ) : null}
+
+        {eyebrow ? (
+          <p className="hero-strada-eyebrow mb-3 text-balance">{eyebrow}</p>
+        ) : null}
+
+        <h1 className="hero-strada-title text-balance">{title}</h1>
+
+        {tagline ? (
+          <p className="hero-strada-tagline mt-5 text-balance">{tagline}</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function DefaultHero({
   title,
   hero,
@@ -486,7 +579,7 @@ function DefaultHero({
 export function StorefrontHero({
   storeName,
   hero,
-  vibe = "epicurean",
+  vibe = "strada",
 }: StorefrontHeroProps) {
   const title = hero.title?.trim() || storeName;
 
@@ -524,6 +617,14 @@ export function StorefrontHero({
 
   if (isLauraVibe(vibe)) {
     return <LauraHero title={title} hero={hero} />;
+  }
+
+  if (isAtlanticVibe(vibe)) {
+    return <AtlanticHero title={title} hero={hero} />;
+  }
+
+  if (isStradaVibe(vibe)) {
+    return <StradaHero title={title} hero={hero} />;
   }
 
   return <DefaultHero title={title} hero={hero} />;

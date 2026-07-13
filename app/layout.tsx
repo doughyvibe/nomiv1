@@ -10,6 +10,7 @@ import {
   libreCaslonText,
   orbitron,
   playfairDisplay,
+  poppins,
   plusJakartaSans,
   satoshi,
   spaceGrotesk,
@@ -35,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${ebGaramond.variable} ${dmSans.variable} ${chivo.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} ${leagueSpartan.variable} ${satoshi.variable} ${libreCaslonText.variable} ${playfairDisplay.variable} h-full antialiased`}
+      className={`${inter.variable} ${hankenGrotesk.variable} ${plusJakartaSans.variable} ${ebGaramond.variable} ${dmSans.variable} ${chivo.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${spaceGrotesk.variable} ${leagueSpartan.variable} ${satoshi.variable} ${libreCaslonText.variable} ${playfairDisplay.variable} ${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full font-body">{children}</body>
     </html>

@@ -58,6 +58,18 @@ function isLauraVibe(
   return vibe === "laura";
 }
 
+function isStradaVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "strada";
+}
+
+function isAtlanticVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "atlantic";
+}
+
 function ProductCard({
   product,
   index,
@@ -69,6 +81,8 @@ function ProductCard({
   gallery,
   studio,
   laura,
+  atlantic,
+  strada,
 }: {
   product: Product;
   index: number;
@@ -80,12 +94,14 @@ function ProductCard({
   gallery: boolean;
   studio: boolean;
   laura: boolean;
+  atlantic: boolean;
+  strada: boolean;
 }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const category = normalizeCategory(product.category);
   const blurb =
-    atelier || expedition || cyberpunk || candyland || market || gallery || laura
+    atelier || expedition || cyberpunk || candyland || market || gallery || laura || atlantic || strada
       ? product.description?.trim()
       : null;
 
@@ -106,6 +122,8 @@ function ProductCard({
         "catalog-card-add inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 p-0 leading-none transition-colors [&_svg]:block [&_svg]:shrink-0",
         studio && "catalog-studio-add",
         laura && "catalog-laura-add",
+        atlantic && "catalog-atlantic-add",
+        strada && "catalog-strada-add",
         added && "bg-vibe-primary text-vibe-primary-fg",
       )}
     >
@@ -133,6 +151,8 @@ function ProductCard({
         gallery && "catalog-gallery-card",
         studio && "catalog-studio-card",
         laura && "catalog-laura-card",
+        atlantic && "catalog-atlantic-card",
+        strada && "catalog-strada-card",
       )}
       style={{
         animationDelay: `${80 + index * 50}ms`,
@@ -151,6 +171,8 @@ function ProductCard({
           gallery && "catalog-gallery-pedestal catalog-gallery-image",
           studio && "catalog-studio-image",
           laura && "catalog-laura-image",
+          atlantic && "catalog-atlantic-image",
+          strada && "catalog-strada-image",
         )}
       >
         {product.image_url ? (
@@ -181,6 +203,8 @@ function ProductCard({
             gallery && "catalog-gallery-image-fade",
             studio && "catalog-studio-image-fade",
             laura && "catalog-laura-image-fade",
+            atlantic && "catalog-atlantic-image-fade",
+            strada && "catalog-strada-image-fade",
           )}
         />
       </div>
@@ -196,6 +220,8 @@ function ProductCard({
           gallery && "catalog-gallery-body",
           studio && "catalog-studio-body",
           laura && "catalog-laura-body",
+          atlantic && "catalog-atlantic-body",
+          strada && "catalog-strada-body",
         )}
       >
         {gallery ? (
@@ -243,6 +269,8 @@ function ProductCard({
                 candyland && "catalog-candyland-price-row",
                 market && "catalog-market-price-row",
                 laura && "catalog-laura-price-row",
+                atlantic && "catalog-atlantic-price-row",
+                strada && "catalog-strada-price-row",
               )}
             >
               <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
@@ -274,7 +302,9 @@ export function ProductCatalog({
   const gallery = isGalleryVibe(vibe);
   const studio = isStudioVibe(vibe);
   const laura = isLauraVibe(vibe);
-  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market || laura;
+  const atlantic = isAtlanticVibe(vibe);
+  const strada = isStradaVibe(vibe);
+  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market || laura || atlantic || vibe === "vows" || vibe === "strada";
   const textFilters = gallery || studio;
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -390,6 +420,8 @@ export function ProductCatalog({
               gallery={gallery}
               studio={studio}
               laura={laura}
+              atlantic={atlantic}
+              strada={strada}
             />
           ))
         )}

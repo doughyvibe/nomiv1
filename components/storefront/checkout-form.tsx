@@ -26,6 +26,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
   const gallery = store.vibe === "gallery";
   const studio = store.vibe === "studio";
   const laura = store.vibe === "laura";
+  const atlantic = store.vibe === "atlantic";
+  const strada = store.vibe === "strada";
 
   const productMap = new Map(products.map((p) => [p.id, p]));
   const lines = cart.items
@@ -77,6 +79,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-back",
           studio && "checkout-studio-back",
           laura && "checkout-laura-back",
+          atlantic && "checkout-atlantic-back",
+          strada && "checkout-strada-back",
           )}
         >
           <ArrowLeft className="size-3.5" aria-hidden />
@@ -105,6 +109,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery",
           studio && "checkout-studio",
           laura && "checkout-laura",
+          atlantic && "checkout-atlantic",
+          strada && "checkout-strada",
       )}
     >
       <div>
@@ -120,6 +126,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-back",
           studio && "checkout-studio-back",
           laura && "checkout-laura-back",
+          atlantic && "checkout-atlantic-back",
+          strada && "checkout-strada-back",
           )}
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden />
@@ -136,6 +144,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-title",
           studio && "checkout-studio-title",
           laura && "checkout-laura-title",
+          atlantic && "checkout-atlantic-title",
+          strada && "checkout-strada-title",
           )}
         >
           Checkout
@@ -163,6 +173,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-panel",
           studio && "checkout-studio-panel",
           laura && "checkout-laura-panel",
+          atlantic && "checkout-atlantic-panel",
+          strada && "checkout-strada-panel",
         )}
       >
         <h2
@@ -176,6 +188,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
           )}
         >
           Order summary
@@ -212,6 +226,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
             )}
           >
             Fulfillment
@@ -228,6 +244,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-option",
           studio && "checkout-studio-option",
           laura && "checkout-laura-option",
+          atlantic && "checkout-atlantic-option",
+          strada && "checkout-strada-option",
               )}
             >
               <input
@@ -242,7 +260,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
           market && "checkout-market-radio",
           gallery && "checkout-gallery-radio",
           studio && "checkout-studio-radio",
-          laura && "checkout-laura-radio")}
+          laura && "checkout-laura-radio",
+          atlantic && "checkout-atlantic-radio",
+          strada && "checkout-strada-radio")}
               />
               <span>
                 <span
@@ -273,6 +293,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-option",
           studio && "checkout-studio-option",
           laura && "checkout-laura-option",
+          atlantic && "checkout-atlantic-option",
+          strada && "checkout-strada-option",
               )}
             >
               <input
@@ -287,7 +309,9 @@ export function CheckoutForm({ slug }: { slug: string }) {
           market && "checkout-market-radio",
           gallery && "checkout-gallery-radio",
           studio && "checkout-studio-radio",
-          laura && "checkout-laura-radio")}
+          laura && "checkout-laura-radio",
+          atlantic && "checkout-atlantic-radio",
+          strada && "checkout-strada-radio")}
               />
               <span>
                 <span
@@ -321,6 +345,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-section-label",
           studio && "checkout-studio-section-label",
           laura && "checkout-laura-section-label",
+          atlantic && "checkout-atlantic-section-label",
+          strada && "checkout-strada-section-label",
           )}
         >
           Your details
@@ -341,6 +367,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-input",
           studio && "checkout-studio-input",
           laura && "checkout-laura-input",
+          atlantic && "checkout-atlantic-input",
+          strada && "checkout-strada-input",
             )}
           />
         </label>
@@ -365,6 +393,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-input",
           studio && "checkout-studio-input",
           laura && "checkout-laura-input",
+          atlantic && "checkout-atlantic-input",
+          strada && "checkout-strada-input",
             )}
           />
         </label>
@@ -385,6 +415,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-input",
           studio && "checkout-studio-input",
           laura && "checkout-laura-input",
+          atlantic && "checkout-atlantic-input",
+          strada && "checkout-strada-input",
             )}
           />
         </label>
@@ -406,6 +438,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-input",
           studio && "checkout-studio-input",
           laura && "checkout-laura-input",
+          atlantic && "checkout-atlantic-input",
+          strada && "checkout-strada-input",
               )}
             />
           </label>
@@ -427,6 +461,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-input",
           studio && "checkout-studio-input",
           laura && "checkout-laura-input",
+          atlantic && "checkout-atlantic-input",
+          strada && "checkout-strada-input",
             )}
           />
         </label>
@@ -451,6 +487,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
           gallery && "checkout-gallery-cta",
           studio && "checkout-studio-cta",
           laura && "checkout-laura-cta",
+          atlantic && "checkout-atlantic-cta",
+          strada && "checkout-strada-cta",
         )}
       >
         {pending ? "Creating order…" : "Place order & pay"}
