@@ -11,9 +11,9 @@
 
 1. **One task at a time.** Complete and verify before moving on.
 2. **Update this document** after every completed task (mark ✅, add notes, update file manifest).
-3. **At the start of any new conversation**, read this document AND `docs/whiteboard.md` first to understand current state.
+3. **At the start of any new conversation**, read `docs/whiteboard.md` first, then this document. For storefront structure read `docs/NOMI_STOREFRONT_ARCHITECTURE.md`. Read `docs/PRD.md` only for product intent / flows — **not** as live visual or vibe inventory (see PRD as-built snapshot; code wins on conflicts).
 4. **Do not skip tasks.** Each task builds on the previous. (Exception: tasks explicitly marked as parallelizable.)
-5. **Do not add features** not in the PRD. If tempted, add to Backlog and move on.
+5. **Do not add features** outside agreed scope (whiteboard / current task). Stale PRD UI details (e.g. bottom nav, old vibe names) are not requirements. If tempted to expand scope, add to Backlog and move on.
 6. **Keep it simple.** If a task feels over-engineered, simplify.
 7. **Test after every task.** The app should run without errors at each checkpoint.
 8. **Tasks marked 👤 MANUAL** require the human to do something (create accounts, paste keys, test on a real phone). The AI must write clear step-by-step instructions in `docs/whiteboard.md` under "YOUR MANUAL CHECK".

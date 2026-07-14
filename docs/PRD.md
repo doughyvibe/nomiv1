@@ -1,5 +1,34 @@
 PRD: Nomi — Subdomain Storefront Platform for Singapore Social Sellers
 
+> **Document status (2026-07-14):** This PRD is the original **product intent** document. Large parts of the visual / vibe / navigation detail below are **out of date** relative to the shipped app. Do **not** treat every section as an implementation checklist.
+>
+> **For AI agents — read in this order:**
+> 1. `docs/whiteboard.md` (where we are + Decision Log + handoff)
+> 2. `docs/NOMI_STOREFRONT_ARCHITECTURE.md` (immutable storefront structure)
+> 3. `docs/Implementation.md` (phases / tasks)
+> 4. This PRD — for **why / who / core flows / MVP constraints** only
+> 5. **Code** — `lib/vibes.ts`, `styles/tokens.css`, storefront components — for what the app actually does
+>
+> If this PRD conflicts with whiteboard, architecture, or code → **code + whiteboard win.**
+
+⸻
+
+### As-built snapshot (2026-07-14) — current product shape
+
+Use this block instead of the old “4 vibes / bottom nav / Unicorn…” sections when checking what exists today.
+
+**Surfaces (unchanged):** `nomi.store` marketing · `app.nomi.store` seller app · `{slug}.nomi.store` public storefront.
+
+**Storefront structure (locked):** Hero → Featured product → Catalog (+ category filters when ≥2) → Sticky checkout bar → Cart → Checkout → PayNow QR → Seller verifies. No cover/banner. No hero CTA. No bottom nav. Featured CTA is always “Add to cart.” No fake product specs.
+
+**Vibes shipped (12):** `strada` (**system default** — B&W Inter), `epicurean` (Noir), `atelier`, `expedition`, `cyberpunk`, `candyland`, `gallery`, `market`, `studio`, `laura`, `atlantic`, `vows`. Old PRD names Unicorn / Outback / Futuristic / Industrial map to Atelier / Expedition / Cyberpunk / (Industrial direction → Expedition + Noir references). Source of truth: `lib/vibes.ts` + `styles/tokens.css`.
+
+**Still true from this PRD:** Singapore social sellers, subdomain storefronts, content-not-design seller model, PayNow QR + manual verification MVP, vibe applies to public storefront only (not dashboard/marketing).
+
+**Intentionally not kept in sync here:** Per-vibe colors, fonts, motion, mockup screenshots, Industrial/JigWave token essays. Those live in code and (optionally) disposable `docs/*_storefront` reference packs.
+
+⸻
+
 1. Product Summary
 
 Build Nomi, a mobile-first web platform that allows Singapore-based social sellers to create a polished storefront link, share it in their social media bio, accept customer orders, and guide buyers through a self-generated dynamic PayNow QR payment flow.
@@ -17,9 +46,10 @@ Turn your bio into a PayNow-ready storefront.
 Nomi should support:
 
 * Seller subdomain storefronts
-* Storefront vibe presets
-* Hero-led storefront design
+* Storefront vibe presets (as-built: 12 vibes; default Strada)
+* Hero-led storefront design (logo/wordmark hero; no cover image)
 * Product catalog with optional category filter pills
+* Sticky checkout bar (not bottom tab navigation)
 * Standardized checkout
 * Self-generated dynamic PayNow QR
 * Save/screenshot QR buyer payment flow
@@ -336,6 +366,8 @@ The buyer should be able to:
 
 9. Storefront Vibe System
 
+> **SUPERSEDED (visual inventory):** The “4 MVP vibes” (Unicorn / Outback / Futuristic / Industrial) and the long Industrial token essay below are **historical design intent**, not the live catalog. See **As-built snapshot** at the top of this file and `lib/vibes.ts`. The *rules* in this section (vibe ≠ theme builder; vibe = public storefront only; seller edits content) still hold.
+
 The MVP should include a storefront-only vibe system.
 
 A vibe is not a full theme builder. A vibe is a professionally designed buyer-facing visual preset that controls the public storefront experience while keeping the layout structure mostly fixed.
@@ -381,7 +413,9 @@ The seller dashboard should remain neutral, clean, and consistent.
 
 MVP Vibe Options
 
-The MVP should include 4 vibe options:
+> **As-built (do not implement the four names below):** Strada (default), Noir (`epicurean`), Atelier, Expedition, Cyberpunk, Candyland, Gallery, Market, Studio, Laura, Atlantic, Vows. Historical rename map: Unicorn→Atelier, Outback→Expedition, Futuristic→Cyberpunk. Industrial direction informed Expedition / Noir / JigWave demo — not a live vibe id.
+
+The original draft listed 4 vibe options (kept for history only):
 
 Unicorn
 Outback
@@ -794,9 +828,11 @@ For Unicorn, Outback, and Futuristic:
 
 14. Buyer Navigation Pattern
 
+> **SUPERSEDED:** Bottom tab navigation was **not** shipped. As-built uses a **sticky checkout bar** (cart total + checkout CTA). Category filters stay in the catalog. See `docs/NOMI_STOREFRONT_ARCHITECTURE.md` and whiteboard Decision Log. Ignore bottom-nav styling requirements in this section for implementation.
+
 The public storefront should feel mobile-app-like.
 
-A bottom navigation is recommended for the buyer storefront.
+~~A bottom navigation is recommended for the buyer storefront.~~ (superseded — sticky checkout bar)
 
 MVP bottom nav:
 
@@ -953,7 +989,9 @@ Why this step comes first:
 
 Step 2: Choose Storefront Vibe
 
-The seller chooses one of four vibes:
+> **As-built:** Seller picks from the shipped vibe catalog (default Strada). Old four names below are historical only.
+
+The seller chooses a storefront vibe (original draft listed four):
 
 Unicorn
 Outback
@@ -1931,7 +1969,7 @@ A new seller can:
 * Sign up
 * Enter store name
 * Claim unique Nomi subdomain
-* Choose one of four vibes: Unicorn, Outback, Futuristic, Industrial
+* Choose a storefront vibe from the shipped catalog (default Strada; see as-built snapshot / `lib/vibes.ts`)
 * Design storefront hero
 * Reorder hero content blocks
 * Add at least one product
@@ -2071,7 +2109,7 @@ The MVP is successful if:
 
 1. A seller can create and publish a Nomi subdomain storefront without help.
 2. The public storefront looks polished using one of the predefined vibes.
-3. The Industrial vibe can produce a JigWave-like finished storefront.
+3. A demo storefront (e.g. JigWave) can look finished under a suitable vibe (Expedition / Noir / etc. — not the retired “Industrial” id).
 4. A buyer can browse, add to cart, and checkout from mobile without confusion.
 5. The buyer can save/screenshot a dynamic PayNow QR and complete payment outside the app.
 6. The seller can manually verify payment and mark the order paid.
