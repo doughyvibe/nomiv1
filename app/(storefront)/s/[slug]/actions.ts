@@ -7,6 +7,7 @@ import { generateOrderReference } from "@/lib/orders/reference";
 import { sendVerificationRequestPush } from "@/lib/push/send-verification-alert";
 import { getPublishedStorefront } from "@/lib/stores/load-storefront";
 import type { FulfillmentConfig } from "@/lib/stores/types";
+import { paynowIsComplete } from "@/lib/stores/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   isValidCustomerPhone,
@@ -62,6 +63,12 @@ export async function createOrderAction(
   if (!storefront) return { error: "Store not found" };
 
   const { store, products } = storefront;
+  if (!paynowIsComplete(store.paynow)) {
+    return {
+      error:
+        "This store isn't ready to take PayNow payments yet. Please contact the seller.",
+    };
+  }
   const fulfillment = store.fulfillment as FulfillmentConfig;
 
   const method = String(formData.get("fulfillment_method") ?? "");

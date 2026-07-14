@@ -8,9 +8,11 @@
 ## Phase Status
 
 **Phase 7 — Vibes + Marketing:** ✅ COMPLETE (storefront vibes all shipped)
-**Phase 8 — Polish, Hardening & Launch:** in progress
-**Just finished:** All vibes overhauled (Noir → Strada); **Strada** is system default
-**Next up:** App polish outside vibe themes (dashboard / marketing / flows) — see handoff prompt below
+**Phase 8 — Polish, Hardening & Launch:** in progress → **Product Refinement**
+**Just finished:** Sprint 4 polish tail (seller/buyer leftovers; **marketing landing deferred** for founder redesign)
+**Next up:** Founder review / remaining optional Low items — then polish confidence before domain + deploy
+
+**Launch note (H4):** Real PayNow already verified. **Production deploy + domain purchase deferred** until polish is complete and founder is confident. Not part of current sprints.
 
 ---
 
@@ -18,6 +20,12 @@
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-07-14 | Sprint 4 done (non-marketing): vibe picker guidance, featured toggle, publish deep-links, checkout polish, order polling; E2/E3 marketing landing deferred for redesign | Polish tail without landing rewrite |
+| 2026-07-14 | Sprint 3 done: branded error/404, BrandLink CTAs, useSavedFlash, marketing focus/skip/main, form aria-invalid | Platform resilience & a11y baseline |
+| 2026-07-14 | Sprint 2 done: vibe Continue (no auto-advance), Settings store identity, branded onboarding shell, PWA/dashboard primary → brand yellow | Seller setup quality |
+| 2026-07-14 | Sprint 1 done: sticky on browse paths, PDP post-add links, PayNow checkout gate, expired→shop CTA, stale cart prune, delivery address only when delivery | Buyer conversion / trust continuity |
+| 2026-07-14 | Sprint 0 done: terms/privacy, checkout total due, seller contact on order pages, order URLs survive unpublish | Trust blockers before more polish |
+| 2026-07-14 | H4 production deploy + domain held | PayNow already tested live; deploy only after full polish confidence |
 | 2026-07-14 | PRD = intent; whiteboard/architecture/code = truth | Agents must not treat full PRD as live UI/vibe checklist; as-built banner at top of PRD; Implementation.md reading order updated |
 | 2026-07-14 | Strada = system default (B&W + Inter) | Strict white/`#111`; solid black CTAs; picker first; storefront/marketing fallbacks `epicurean`→`strada` |
 | 2026-07-14 | Vows: Poppins + category underline fix | Swapped Fredoka→Poppins; desktop no longer uses full-width tab rule (pillsOnDesktop + short underline) |
@@ -149,8 +157,13 @@ npm run dev
 |---|---|
 | Real-phone mobile verification (8.3) | 👤 Checklist |
 | Two-account cross-tenant test (8.2) | 👤 Optional before launch |
-| Production deploy + real payment (8.4) | 👤 Milestone |
+| Production deploy + domain + real payment (8.4) | ⏸️ Deferred — PayNow verified; deploy after polish confidence |
 | Clear `vows.provisional` in `lib/vibes.ts` | Optional cleanup |
 | Delete `docs/*_storefront` mockup packs | Safe — human choice |
+| Sprint 0 (E1/A1/A2/A3) | ✅ Done 2026-07-14 |
+| Sprint 1 (B1/B2/A4–A7) | ✅ Done 2026-07-14 |
+| Sprint 2 (C1/C2/C3/D5) | ✅ Done 2026-07-14 |
+| Sprint 3 (F1/F2/D1/D2/E4/G1) | ✅ Done 2026-07-14 |
+| Sprint 4 (non-marketing) | ✅ Done 2026-07-14 — E2/E3 landing deferred |
 
 ---

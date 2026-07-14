@@ -215,6 +215,23 @@ export function ProductDetail({ product }: { product: Product }) {
         >
           {added ? "Added to cart" : "Add to cart"}
         </button>
+        {added ? (
+          <p className="text-center text-sm text-vibe-text-muted">
+            <Link
+              href="/cart"
+              className="font-medium text-vibe-primary underline underline-offset-2"
+            >
+              View cart
+            </Link>
+            {" · "}
+            <Link
+              href="/checkout"
+              className="font-medium text-vibe-primary underline underline-offset-2"
+            >
+              Checkout
+            </Link>
+          </p>
+        ) : null}
       </div>
     </div>
   );

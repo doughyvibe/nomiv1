@@ -32,6 +32,38 @@ export function cartItemCount(cart: Cart): number {
   return cart.items.reduce((sum, i) => sum + i.quantity, 0);
 }
 
+/** Keep only items whose product still exists; returns how many line entries were dropped. */
+export function pruneCartToProductIds(
+  slug: string,
+  productIds: ReadonlySet<string>,
+): { cart: Cart; removedLines: number } {
+  const cart = loadCart(slug);
+  const nextItems = cart.items.filter((i) => productIds.has(i.productId));
+  const removedLines = cart.items.length - nextItems.length;
+  if (removedLines === 0) return { cart, removedLines: 0 };
+  const next = { items: nextItems };
+  saveCart(slug, next);
+  return { cart: next, removedLines };
+}
+
+/** Count/subtotal using only products that still exist (avoids sticky vs money mismatch). */
+export function availableCartSummary(
+  items: CartItem[],
+  priceById: ReadonlyMap<string, number>,
+): { count: number; subtotalCents: number; availableItems: CartItem[] } {
+  let count = 0;
+  let subtotalCents = 0;
+  const availableItems: CartItem[] = [];
+  for (const item of items) {
+    const price = priceById.get(item.productId);
+    if (price === undefined) continue;
+    availableItems.push(item);
+    count += item.quantity;
+    subtotalCents += price * item.quantity;
+  }
+  return { count, subtotalCents, availableItems };
+}
+
 export function addToCart(
   slug: string,
   productId: string,

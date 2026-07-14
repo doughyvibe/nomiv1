@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { Wordmark } from "@/components/marketing/wordmark";
 import { StepFulfillment } from "@/components/onboarding/step-fulfillment";
 import { StepHero } from "@/components/onboarding/step-hero";
 import { StepNameSlug } from "@/components/onboarding/step-name-slug";
@@ -36,52 +38,77 @@ export function OnboardingWizard({ store, products, derivedStep }: WizardProps) 
   }
 
   return (
-    <main className="mx-auto flex min-h-full w-full max-w-xl flex-col gap-6 p-4 pb-16 sm:p-8">
-      <header className="flex flex-col gap-3">
-        <p className="text-sm font-medium text-dashboard-muted">
-          Set up your store
-        </p>
-        {/* Step indicator: 7 dots, tappable for completed steps */}
-        <ol className="flex items-center gap-1.5">
-          {ONBOARDING_STEPS.map(({ step: s, label }) => (
-            <li key={s} className="flex-1">
-              <button
-                type="button"
-                onClick={() => goTo(s as OnboardingStep)}
-                disabled={s > derivedStep}
-                aria-label={`Step ${s}: ${label}`}
-                aria-current={s === step ? "step" : undefined}
-                className={cn(
-                  "h-1.5 w-full rounded-full transition-colors",
-                  s < derivedStep && "bg-dashboard-primary/50",
-                  s === step && "bg-dashboard-primary",
-                  s > derivedStep && "bg-dashboard-border",
-                  s <= derivedStep && s !== step && "cursor-pointer",
-                )}
-              />
-            </li>
-          ))}
-        </ol>
-        <p className="text-xs text-dashboard-muted">
-          Step {step} of 7 — {ONBOARDING_STEPS[step - 1].label}
-        </p>
-      </header>
+    <div data-brand className="relative min-h-dvh text-foreground">
+      <div
+        className="brand-grain pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden
+      />
+      <div
+        className="brand-orb animate-brand-drift-1 pointer-events-none absolute top-[10%] left-[5%] size-64 bg-[rgba(247,197,24,0.1)]"
+        aria-hidden
+      />
+      <div
+        className="brand-orb animate-brand-drift-2 pointer-events-none absolute right-[8%] bottom-[18%] size-72 bg-[rgba(124,47,224,0.08)]"
+        aria-hidden
+      />
 
-      {step === 1 && <StepNameSlug onDone={advance} />}
-      {step === 2 && store && (
-        <StepVibe store={store} onDone={advance} />
-      )}
-      {step === 3 && store && <StepHero store={store} onDone={advance} />}
-      {step === 4 && store && (
-        <StepProduct store={store} products={products} onDone={advance} />
-      )}
-      {step === 5 && store && (
-        <StepFulfillment store={store} onDone={advance} />
-      )}
-      {step === 6 && store && <StepPayNow store={store} onDone={advance} />}
-      {step === 7 && store && (
-        <StepPublish store={store} products={products} />
-      )}
-    </main>
+      <main className="relative mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-6 p-4 pb-16 sm:p-8">
+        <div className="flex items-center justify-between gap-4">
+          <Wordmark />
+          <SignOutButton />
+        </div>
+
+        <header className="flex flex-col gap-3">
+          <p className="text-sm font-medium text-muted-foreground">
+            Set up your store
+          </p>
+          <ol className="flex items-center gap-1.5">
+            {ONBOARDING_STEPS.map(({ step: s, label }) => (
+              <li key={s} className="flex-1">
+                <button
+                  type="button"
+                  onClick={() => goTo(s as OnboardingStep)}
+                  disabled={s > derivedStep}
+                  aria-label={`Step ${s}: ${label}`}
+                  aria-current={s === step ? "step" : undefined}
+                  className={cn(
+                    "flex h-11 w-full items-center",
+                    s <= derivedStep && s !== step && "cursor-pointer",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "block h-2.5 w-full rounded-full transition-colors",
+                      s < derivedStep && "bg-primary/50",
+                      s === step && "bg-primary",
+                      s > derivedStep && "bg-border",
+                    )}
+                  />
+                </button>
+              </li>
+            ))}
+          </ol>
+          <p className="text-xs text-muted-foreground">
+            Step {step} of 7 — {ONBOARDING_STEPS[step - 1].label}
+          </p>
+        </header>
+
+        {step === 1 && <StepNameSlug onDone={advance} />}
+        {step === 2 && store && (
+          <StepVibe store={store} onDone={advance} />
+        )}
+        {step === 3 && store && <StepHero store={store} onDone={advance} />}
+        {step === 4 && store && (
+          <StepProduct store={store} products={products} onDone={advance} />
+        )}
+        {step === 5 && store && (
+          <StepFulfillment store={store} onDone={advance} />
+        )}
+        {step === 6 && store && <StepPayNow store={store} onDone={advance} />}
+        {step === 7 && store && (
+          <StepPublish store={store} products={products} />
+        )}
+      </main>
+    </div>
   );
 }

@@ -130,7 +130,20 @@ export function PayNowForm({
           value={proxyValue}
           onChange={(e) => setProxyValue(e.target.value)}
           placeholder={proxyType === "mobile" ? "91234567" : "201403121W"}
+          aria-invalid={proxyValue.trim().length > 0 && !inputValid ? true : undefined}
+          aria-describedby={
+            proxyValue.trim().length > 0 && !inputValid
+              ? "paynow-value-hint"
+              : undefined
+          }
         />
+        {proxyValue.trim().length > 0 && !inputValid ? (
+          <p id="paynow-value-hint" className="text-destructive text-xs" role="alert">
+            {proxyType === "mobile"
+              ? "Enter a valid SG mobile (8 digits starting with 8 or 9)"
+              : "Enter a valid UEN (e.g. 201403121W)"}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">

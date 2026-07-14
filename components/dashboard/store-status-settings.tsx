@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -17,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { PublishIssue } from "@/lib/stores/publish-readiness";
 import type { Store } from "@/lib/stores/types";
 
 export function StoreStatusSettings({
@@ -24,7 +26,7 @@ export function StoreStatusSettings({
   publishIssues,
 }: {
   store: Store;
-  publishIssues: string[];
+  publishIssues: PublishIssue[];
 }) {
   const router = useRouter();
   const [publishOpen, setPublishOpen] = useState(false);
@@ -71,7 +73,14 @@ export function StoreStatusSettings({
           {!canPublish && (
             <ul className="text-muted-foreground list-inside list-disc text-sm">
               {publishIssues.map((issue) => (
-                <li key={issue}>{issue}</li>
+                <li key={issue.message}>
+                  <Link
+                    href={issue.href}
+                    className="text-foreground underline underline-offset-2 hover:opacity-80"
+                  >
+                    {issue.message}
+                  </Link>
+                </li>
               ))}
             </ul>
           )}
@@ -119,21 +128,23 @@ export function StoreStatusSettings({
           <DialogHeader>
             <DialogTitle>Unpublish your store?</DialogTitle>
             <DialogDescription>
-              Your public storefront will immediately show as unavailable. Existing
-              order links still work for buyers.
+              Your storefront will be hidden. Existing order links still work.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-end">
-            <Button type="button" variant="outline" onClick={() => setUnpublishOpen(false)}>
-              Keep live
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setUnpublishOpen(false)}
+            >
+              Cancel
             </Button>
             <Button
               type="button"
-              variant="destructive"
               disabled={pending}
               onClick={() => run(unpublishStoreAction)}
             >
-              {pending ? "Updating…" : "Unpublish store"}
+              {pending ? "Unpublishing…" : "Unpublish store"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -6,6 +6,7 @@ import {
   publishStore,
   saveFulfillment,
   savePayNow,
+  updateStoreIdentity,
 } from "@/app/(dashboard)/dashboard/onboarding/actions";
 import { friendlyDbError } from "@/lib/errors/friendly-db";
 import { revalidateDashboardStore } from "@/lib/stores/revalidate";
@@ -14,6 +15,7 @@ import type {
   FulfillmentConfig,
   PayNowConfig,
   Store,
+  TradeHint,
 } from "@/lib/stores/types";
 import type { PushSubscriptionPayload } from "@/lib/push/client";
 import { createClient } from "@/lib/supabase/server";
@@ -72,6 +74,20 @@ export async function savePayNowAction(
   if ("error" in ctx) return ctx;
 
   const result = await savePayNow(config);
+  if (!result.ok) return { error: result.error };
+
+  revalidateDashboardStore(ctx.store);
+  return { success: true };
+}
+
+export async function saveStoreIdentityAction(input: {
+  name: string;
+  tradeHint: TradeHint | null;
+}): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const result = await updateStoreIdentity(input);
   if (!result.ok) return { error: result.error };
 
   revalidateDashboardStore(ctx.store);

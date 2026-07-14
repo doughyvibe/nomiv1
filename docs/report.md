@@ -566,10 +566,11 @@ Observations are numbered for reference. Related items point to their initiative
 - **Where:** `docs/Implementation.md` Task 8.4; whiteboard open questions
 - **Why it matters:** Polish without production proof still leaves launch risk.
 - **User impact:** Real-world breakage undiscovered.
-- **Recommended approach:** Keep as a parallel founder milestone: deploy, real PayNow, two-account tenant check, real-phone pass. Not a feature — a gate.
-- **Priority:** Critical (launch gate) — operational, not a UI ticket
-- **Dependencies:** Founder / infra access
-- **Initiative:** Launch gate (alongside polish)
+- **Recommended approach:** **Deferred by founder (2026-07-14).** Real PayNow already verified. Hold production deploy and domain purchase until polish is complete and confidence is high. Not a current sprint item.
+- **Priority:** Critical (launch gate) — operational, deferred
+- **Dependencies:** Founder sign-off after polish
+- **Initiative:** Launch gate (post-polish)
+- **Status:** ⏸️ Deferred — PayNow ✅ tested; deploy later
 
 #### H5. Incomplete vibe branching on shared cart/checkout/PDP for some vibes (e.g. Vows falls through; Noir cart back-link gap)
 - **Where:** Shared storefront components with many `isXVibe` flags
@@ -613,13 +614,13 @@ Suggested order for implementation sprints (still subject to founder pick):
 
 | Sprint | Focus | Initiatives | Outcome |
 |--------|-------|-------------|---------|
-| **0** | Launch blockers | E1, A1, A2, A3, H4 | Legal pages; checkout total; order page survival; seller contact; production smoke |
-| **1** | Buyer conversion | B1, B2, A4, A5, A6, A7 | Sticky continuity; PayNow gate; expired recovery; cart honesty |
-| **2** | Seller setup quality | C1, C2, C3, D5 | Vibe step fix; identity settings; branded onboarding |
-| **3** | Platform resilience & consistency | F1, F2, D1, D2, E4, G1 | Error/404, CTA/feedback unify, a11y baseline |
-| **4** | Marketing & polish tail | E2, E3, C5, C6, C7, A8–A12, G*, H* | Landing trust, SEO, remaining Medium/Low |
+| **0** | Launch blockers | E1, A1, A2, A3 ✅ (2026-07-14) | Legal pages; checkout total; order page survival; seller contact. **H4 deploy deferred** — PayNow already verified; domain/deploy after polish confidence |
+| **1** | Buyer conversion | B1, B2, A4, A5, A6, A7 ✅ (2026-07-14) | Sticky on browse paths; PDP view cart; PayNow gate; expired → shop; stale cart prune; delivery address conditional |
+| **2** | Seller setup quality | C1, C2, C3, D5 ✅ (2026-07-14) | Vibe Continue (no auto-advance); Settings identity; branded onboarding; PWA/dashboard primary → yellow |
+| **3** | Platform resilience & consistency | F1, F2, D1, D2, E4, G1 ✅ (2026-07-14) | error/404 boundaries; BrandLink; useSavedFlash; marketing focus/skip/main; form aria-invalid |
+| **4** | Marketing & polish tail | C5–C7, A8–A12, G2/G4/G5, H1 ✅ (2026-07-14); **E2/E3 deferred** | Seller/buyer polish; landing redesign owned by founder later |
 
-Do not start Sprint 4 items before Sprint 0 trust fixes.
+Do not start Sprint 4 landing items (E2/E3) until the founder’s marketing redesign. **Do not production-deploy until founder signs off post-polish.**
 
 ---
 

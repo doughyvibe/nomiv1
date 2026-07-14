@@ -83,7 +83,7 @@ function BlackPillCta({
     <a
       href={href}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-      className="group inline-flex h-13 items-center justify-center gap-3 rounded-full bg-foreground pr-2 pl-6 text-base font-semibold text-white transition-colors hover:bg-[#2c2a26] active:scale-[0.97]"
+      className="group inline-flex h-13 items-center justify-center gap-3 rounded-full bg-foreground pr-2 pl-6 text-base font-semibold text-white transition-colors hover:bg-[#2c2a26] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97]"
     >
       {children}
       <span
@@ -100,22 +100,16 @@ function OutlinePillCta({
   href,
   children,
   external,
-  onYellow,
 }: {
   href: string;
   children: React.ReactNode;
   external?: boolean;
-  onYellow?: boolean;
 }) {
   return (
     <a
       href={href}
       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-      className={
-        onYellow
-          ? "inline-flex h-13 items-center justify-center rounded-full border-[1.5px] border-foreground px-7 text-base font-semibold text-foreground transition-colors hover:bg-foreground/10 active:scale-[0.97]"
-          : "inline-flex h-13 items-center justify-center rounded-full border-[1.5px] border-foreground/30 bg-card px-7 text-base font-semibold text-foreground shadow-[0_2px_10px_rgba(22,19,14,0.08)] transition-all hover:border-foreground/45 hover:bg-[var(--brand-bg-soft)] hover:shadow-[0_4px_16px_rgba(22,19,14,0.12)] active:scale-[0.97]"
-      }
+      className="inline-flex h-13 items-center justify-center rounded-full border-[1.5px] border-foreground/30 bg-card px-7 text-base font-semibold text-foreground shadow-[0_2px_10px_rgba(22,19,14,0.08)] transition-all hover:border-foreground/45 hover:bg-[var(--brand-bg-soft)] hover:shadow-[0_4px_16px_rgba(22,19,14,0.12)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97]"
     >
       {children}
     </a>
@@ -178,6 +172,13 @@ export function MarketingHome() {
 
   return (
     <div data-brand className="min-h-full bg-background text-foreground">
+      <a
+        href="#main-content"
+        className="bg-primary text-primary-foreground focus:ring-ring sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:ring-3 focus:outline-none"
+      >
+        Skip to content
+      </a>
+
       {/* ------------------------------------------------ Floating pill nav */}
       <header className="sticky top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
         <div className="relative mx-auto max-w-5xl rounded-full border border-border bg-[#fbf7f2]/95 py-2 pr-2 pl-5 shadow-[0_1px_3px_rgba(27,26,24,0.08)] backdrop-blur-sm">
@@ -189,13 +190,13 @@ export function MarketingHome() {
             <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 sm:ml-auto">
               <a
                 href={signInUrl}
-                className="px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground sm:px-3 sm:text-[14.5px]"
+                className="min-h-11 inline-flex items-center px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:px-3 sm:text-[14.5px]"
               >
                 Sign in
               </a>
               <a
                 href={createStoreUrl}
-                className="inline-flex h-9 items-center rounded-full bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:-translate-y-px hover:bg-[var(--brand-yellow-deep)] active:scale-[0.98] sm:px-4.5 sm:text-sm"
+                className="inline-flex h-11 min-h-11 items-center rounded-full bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:-translate-y-px hover:bg-[var(--brand-yellow-deep)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 active:scale-[0.98] sm:px-4.5 sm:text-sm"
               >
                 Create my store
               </a>
@@ -204,6 +205,7 @@ export function MarketingHome() {
         </div>
       </header>
 
+      <main id="main-content">
       {/* ------------------------------------------------ Hero */}
       <section className="relative overflow-hidden px-4 pt-14 pb-16 text-center sm:px-6 sm:pt-20">
         <div
@@ -410,6 +412,7 @@ export function MarketingHome() {
           </div>
         </Reveal>
       </section>
+      </main>
 
       {/* ------------------------------------------------ Footer */}
       <footer className="border-t border-border bg-[var(--brand-bg-soft)] px-4 py-10 sm:px-6">
@@ -424,7 +427,7 @@ export function MarketingHome() {
             Demo store:{" "}
             <a
               href={demoUrl}
-              className="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4"
+              className="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               target="_blank"
               rel="noreferrer"
             >

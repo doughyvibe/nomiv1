@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import QRCode from "react-qr-code";
 
 import { notifySellerAction } from "@/app/(storefront)/s/[slug]/actions";
@@ -18,6 +19,7 @@ import {
 import { downloadPayNowQrImage } from "@/lib/paynow/download-qr-image";
 import { formatPrice } from "@/lib/money";
 import type { LoadedOrder } from "@/lib/orders/load-order";
+import { sellerMobileContact } from "@/lib/orders/seller-contact";
 import { buyerOrderView } from "@/lib/orders/status";
 import { cn } from "@/lib/utils";
 
@@ -103,6 +105,64 @@ function StatusShell({
   );
 }
 
+function SellerContact({
+  storeName,
+  paynow,
+  reference,
+}: {
+  storeName: string;
+  paynow: LoadedOrder["store"]["paynow"];
+  reference: string;
+}) {
+  const contact = sellerMobileContact(paynow);
+  if (!contact) {
+    return (
+      <p className="mt-4 text-sm text-vibe-text-muted">
+        Contact {storeName} with reference{" "}
+        <strong className="text-vibe-text">{reference}</strong>. The seller has
+        not shared a mobile number on this storefront.
+      </p>
+    );
+  }
+  return (
+    <div className="mt-4 flex flex-col items-center gap-2 text-sm">
+      <p className="text-vibe-text-muted">
+        Contact {storeName} ({contact.display}) — reference{" "}
+        <strong className="text-vibe-text">{reference}</strong>
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={contact.waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="min-h-11 inline-flex items-center font-medium text-vibe-primary underline underline-offset-2"
+        >
+          WhatsApp
+        </a>
+        <a
+          href={contact.telUrl}
+          className="min-h-11 inline-flex items-center font-medium text-vibe-primary underline underline-offset-2"
+        >
+          Call
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function StoreOfflineBanner({ status }: { status: string }) {
+  if (status === "published") return null;
+  return (
+    <p
+      className="mb-4 rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2 text-center text-xs text-vibe-text-muted"
+      role="status"
+    >
+      This storefront is temporarily offline. Your order still exists — you can
+      use this page to pay or check status.
+    </p>
+  );
+}
+
 export function OrderStatusPageContent({
   slug,
   data,
@@ -145,6 +205,15 @@ export function OrderStatusPageContent({
     if (notifyState?.success) router.refresh();
   }, [notifyState, router]);
 
+  // Lightweight poll while waiting for seller verification (no websockets)
+  useEffect(() => {
+    if (!awaiting) return;
+    const id = setInterval(() => {
+      router.refresh();
+    }, 8_000);
+    return () => clearInterval(id);
+  }, [awaiting, router]);
+
   async function handleSaveQr() {
     const svg = qrRef.current?.querySelector("svg");
     if (!svg) return;
@@ -178,10 +247,16 @@ export function OrderStatusPageContent({
 
     return (
       <StatusShell title={title} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
+        <StoreOfflineBanner status={store.status} />
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
           {store.name} has verified your payment. Your order is being prepared.
         </p>
         <OrderReceipt data={data} showPaidLabel atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
+        <SellerContact
+          storeName={store.name}
+          paynow={store.paynow}
+          reference={order.reference}
+        />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to check your order status any time.
         </p>
@@ -192,12 +267,17 @@ export function OrderStatusPageContent({
   if (view === "cancelled") {
     return (
       <StatusShell title="Order cancelled" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
+        <StoreOfflineBanner status={store.status} />
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
-          This order was cancelled. If you have questions, contact {store.name}{" "}
-          with reference{" "}
-          <strong className="text-vibe-text">{order.reference}</strong>.
+          This order was cancelled. If you have questions, reach out to the
+          seller with your order reference.
         </p>
         <OrderReceipt data={data} showPaidLabel={false} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
+        <SellerContact
+          storeName={store.name}
+          paynow={store.paynow}
+          reference={order.reference}
+        />
       </StatusShell>
     );
   }
@@ -205,11 +285,17 @@ export function OrderStatusPageContent({
   if (awaiting) {
     return (
       <StatusShell title="Awaiting seller verification" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
+        <StoreOfflineBanner status={store.status} />
         <p className="mb-6 max-w-sm text-sm leading-relaxed text-vibe-text-muted">
-          The seller will verify your payment manually. Check back on this page
-          for updates — your order is not confirmed until they verify payment.
+          The seller will verify your payment manually. This page refreshes
+          automatically — your order is not confirmed until they verify payment.
         </p>
         <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
+        <SellerContact
+          storeName={store.name}
+          paynow={store.paynow}
+          reference={order.reference}
+        />
         <p className="mt-6 text-xs text-vibe-text-muted">
           Bookmark this page to see when your order is confirmed.
         </p>
@@ -220,11 +306,40 @@ export function OrderStatusPageContent({
   if (view === "expired" || countdown.expired) {
     return (
       <StatusShell title="Payment window expired" atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada}>
+        <StoreOfflineBanner status={store.status} />
         <p className="mb-6 max-w-sm text-sm text-vibe-text-muted">
-          If you already paid, contact {store.name} with your order reference{" "}
-          <strong className="text-vibe-text">{order.reference}</strong>.
+          If you already paid, contact the seller with your order reference so
+          they can verify payment.
         </p>
         <OrderReceipt data={data} atelier={atelier} expedition={expedition} cyberpunk={cyberpunk} candyland={candyland} market={market} gallery={gallery} studio={studio} laura={laura} atlantic={atlantic} strada={strada} />
+        <SellerContact
+          storeName={store.name}
+          paynow={store.paynow}
+          reference={order.reference}
+        />
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <Link
+            href="/"
+            className={cn(
+              "vibe-display inline-flex min-h-11 items-center justify-center rounded-[var(--vibe-radius)] bg-vibe-primary px-6 py-3 text-sm font-semibold text-vibe-primary-fg uppercase",
+              atelier && "checkout-atelier-cta",
+              expedition && "checkout-expedition-cta",
+              cyberpunk && "checkout-cyberpunk-cta",
+              candyland && "checkout-candyland-cta",
+              market && "checkout-market-cta",
+              gallery && "checkout-gallery-cta",
+              studio && "checkout-studio-cta",
+              laura && "checkout-laura-cta",
+              atlantic && "checkout-atlantic-cta",
+              strada && "checkout-strada-cta",
+            )}
+          >
+            Back to shop
+          </Link>
+          <p className="text-xs text-vibe-text-muted">
+            Start a new order from the catalogue if you still want to buy.
+          </p>
+        </div>
       </StatusShell>
     );
   }
@@ -245,6 +360,7 @@ export function OrderStatusPageContent({
           strada && "pay-strada",
       )}
     >
+      <StoreOfflineBanner status={store.status} />
       <div className="text-center">
         <p
           className={cn(
@@ -317,10 +433,17 @@ export function OrderStatusPageContent({
           </p>
         </div>
       ) : (
-        <p className="text-center text-sm text-vibe-text-muted">
-          Payment QR unavailable. Contact the seller with reference{" "}
-          {order.reference}.
-        </p>
+        <div className="text-center">
+          <p className="text-sm text-vibe-text-muted">
+            Payment QR unavailable. Contact the seller with your order
+            reference.
+          </p>
+          <SellerContact
+            storeName={store.name}
+            paynow={store.paynow}
+            reference={order.reference}
+          />
+        </div>
       )}
 
       {payload && (
@@ -423,6 +546,12 @@ export function OrderStatusPageContent({
       >
         {notifyPending ? "Notifying…" : "Notify seller to verify payment"}
       </button>
+
+      <SellerContact
+        storeName={store.name}
+        paynow={store.paynow}
+        reference={order.reference}
+      />
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent

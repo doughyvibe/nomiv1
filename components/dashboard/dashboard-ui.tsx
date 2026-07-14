@@ -186,14 +186,15 @@ export function DashboardEmptyState({
   );
 }
 
-/** Primary pill CTA — matches login Google button (warm ink). */
+/** Primary pill CTA — warm ink (marketing / recovery actions). */
 export function BrandCta({
   className,
+  type = "button",
   children,
   ...props
 }: React.ComponentProps<"button">) {
   return (
-    <button type="button" className={cn("btn-brand-dark", className)} {...props}>
+    <button type={type} className={cn("btn-brand-dark", className)} {...props}>
       {children}
     </button>
   );
@@ -202,16 +203,43 @@ export function BrandCta({
 /** Secondary pill — outline on white card. */
 export function BrandCtaOutline({
   className,
+  type = "button",
   children,
   ...props
 }: React.ComponentProps<"button">) {
   return (
     <button
-      type="button"
+      type={type}
       className={cn("btn-brand-outline", className)}
       {...props}
     >
       {children}
     </button>
+  );
+}
+
+/** Link styled as primary brand pill. */
+export function BrandLink({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof Link>) {
+  return (
+    <Link className={cn("btn-brand-dark no-underline", className)} {...props}>
+      {children}
+    </Link>
+  );
+}
+
+/** Link styled as outline brand pill. */
+export function BrandLinkOutline({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof Link>) {
+  return (
+    <Link className={cn("btn-brand-outline no-underline", className)} {...props}>
+      {children}
+    </Link>
   );
 }

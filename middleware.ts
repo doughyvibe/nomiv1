@@ -57,7 +57,10 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     const suffix = pathname === "/" ? "" : pathname;
     url.pathname = `/s/${slug}${suffix}`;
-    return NextResponse.rewrite(url);
+    // Request header so the storefront layout can allow /order/* when unpublished
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-nomi-pathname", url.pathname);
+    return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
   }
 
   return NextResponse.next();

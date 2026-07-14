@@ -153,7 +153,7 @@ export const VIBES: VibeMeta[] = [
       primary: "rgb(233 231 120)",
       secondary: "rgb(36 31 33)",
     },
-    provisional: true,
+    provisional: false,
   },
 ];
 

@@ -56,6 +56,14 @@ export function OrdersListView({
                 </a>
               </>
             ) : null}
+            {statusFilter !== "all" ? (
+              <Link
+                href="/orders"
+                className="btn-brand-outline inline-flex h-11 items-center px-5"
+              >
+                Clear filter
+              </Link>
+            ) : null}
           </DashboardEmptyState>
         </DashboardPanel>
       ) : (

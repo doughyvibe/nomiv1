@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 
 import { createOrderAction } from "@/app/(storefront)/s/[slug]/actions";
@@ -11,6 +11,7 @@ import { useStorefront } from "@/components/storefront/storefront-context";
 import { clearCart } from "@/lib/cart/storage";
 import { formatPrice } from "@/lib/money";
 import type { FulfillmentConfig } from "@/lib/stores/types";
+import { paynowIsComplete } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
 export function CheckoutForm({ slug }: { slug: string }) {
@@ -18,6 +19,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
   const { cart } = useCart();
   const { store, products } = useStorefront();
   const fulfillment = store.fulfillment as FulfillmentConfig;
+  const paynowReady = paynowIsComplete(store.paynow);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const atelier = store.vibe === "atelier";
   const expedition = store.vibe === "expedition";
   const cyberpunk = store.vibe === "cyberpunk";
@@ -49,6 +52,14 @@ export function CheckoutForm({ slug }: { slug: string }) {
   const pickupEnabled = Boolean(fulfillment.pickup?.enabled);
   const deliveryEnabled = Boolean(fulfillment.delivery?.enabled);
   const deliveryFee = fulfillment.delivery?.fee_cents ?? 0;
+  const defaultMethod = pickupEnabled
+    ? "pickup"
+    : deliveryEnabled
+      ? "delivery"
+      : "pickup";
+  const [method, setMethod] = useState<"pickup" | "delivery">(defaultMethod);
+  const appliedDelivery = method === "delivery" ? deliveryFee : 0;
+  const totalDue = subtotal + appliedDelivery;
 
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
@@ -61,26 +72,61 @@ export function CheckoutForm({ slug }: { slug: string }) {
     null,
   );
 
+  useEffect(() => {
+    if (state?.error) {
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      errorRef.current?.focus();
+    }
+  }, [state?.error]);
+
   const staleCount = cart.items.length - lines.length;
 
   if (lines.length === 0) {
     return (
-      <div className="px-5 py-16 text-center sm:px-6">
-        <p className="text-vibe-text-muted">Your cart is empty.</p>
+      <div className="flex flex-col items-center px-5 py-16 text-center sm:px-6">
+        <p
+          className={cn(
+            "vibe-display font-display text-lg font-bold uppercase",
+            strada && "checkout-strada-title",
+          )}
+        >
+          Your cart is empty
+        </p>
+        <p className="mt-2 max-w-xs text-sm text-vibe-text-muted">
+          Add something from the shop, then come back to check out.
+        </p>
+        <Link
+          href="/"
+          className={cn(
+            "vibe-display mt-8 inline-flex rounded-[var(--vibe-radius)] bg-vibe-primary px-6 py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase",
+            atelier && "checkout-atelier-cta",
+            expedition && "checkout-expedition-cta",
+            cyberpunk && "checkout-cyberpunk-cta",
+            candyland && "checkout-candyland-cta",
+            market && "checkout-market-cta",
+            gallery && "checkout-gallery-cta",
+            studio && "checkout-studio-cta",
+            laura && "checkout-laura-cta",
+            atlantic && "checkout-atlantic-cta",
+            strada && "checkout-strada-cta",
+          )}
+        >
+          Continue shopping
+        </Link>
         <Link
           href="/cart"
           className={cn(
-            "mt-4 inline-flex min-h-11 items-center gap-1.5 text-vibe-primary",
+            "mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm text-vibe-text-muted",
             atelier && "checkout-atelier-back",
             expedition && "checkout-expedition-back",
             cyberpunk && "checkout-cyberpunk-back",
             candyland && "checkout-candyland-back",
-          market && "checkout-market-back",
-          gallery && "checkout-gallery-back",
-          studio && "checkout-studio-back",
-          laura && "checkout-laura-back",
-          atlantic && "checkout-atlantic-back",
-          strada && "checkout-strada-back",
+            market && "checkout-market-back",
+            gallery && "checkout-gallery-back",
+            studio && "checkout-studio-back",
+            laura && "checkout-laura-back",
+            atlantic && "checkout-atlantic-back",
+            strada && "checkout-strada-back",
           )}
         >
           <ArrowLeft className="size-3.5" aria-hidden />
@@ -89,12 +135,6 @@ export function CheckoutForm({ slug }: { slug: string }) {
       </div>
     );
   }
-
-  const defaultMethod = pickupEnabled
-    ? "pickup"
-    : deliveryEnabled
-      ? "delivery"
-      : "pickup";
 
   return (
     <form
@@ -146,11 +186,22 @@ export function CheckoutForm({ slug }: { slug: string }) {
           laura && "checkout-laura-title",
           atlantic && "checkout-atlantic-title",
           strada && "checkout-strada-title",
-          )}
+            )}
         >
           Checkout
         </h1>
       </div>
+
+      {state?.error ? (
+        <p
+          ref={errorRef}
+          tabIndex={-1}
+          className="rounded-[var(--vibe-radius)] border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400 outline-none"
+          role="alert"
+        >
+          {state.error}
+        </p>
+      ) : null}
 
       <input type="hidden" name="cart" value={JSON.stringify(cart.items)} />
 
@@ -207,10 +258,6 @@ export function CheckoutForm({ slug }: { slug: string }) {
             </li>
           ))}
         </ul>
-        <div className="mt-3 flex justify-between border-t border-vibe-border/30 pt-3 text-sm font-medium">
-          <span>Subtotal</span>
-          <span>{formatPrice(subtotal)}</span>
-        </div>
       </section>
 
       {(pickupEnabled || deliveryEnabled) && (
@@ -252,7 +299,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 type="radio"
                 name="fulfillment_method"
                 value="pickup"
-                defaultChecked={defaultMethod === "pickup"}
+                checked={method === "pickup"}
+                onChange={() => setMethod("pickup")}
                 className={cn("mt-1", atelier && "checkout-atelier-radio",
                   expedition && "checkout-expedition-radio",
                   cyberpunk && "checkout-cyberpunk-radio",
@@ -301,7 +349,8 @@ export function CheckoutForm({ slug }: { slug: string }) {
                 type="radio"
                 name="fulfillment_method"
                 value="delivery"
-                defaultChecked={defaultMethod === "delivery"}
+                checked={method === "delivery"}
+                onChange={() => setMethod("delivery")}
                 className={cn("mt-1", atelier && "checkout-atelier-radio",
                   expedition && "checkout-expedition-radio",
                   cyberpunk && "checkout-cyberpunk-radio",
@@ -332,6 +381,40 @@ export function CheckoutForm({ slug }: { slug: string }) {
           )}
         </fieldset>
       )}
+
+      <section
+        className={cn(
+          "metal-panel rust-edge rounded-[var(--vibe-radius)] p-4",
+          atelier && "checkout-atelier-panel",
+          expedition && "checkout-expedition-panel",
+          cyberpunk && "checkout-cyberpunk-panel",
+          candyland && "checkout-candyland-panel",
+          market && "checkout-market-panel",
+          gallery && "checkout-gallery-panel",
+          studio && "checkout-studio-panel",
+          laura && "checkout-laura-panel",
+          atlantic && "checkout-atlantic-panel",
+          strada && "checkout-strada-panel",
+        )}
+        aria-live="polite"
+      >
+        <div className="space-y-1.5 text-sm">
+          <div className="flex justify-between text-vibe-text-muted">
+            <span>Subtotal</span>
+            <span>{formatPrice(subtotal)}</span>
+          </div>
+          {method === "delivery" && (
+            <div className="flex justify-between text-vibe-text-muted">
+              <span>Delivery</span>
+              <span>{formatPrice(appliedDelivery)}</span>
+            </div>
+          )}
+          <div className="flex justify-between border-t border-vibe-border/30 pt-2 font-medium text-vibe-text">
+            <span>Total due</span>
+            <span>{formatPrice(totalDue)}</span>
+          </div>
+        </div>
+      </section>
 
       <section className="flex flex-col gap-4">
         <h2
@@ -419,14 +502,19 @@ export function CheckoutForm({ slug }: { slug: string }) {
           strada && "checkout-strada-input",
             )}
           />
+          <span className="text-[11px] text-vibe-text-muted">
+            So the seller can reach you about this order. Bookmark the next page
+            for your receipt and status.
+          </span>
         </label>
-        {deliveryEnabled && (
+        {deliveryEnabled && method === "delivery" && (
           <label className="flex flex-col gap-1.5">
             <span className="text-xs text-vibe-text-muted">
               Delivery address
             </span>
             <textarea
               name="delivery_address"
+              required
               rows={2}
               className={cn(
                 "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
@@ -468,15 +556,25 @@ export function CheckoutForm({ slug }: { slug: string }) {
         </label>
       </section>
 
-      {state?.error && (
-        <p className="text-sm text-red-400" role="alert">
-          {state.error}
+      {!paynowReady && (
+        <p
+          className="rounded-[var(--vibe-radius)] border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-vibe-text"
+          role="alert"
+        >
+          This store isn&apos;t ready to take PayNow payments yet. Please
+          contact the seller.
         </p>
       )}
 
+      {paynowReady ? (
+        <p className="text-center text-xs text-vibe-text-muted">
+          Next: PayNow QR → pay the exact amount → notify the seller to verify.
+        </p>
+      ) : null}
+
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || !paynowReady}
         className={cn(
           "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-60",
           atelier && "checkout-atelier-cta",

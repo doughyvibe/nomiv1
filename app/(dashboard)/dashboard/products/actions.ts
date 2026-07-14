@@ -195,6 +195,19 @@ export async function setFeaturedProductAction(
   if ("error" in ctx) return ctx;
 
   const { supabase, store } = ctx;
+
+  // Toggle off if this product is already featured
+  if (store.featured_product_id === productId) {
+    const { error } = await supabase
+      .from("stores")
+      .update({ featured_product_id: null })
+      .eq("id", store.id);
+    if (error) return { error: friendlyDbError(error) };
+    revalidatePath("/dashboard/products");
+    revalidatePath(`/s/${store.slug}`);
+    return { success: true };
+  }
+
   const { data: product } = await supabase
     .from("products")
     .select("id")

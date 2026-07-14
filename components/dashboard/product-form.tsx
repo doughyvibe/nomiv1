@@ -12,6 +12,7 @@ import { collectCategories, normalizeCategory } from "@/lib/products/category";
 import { parsePriceToCents, type ProductInput } from "@/lib/products/validate";
 import type { TradeHint } from "@/lib/stores/types";
 import { createClient } from "@/lib/supabase/client";
+import { useSavedFlash } from "@/lib/ui/use-saved-flash";
 
 type ProductFormProps = {
   initial?: Partial<ProductInput>;
@@ -48,8 +49,10 @@ export function ProductForm({
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<"name" | "price" | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { flashSaved, saveLabel } = useSavedFlash();
 
   async function handleImage(file: File | undefined) {
     if (!file) return;
@@ -73,8 +76,17 @@ export function ProductForm({
   function handleSave() {
     setError(null);
     setToast(null);
+    setFieldError(null);
+
+    if (!name.trim()) {
+      setFieldError("name");
+      setError("Product name is required");
+      return;
+    }
+
     const priceCents = parsePriceToCents(price);
     if (priceCents == null) {
+      setFieldError("price");
       setError("Enter a valid price, e.g. 9.50");
       return;
     }
@@ -91,6 +103,8 @@ export function ProductForm({
         setError(result.error);
         return;
       }
+
+      flashSaved();
 
       if (result.filtersLive && result.categories?.length) {
         const preview = storeSlug ? getStorefrontUrl(storeSlug) : null;
@@ -117,6 +131,8 @@ export function ProductForm({
           placeholder="Signature item"
           maxLength={80}
           disabled={disabled}
+          aria-invalid={fieldError === "name" || undefined}
+          aria-describedby={error && fieldError === "name" ? "product-form-error" : undefined}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -128,6 +144,8 @@ export function ProductForm({
           onChange={(e) => setPrice(e.target.value)}
           placeholder="9.50"
           disabled={disabled}
+          aria-invalid={fieldError === "price" || undefined}
+          aria-describedby={error && fieldError === "price" ? "product-form-error" : undefined}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -152,7 +170,7 @@ export function ProductForm({
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <Label>Category</Label>
+        <Label htmlFor="product-category">Category</Label>
         <CategoryPicker
           value={category}
           onChange={setCategory}
@@ -181,13 +199,13 @@ export function ProductForm({
       </div>
 
       {error && (
-        <p className="text-destructive text-sm" role="alert">
+        <p id="product-form-error" className="text-destructive text-sm" role="alert">
           {error}
         </p>
       )}
 
       {toast && (
-        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900" role="status">
           {toast}
           {storeSlug ? (
             <>
@@ -211,8 +229,10 @@ export function ProductForm({
         disabled={
           disabled || pending || uploading || !name.trim() || !price.trim()
         }
+        className="rounded-full"
+        aria-live="polite"
       >
-        {pending ? "Saving…" : submitLabel}
+        {saveLabel(pending, submitLabel)}
       </Button>
     </div>
   );

@@ -1,6 +1,7 @@
-import type { PayNowConfig } from "@/lib/stores/types";
+import type { PayNowConfig, Store, Vibe } from "@/lib/stores/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import { orderStoreAllowsBuyerAccess } from "./seller-contact";
 import type { OrderItemRow, OrderRow } from "./types";
 
 export type { OrderItemRow, OrderRow } from "./types";
@@ -11,6 +12,7 @@ export type OrderStore = {
   name: string;
   paynow: Partial<PayNowConfig>;
   status: string;
+  vibe?: Vibe | null;
 };
 
 export type LoadedOrder = {
@@ -36,11 +38,14 @@ export async function getOrderForPayment(
 
   const { data: store } = await admin
     .from("stores")
-    .select("id, slug, name, paynow, status")
+    .select("id, slug, name, paynow, status, vibe")
     .eq("id", order.store_id)
     .single<OrderStore>();
 
-  if (!store || store.slug !== slug || store.status !== "published") return null;
+  // Existing orders stay reachable after unpublish (catalogue still gated).
+  if (!store || store.slug !== slug || !orderStoreAllowsBuyerAccess(store.status)) {
+    return null;
+  }
 
   const { data: items } = await admin
     .from("order_items")
@@ -48,4 +53,22 @@ export async function getOrderForPayment(
     .eq("order_id", order.id);
 
   return { order, store, items: (items as OrderItemRow[]) ?? [] };
+}
+
+/**
+ * Minimal storefront chrome for order pages when the shop is unpublished.
+ * Catalogue stays blocked by the published gate; products intentionally empty.
+ */
+export async function getOrderStorefrontChrome(
+  slug: string,
+): Promise<{ store: Store; products: [] } | null> {
+  const admin = createAdminClient();
+  const { data: store } = await admin
+    .from("stores")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle<Store>();
+
+  if (!store || !orderStoreAllowsBuyerAccess(store.status)) return null;
+  return { store, products: [] };
 }

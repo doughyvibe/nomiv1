@@ -93,6 +93,7 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
           placeholder="Sarah Bakes"
           maxLength={60}
           autoFocus
+          aria-invalid={Boolean(error && !name.trim()) || undefined}
         />
       </div>
 
@@ -108,6 +109,8 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
             }}
             placeholder="sarahbakes"
             className="flex-1"
+            aria-invalid={check && !check.available ? true : undefined}
+            aria-describedby="store-slug-status"
           />
           <span className="text-sm whitespace-nowrap text-muted-foreground">
             .{rootDomain}
@@ -115,7 +118,7 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
         </div>
 
         {slug && (
-          <p className="text-sm" aria-live="polite">
+          <p id="store-slug-status" className="text-sm" aria-live="polite">
             {checking ? (
               <span className="text-muted-foreground">Checking…</span>
             ) : check?.available ? (
@@ -147,9 +150,13 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
         )}
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
 
-      <Button onClick={handleContinue} disabled={!canContinue}>
+      <Button onClick={handleContinue} disabled={!canContinue} className="rounded-full">
         {pending ? "Claiming…" : "Continue"}
       </Button>
     </section>

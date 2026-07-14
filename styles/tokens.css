@@ -16,8 +16,9 @@
   --dashboard-border: 228 228 231;
   --dashboard-fg: 24 24 27;
   --dashboard-muted: 113 113 122;
-  --dashboard-primary: 13 148 136;
-  --dashboard-primary-fg: 255 255 255;
+  /* Brand yellow (Warm Tactile) — was teal v1 residue */
+  --dashboard-primary: 247 197 24;
+  --dashboard-primary-fg: 22 19 14;
   --dashboard-radius: 0.5rem;
 
   /* Storefront vibe defaults (overridden per vibe on [data-surface="storefront"]) */
@@ -210,6 +211,13 @@
   pointer-events: none;
 }
 
+[data-brand] .btn-brand-dark:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent),
+    0 0 0 1px var(--ring);
+}
+
 [data-brand] .btn-brand-outline {
   display: inline-flex;
   height: 2.75rem;
@@ -230,6 +238,13 @@
 
 [data-brand] .btn-brand-outline:hover {
   background: var(--accent);
+}
+
+[data-brand] .btn-brand-outline:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent),
+    0 0 0 1px var(--ring);
 }
 
 [data-brand] .btn-brand-outline:active {

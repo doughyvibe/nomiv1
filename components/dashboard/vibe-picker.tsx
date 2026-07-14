@@ -16,9 +16,12 @@ const SAMPLE_HERO = {
   order: ["eyebrow", "title", "subheading"] as const,
 };
 
+/** Neutral samples — avoid trade-specific fishing names during empty onboarding. */
 const FALLBACK_PRODUCTS = [
-  { name: "Black Gold Slayer", price_cents: 950, image_url: null, category: "Metal Jigs" },
-  { name: "Deep Assist Hook", price_cents: 1250, image_url: null, category: "Assist Hooks" },
+  { name: "Signature item", price_cents: 1800, image_url: null, category: "Bestsellers" },
+  { name: "Everyday pick", price_cents: 1200, image_url: null, category: "Shop" },
+  { name: "Gift set", price_cents: 3200, image_url: null, category: "Gifts" },
+  { name: "Add-on", price_cents: 600, image_url: null, category: "Extras" },
 ];
 
 type VibePickerProps = {
@@ -56,10 +59,14 @@ export function VibePicker({
     });
   }
 
-  const previewProducts = products.length > 0 ? products.slice(0, 4) : FALLBACK_PRODUCTS;
+  const previewProducts =
+    products.length > 0 ? products.slice(0, 4) : FALLBACK_PRODUCTS;
 
   return (
     <div className="flex flex-col gap-4">
+      <p className="text-muted-foreground text-xs sm:hidden">
+        Swipe sideways to browse vibes →
+      </p>
       <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
         {VIBES.map((vibe) => (
           <div
@@ -72,26 +79,27 @@ export function VibePicker({
             <MiniPreview
               vibe={vibe.id}
               storeName={store.name}
-              hero={{ ...SAMPLE_HERO, title: store.name, order: [...SAMPLE_HERO.order] }}
+              hero={{
+                ...SAMPLE_HERO,
+                title: store.name,
+                order: [...SAMPLE_HERO.order],
+              }}
               products={previewProducts}
               store={store}
             />
             <div>
-              <p className="font-semibold">
-                {vibe.name}
-                {vibe.provisional ? (
-                  <span className="text-muted-foreground ml-2 text-[10px] font-medium tracking-wide uppercase">
-                    Preview
-                  </span>
-                ) : null}
-              </p>
+              <p className="font-semibold">{vibe.name}</p>
               <p className="text-muted-foreground text-xs">{vibe.tagline}</p>
+              <p className="text-muted-foreground mt-1 text-[11px] leading-snug">
+                Best for: {vibe.suitableFor}
+              </p>
             </div>
             <Button
               type="button"
               onClick={() => handleUseVibe(vibe.id)}
               disabled={pending}
               variant={selected === vibe.id ? "default" : "outline"}
+              className="rounded-full"
             >
               {pending && selected === vibe.id
                 ? "Saving…"

@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { normalizeCategory } from "@/lib/products/category";
 import { categorySuggestions } from "@/lib/trade-hint";
 import type { TradeHint } from "@/lib/stores/types";
@@ -25,7 +26,11 @@ export function CategoryPicker({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label="Category suggestions"
+      >
         {suggestions.map((cat) => {
           const selected =
             normalizedValue.toLowerCase() === cat.toLowerCase();
@@ -34,9 +39,10 @@ export function CategoryPicker({
               key={cat}
               type="button"
               disabled={disabled}
+              aria-pressed={selected}
               onClick={() => onChange(selected ? "" : cat)}
               className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors min-h-9",
+                "min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
                 selected
                   ? "border-foreground bg-primary text-foreground"
                   : "border-border bg-card text-muted-foreground hover:border-foreground/30",
@@ -47,14 +53,15 @@ export function CategoryPicker({
           );
         })}
       </div>
-      <input
+      <Input
+        id="product-category"
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Or type a custom category"
         maxLength={40}
         disabled={disabled}
-        className="h-11 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+        aria-label="Custom category"
       />
       <p className="text-muted-foreground text-xs">
         Categories group your storefront menu. Add a second category to enable

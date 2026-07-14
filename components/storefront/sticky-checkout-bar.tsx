@@ -5,19 +5,16 @@ import { ShoppingCart } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
+import { availableCartSummary } from "@/lib/cart/storage";
 import { formatPrice } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
 export function StickyCheckoutBar() {
-  const { count, cart } = useCart();
+  const { cart } = useCart();
   const { products } = useStorefront();
 
-  const productMap = new Map(products.map((p) => [p.id, p]));
-  const subtotal = cart.items.reduce((sum, item) => {
-    const product = productMap.get(item.productId);
-    return sum + (product ? product.price_cents * item.quantity : 0);
-  }, 0);
-
+  const priceById = new Map(products.map((p) => [p.id, p.price_cents]));
+  const { count, subtotalCents } = availableCartSummary(cart.items, priceById);
   const hasItems = count > 0;
 
   return (
@@ -50,7 +47,7 @@ export function StickyCheckoutBar() {
                 {count} {count === 1 ? "item" : "items"}
               </span>
               <span className="font-display text-xl font-semibold text-vibe-text-bright">
-                {formatPrice(subtotal)}
+                {formatPrice(subtotalCents)}
               </span>
             </>
           ) : (

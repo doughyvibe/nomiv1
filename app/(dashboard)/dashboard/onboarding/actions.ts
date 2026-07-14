@@ -42,6 +42,42 @@ async function getOwnedStore() {
   return { supabase, user, store };
 }
 
+const VALID_TRADE_HINTS: TradeHint[] = [
+  "general",
+  "food",
+  "handmade",
+  "services",
+  "plants",
+];
+
+/** Shared name + trade hint update (onboarding / settings). */
+export async function updateStoreIdentity(input: {
+  name: string;
+  tradeHint: TradeHint | null;
+}): Promise<ActionResult> {
+  const trimmedName = input.name.trim();
+  if (!trimmedName) return { ok: false, error: "Store name is required" };
+  if (trimmedName.length > 60) {
+    return { ok: false, error: "Store name must be at most 60 characters" };
+  }
+  if (input.tradeHint !== null && !VALID_TRADE_HINTS.includes(input.tradeHint)) {
+    return { ok: false, error: "Invalid store type" };
+  }
+
+  const { supabase, store } = await getOwnedStore();
+  if (!store) return { ok: false, error: "No store yet" };
+
+  const { error } = await supabase
+    .from("stores")
+    .update({
+      name: trimmedName,
+      trade_hint: input.tradeHint,
+    })
+    .eq("id", store.id);
+
+  return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
+}
+
 // ---------------------------------------------------------------------------
 // Step 1 — slug check + store creation
 // ---------------------------------------------------------------------------
@@ -156,14 +192,7 @@ export async function saveVibe(vibe: Vibe): Promise<ActionResult> {
 export async function saveTradeHint(
   tradeHint: TradeHint,
 ): Promise<ActionResult> {
-  const valid: TradeHint[] = [
-    "general",
-    "food",
-    "handmade",
-    "services",
-    "plants",
-  ];
-  if (!valid.includes(tradeHint)) {
+  if (!VALID_TRADE_HINTS.includes(tradeHint)) {
     return { ok: false, error: "Invalid store type" };
   }
 

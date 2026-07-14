@@ -11,7 +11,8 @@
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "test:paynow": "tsx --test lib/paynow/build-payload.test.ts",
-    "test:orders": "tsx --test lib/orders/contact-buyer.test.ts lib/orders/status.test.ts lib/orders/confirmation-message.test.ts lib/orders/status-transitions.test.ts",
+    "test:orders": "tsx --test lib/orders/contact-buyer.test.ts lib/orders/status.test.ts lib/orders/confirmation-message.test.ts lib/orders/status-transitions.test.ts lib/orders/seller-contact.test.ts",
+    "test:cart": "tsx --test lib/cart/storage.test.ts",
     "generate:vapid": "npx web-push generate-vapid-keys",
     "lint": "eslint"
   },

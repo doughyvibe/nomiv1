@@ -1,6 +1,7 @@
 import {
   saveFulfillmentAction,
   savePayNowAction,
+  saveStoreIdentityAction,
 } from "@/app/(dashboard)/dashboard/settings/actions";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { FulfillmentForm } from "@/components/dashboard/fulfillment-form";
@@ -12,10 +13,11 @@ import {
 } from "@/components/dashboard/dashboard-ui";
 import { PayNowForm } from "@/components/dashboard/paynow-form";
 import { PushAlertsSettings } from "@/components/dashboard/push-alerts-settings";
+import { StoreIdentityForm } from "@/components/dashboard/store-identity-form";
 import { StoreStatusSettings } from "@/components/dashboard/store-status-settings";
 import { listUserPushSubscriptions } from "@/lib/push/subscriptions";
 import { getVapidPublicKey } from "@/lib/push/vapid";
-import { storePublishReadiness } from "@/lib/stores/publish-readiness";
+import { storePublishIssues } from "@/lib/stores/publish-readiness";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
 import type { Metadata } from "next";
@@ -37,20 +39,27 @@ export default async function SettingsPage() {
     user ? listUserPushSubscriptions(supabase, user.id) : Promise.resolve([]),
   ]);
 
-  const { issues: publishIssues } = storePublishReadiness(
-    store,
-    productCount ?? 0,
-  );
+  const publishIssues = storePublishIssues(store, productCount ?? 0);
 
   return (
     <div className="flex flex-col gap-8">
       <DashboardPageHeader
         eyebrow={store.name}
         title="Settings"
-        description="Fulfillment, PayNow, store status, and notifications."
+        description="Store identity, fulfillment, PayNow, status, and notifications."
       />
 
       <div className="flex flex-col gap-5">
+        <DashboardPanel>
+          <DashboardPanelHeader
+            title="Store identity"
+            description="Name, link, and what you sell"
+          />
+          <DashboardPanelBody>
+            <StoreIdentityForm store={store} onSave={saveStoreIdentityAction} />
+          </DashboardPanelBody>
+        </DashboardPanel>
+
         <DashboardPanel>
           <DashboardPanelHeader
             title="Store status"
@@ -95,7 +104,10 @@ export default async function SettingsPage() {
         </DashboardPanel>
       </div>
 
-      <div className="flex flex-col gap-4 border-t border-border pt-6 lg:hidden">
+      <div className="flex flex-col gap-2 border-t border-border pt-6 lg:hidden">
+        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          Account
+        </p>
         <SignOutButton className="w-full" />
       </div>
     </div>
