@@ -24,6 +24,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const studio = store.vibe === "studio";
   const laura = store.vibe === "laura";
   const atlantic = store.vibe === "atlantic";
+  const vows = store.vibe === "vows";
   const strada = store.vibe === "strada";
 
   function handleAdd() {
@@ -45,6 +46,7 @@ export function ProductDetail({ product }: { product: Product }) {
           studio && "pdp-studio",
           laura && "pdp-laura",
           atlantic && "pdp-atlantic",
+          vows && "pdp-vows",
           strada && "pdp-strada",
       )}
     >
@@ -62,6 +64,7 @@ export function ProductDetail({ product }: { product: Product }) {
           studio && "pdp-studio-back",
           laura && "pdp-laura-back",
           atlantic && "pdp-atlantic-back",
+          vows && "pdp-vows-back",
           strada && "pdp-strada-back",
           )}
         >
@@ -121,6 +124,7 @@ export function ProductDetail({ product }: { product: Product }) {
           studio && "pdp-studio-title",
           laura && "pdp-laura-title",
           atlantic && "pdp-atlantic-title",
+          vows && "pdp-vows-title",
           strada && "pdp-strada-title",
             )}
           >
@@ -139,6 +143,7 @@ export function ProductDetail({ product }: { product: Product }) {
           studio && "pdp-studio-price",
           laura && "pdp-laura-price",
           atlantic && "pdp-atlantic-price",
+          vows && "pdp-vows-price",
           strada && "pdp-strada-price",
             )}
           >

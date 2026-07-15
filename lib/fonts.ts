@@ -3,6 +3,7 @@ import {
   Chivo,
   DM_Sans,
   EB_Garamond,
+  Fredoka,
   Hanken_Grotesk,
   Inter,
   JetBrains_Mono,
@@ -84,10 +85,18 @@ export const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-/** Candyland — display (docs/candyland_storefront) */
+/** Candyland — labels / prices / CTAs */
 export const leagueSpartan = League_Spartan({
   subsets: ["latin"],
   variable: "--font-league-spartan",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/** Candyland — friendly display (store name, product titles) */
+export const fredoka = Fredoka({
+  subsets: ["latin"],
+  variable: "--font-fredoka",
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });

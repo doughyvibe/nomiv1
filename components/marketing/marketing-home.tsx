@@ -1,88 +1,23 @@
-import { ArrowRight, Bell, Check, Percent, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
-import { FlowStepsVisual } from "@/components/marketing/flow-steps-visual";
 import { PayNowQrCard } from "@/components/marketing/paynow-qr-card";
 import { Reveal } from "@/components/marketing/reveal";
-import { Wordmark } from "@/components/marketing/wordmark";
-import { MiniPreview } from "@/components/storefront/mini-preview";
-import { getLoginUrl, getStorefrontUrl } from "@/lib/host";
-import { getDemoStoreSlug } from "@/lib/marketing/demo-store";
-import type { Vibe } from "@/lib/stores/types";
+import { SpineLink } from "@/components/marketing/spine-link";
+import { StoreTour } from "@/components/marketing/store-tour";
+import { getLoginUrl, getMarketingUrl } from "@/lib/host";
 
-const PREVIEW_VIBE: Vibe = "strada";
-
-const PREVIEW_PRODUCTS = [
-  {
-    name: "Black Gold Slayer",
-    price_cents: 950,
-    image_url: null,
-    category: "Metal Jigs",
-  },
-  {
-    name: "Deep Assist Hook",
-    price_cents: 1250,
-    image_url: null,
-    category: "Assist Hooks",
-  },
-  {
-    name: "Tide Runner",
-    price_cents: 1450,
-    image_url: null,
-    category: "Metal Jigs",
-  },
-  {
-    name: "Reef King",
-    price_cents: 890,
-    image_url: null,
-    category: "Assist Hooks",
-  },
-];
-
-const MARQUEE_ITEMS = [
-  "Made for SG sellers",
-  "One simple link",
-  "Browse catalogue",
-  "Easy add to cart",
-  "PayNow-ready checkout",
-];
-
-const PAYNOW_BENEFITS = [
-  {
-    Icon: Percent,
-    tint: "bg-primary text-foreground",
-    title: "0% transaction fees",
-    body: "No processing cut — the full amount lands in your pocket.",
-  },
-  {
-    Icon: Zap,
-    tint: "bg-[var(--brand-mint-soft)] text-[var(--brand-mint)]",
-    title: "Instant settlement",
-    body: "Funds go straight to your bank account. No holds, no cashout delays.",
-  },
-  {
-    Icon: ShieldCheck,
-    tint: "bg-[var(--brand-purple-soft)] text-[var(--brand-purple)]",
-    title: "Zero payment errors",
-    body: "Amount and order reference are locked to each QR — nothing to mistype, effortless to verify.",
-  },
-];
-
-/* ---------------------------------------------------------------- pieces */
-
-function BlackPillCta({
+function PrimaryCta({
   href,
   children,
-  external,
 }: {
   href: string;
   children: React.ReactNode;
-  external?: boolean;
 }) {
   return (
     <a
       href={href}
-      {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
       className="group inline-flex h-13 items-center justify-center gap-3 rounded-full bg-foreground pr-2 pl-6 text-base font-semibold text-white transition-colors hover:bg-[#2c2a26] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97]"
     >
       {children}
@@ -96,82 +31,56 @@ function BlackPillCta({
   );
 }
 
-function OutlinePillCta({
+function GhostCta({
   href,
   children,
-  external,
 }: {
   href: string;
   children: React.ReactNode;
-  external?: boolean;
 }) {
   return (
     <a
       href={href}
-      {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-      className="inline-flex h-13 items-center justify-center rounded-full border-[1.5px] border-foreground/30 bg-card px-7 text-base font-semibold text-foreground shadow-[0_2px_10px_rgba(22,19,14,0.08)] transition-all hover:border-foreground/45 hover:bg-[var(--brand-bg-soft)] hover:shadow-[0_4px_16px_rgba(22,19,14,0.12)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97]"
+      className="inline-flex h-12 min-w-[12rem] items-center justify-center rounded-full border-[1.5px] border-foreground/35 bg-transparent px-7 text-base font-semibold text-foreground transition-colors hover:border-foreground/55 hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97]"
     >
       {children}
     </a>
   );
 }
 
-function OrderCard() {
-  return (
-    <div className="w-44 rounded-[18px] border border-border bg-card p-3 shadow-[0_14px_32px_-16px_rgba(27,26,24,0.3)]">
-      <div className="flex items-center gap-2">
-        <span
-          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
-          aria-hidden
-        >
-          <Bell className="size-4" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-xs font-bold">New order</p>
-          <p className="truncate text-[10px] text-muted-foreground">
-            NM-8F2KQ3 · just now
-          </p>
-        </div>
-      </div>
-      <div className="mt-2.5 flex items-baseline justify-between">
-        <p className="text-[11px] text-muted-foreground">2 items · Sarah T.</p>
-        <p className="text-sm font-extrabold">S$48.00</p>
-      </div>
-    </div>
-  );
-}
-
-function PaidCard() {
-  return (
-    <div className="w-52 rounded-[18px] border border-border bg-card p-3 shadow-[0_14px_32px_-16px_rgba(27,26,24,0.3)]">
-      <div className="flex items-center gap-2.5">
-        <span
-          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-mint)] text-white"
-          aria-hidden
-        >
-          <Check className="size-4" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-xs font-bold">S$48.00 received</p>
-          <p className="text-[10px] leading-snug text-muted-foreground">
-            Straight to your bank · 0% fees
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ page */
+const BITES = [
+  {
+    title: "Real shop",
+    body: "Buyers browse and cart — not another link list in your bio.",
+  },
+  {
+    title: "Exact PayNow",
+    body: "Amount and order reference locked into every QR.",
+  },
+  {
+    title: "Made for SG",
+    body: "Built for Instagram, TikTok, and WhatsApp sellers.",
+  },
+] as const;
 
 export function MarketingHome() {
   const createStoreUrl = getLoginUrl("create");
   const signInUrl = getLoginUrl("login");
-  const demoUrl = getStorefrontUrl(getDemoStoreSlug());
-  const demoLabel = `${getDemoStoreSlug()}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN?.split(":")[0] ?? "lvh.me"}`;
+  const termsUrl = getMarketingUrl("/terms");
+  const privacyUrl = getMarketingUrl("/privacy");
 
   return (
-    <div data-brand className="min-h-full bg-background text-foreground">
+    <div data-brand className="relative min-h-full text-foreground">
+      {/* Match login/dashboard: white base + soft orbs (NOT sand --background) */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-white"
+        aria-hidden
+      >
+        <div className="brand-grain absolute inset-0 opacity-40" />
+        <div className="brand-orb animate-brand-drift-1 top-[12%] left-[6%] size-64 bg-[rgba(247,197,24,0.1)]" />
+        <div className="brand-orb animate-brand-drift-2 right-[8%] bottom-[14%] size-72 bg-[rgba(124,47,224,0.08)]" />
+      </div>
+
       <a
         href="#main-content"
         className="bg-primary text-primary-foreground focus:ring-ring sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:ring-3 focus:outline-none"
@@ -179,261 +88,178 @@ export function MarketingHome() {
         Skip to content
       </a>
 
-      {/* ------------------------------------------------ Floating pill nav */}
-      <header className="sticky top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
-        <div className="relative mx-auto max-w-5xl rounded-full border border-border bg-[#fbf7f2]/95 py-2 pr-2 pl-5 shadow-[0_1px_3px_rgba(27,26,24,0.08)] backdrop-blur-sm">
-          <div className="flex items-center justify-between gap-3">
-            <Link href="/" className="shrink-0" aria-label="Nomi home">
-              <Wordmark />
+      {/* Minimal chrome — no sticky pill nav */}
+      <div className="absolute top-4 right-4 z-40 sm:top-6 sm:right-6">
+        <details className="group relative">
+          <summary
+            className="flex size-11 cursor-pointer list-none items-center justify-center rounded-full border border-foreground/20 bg-card/80 text-foreground shadow-sm backdrop-blur-sm marker:content-none [&::-webkit-details-marker]:hidden"
+            aria-label="Menu"
+          >
+            <span className="flex flex-col gap-1.5" aria-hidden>
+              <span className="block h-0.5 w-4 rounded-full bg-foreground" />
+              <span className="block h-0.5 w-4 rounded-full bg-foreground" />
+              <span className="block h-0.5 w-4 rounded-full bg-foreground" />
+            </span>
+          </summary>
+          <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-2xl border border-border bg-card py-2 shadow-lg">
+            <a
+              href={createStoreUrl}
+              className="block px-4 py-2.5 text-sm font-semibold hover:bg-[var(--brand-bg-soft)]"
+            >
+              Create my store
+            </a>
+            <a
+              href={signInUrl}
+              className="block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-[var(--brand-bg-soft)] hover:text-foreground"
+            >
+              Sign in
+            </a>
+            <Link
+              href={termsUrl}
+              className="block px-4 py-2.5 text-sm text-muted-foreground hover:bg-[var(--brand-bg-soft)] hover:text-foreground"
+            >
+              Terms
             </Link>
-
-            <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 sm:ml-auto">
-              <a
-                href={signInUrl}
-                className="min-h-11 inline-flex items-center px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:px-3 sm:text-[14.5px]"
-              >
-                Sign in
-              </a>
-              <a
-                href={createStoreUrl}
-                className="inline-flex h-11 min-h-11 items-center rounded-full bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:-translate-y-px hover:bg-[var(--brand-yellow-deep)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 active:scale-[0.98] sm:px-4.5 sm:text-sm"
-              >
-                Create my store
-              </a>
-            </div>
+            <Link
+              href={privacyUrl}
+              className="block px-4 py-2.5 text-sm text-muted-foreground hover:bg-[var(--brand-bg-soft)] hover:text-foreground"
+            >
+              Privacy
+            </Link>
           </div>
-        </div>
-      </header>
+        </details>
+      </div>
 
       <main id="main-content">
-      {/* ------------------------------------------------ Hero */}
-      <section className="relative overflow-hidden px-4 pt-14 pb-16 text-center sm:px-6 sm:pt-20">
-        <div
-          className="brand-orb animate-brand-drift-1 top-10 left-[12%] size-72 bg-[rgba(247,197,24,0.18)]"
-          aria-hidden
-        />
-        <div
-          className="brand-orb animate-brand-drift-2 top-40 right-[10%] size-80 bg-[rgba(124,47,224,0.10)]"
-          aria-hidden
-        />
-
-        <div className="relative mx-auto max-w-4xl">
-          <h1 className="mx-auto max-w-3xl animate-fade-up font-display text-[2.4rem] leading-[1.05] font-extrabold tracking-[-0.025em] text-balance [animation-fill-mode:both] sm:text-6xl lg:text-[4.1rem]">
-            The easiest way to turn your bio into a{" "}
-            <span className="brand-hl whitespace-nowrap">real store</span>.
-          </h1>
-
-          <div className="mt-9 flex animate-fade-up flex-col items-center justify-center gap-3 [animation-delay:100ms] [animation-fill-mode:both] sm:flex-row">
-            <BlackPillCta href={createStoreUrl}>Create my store</BlackPillCta>
-            <OutlinePillCta href={demoUrl} external>
-              View demo store
-            </OutlinePillCta>
-          </div>
-        </div>
-
-        {/* Phone scene */}
-        <div className="relative mx-auto mt-14 w-full max-w-md animate-fade-up [animation-delay:300ms] [animation-fill-mode:both]">
-          <span
-            className="absolute -top-6 left-[8%] text-2xl text-[var(--brand-purple)] select-none"
-            aria-hidden
-          >
-            ✦
-          </span>
-          <span
-            className="absolute top-16 right-[4%] text-lg select-none"
-            aria-hidden
-          >
-            ✦
-          </span>
-
-          <div className="relative px-10 sm:px-16">
-            <div className="-rotate-2 transition-transform duration-500 hover:rotate-0">
-              <MiniPreview
-                vibe={PREVIEW_VIBE}
-                storeName="JigWave"
-                hero={{
-                  eyebrow: "Est. 2024",
-                  title: "JigWave",
-                  subheading: "Metal jigs & assist hooks for SG anglers.",
-                }}
-                products={PREVIEW_PRODUCTS}
-                className="shadow-[0_18px_40px_-12px_rgba(0,0,0,0.35)]"
+        {/* Hero */}
+        <section className="relative flex min-h-[100dvh] flex-col items-center justify-center px-4 pt-20 pb-4 text-center sm:px-6">
+          <div className="relative mx-auto max-w-3xl">
+            <div className="animate-fade-up flex justify-center [animation-fill-mode:both]">
+              <Image
+                src="/marketing/nomilogo.png"
+                alt="nomi"
+                width={400}
+                height={400}
+                priority
+                className="animate-brand-logo h-48 w-48 object-contain sm:h-56 sm:w-56"
               />
             </div>
 
-            <div className="animate-brand-float absolute top-6 -left-1 sm:left-2">
-              <div className="rotate-[-4deg]">
-                <OrderCard />
-              </div>
-            </div>
-            <div className="animate-brand-float absolute -right-1 bottom-8 [animation-delay:-3.5s] sm:right-2">
-              <div className="rotate-[3deg]">
-                <PaidCard />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <h1 className="mt-3 animate-fade-up font-display text-[2.15rem] leading-[1.08] font-extrabold tracking-[-0.03em] text-balance [animation-delay:80ms] [animation-fill-mode:both] sm:mt-4 sm:text-5xl lg:text-[3.4rem]">
+              Your business deserves a{" "}
+              <span className="brand-hl">better storefront</span>.
+            </h1>
 
-      {/* ------------------------------------------------ Marquee */}
-      <div className="overflow-hidden bg-foreground py-3.5 text-[#f1ede5]">
-        <div className="animate-brand-marquee flex w-max items-center gap-8 pr-8">
-          {[0, 1].map((copy) => (
-            <div
-              key={copy}
-              className="flex items-center gap-8"
-              aria-hidden={copy === 1}
-            >
-              {MARQUEE_ITEMS.map((item) => (
-                <span
-                  key={item}
-                  className="flex items-center gap-8 text-sm font-semibold tracking-wide whitespace-nowrap"
-                >
-                  {item}
-                  <span className="text-primary" aria-hidden>
-                    ✦
-                  </span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ------------------------------------------------ Value prop */}
-      <section className="px-4 py-20 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl leading-[1.08] font-extrabold tracking-[-0.02em] text-balance sm:text-5xl">
-              From messy DMs into{" "}
-              <span className="brand-hl">1-click convenience</span>.
-            </h2>
-          </Reveal>
-          <div className="mt-12">
-            <FlowStepsVisual />
-          </div>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------ PayNow value */}
-      <section className="relative overflow-hidden bg-foreground px-4 py-20 text-[#f4efe6] sm:px-6 sm:py-28">
-        <div
-          className="brand-grain pointer-events-none absolute inset-0 opacity-50"
-          aria-hidden
-        />
-        <div
-          className="brand-orb animate-brand-drift-1 top-[18%] left-[8%] size-72 bg-[rgba(247,197,24,0.14)]"
-          aria-hidden
-        />
-        <div
-          className="brand-orb animate-brand-drift-2 right-[6%] bottom-0 size-80 bg-[rgba(124,47,224,0.16)]"
-          aria-hidden
-        />
-
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <Reveal>
-            <h2 className="font-display text-3xl leading-[1.08] font-extrabold tracking-[-0.02em] text-balance text-white sm:text-5xl">
-              Get paid instantly. Keep{" "}
-              <span className="text-primary">100%</span>.
-            </h2>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-[#d5cfc4] sm:text-lg">
-              Every order generates a dynamic PayNow QR — prefilled with the
-              exact amount and a reference tied to the invoice.
+            <p className="mx-auto mt-5 max-w-xl animate-fade-up text-base leading-relaxed text-muted-foreground [animation-delay:140ms] [animation-fill-mode:both] sm:text-lg">
+              Create a beautiful storefront, showcase your products, accept
+              payments, and start selling.
             </p>
 
-            <ul className="mt-10 space-y-7">
-              {PAYNOW_BENEFITS.map((benefit) => (
-                <li key={benefit.title} className="flex gap-4">
-                  <span
-                    className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${benefit.tint}`}
-                    aria-hidden
-                  >
-                    <benefit.Icon className="size-6" strokeWidth={2} />
-                  </span>
-                  <div>
-                    <p className="text-lg font-bold text-white">
-                      {benefit.title}
-                    </p>
-                    <p className="mt-1 text-base leading-relaxed text-[#c9c2b4]">
-                      {benefit.body}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+            <div className="mt-9 flex animate-fade-up flex-col items-center gap-3 [animation-delay:200ms] [animation-fill-mode:both]">
+              <PrimaryCta href={createStoreUrl}>Create my store</PrimaryCta>
+              <GhostCta href={signInUrl}>Sign in</GhostCta>
+            </div>
+          </div>
 
-          <Reveal
-            delay={120}
-            className="relative flex justify-center text-foreground lg:justify-end"
-          >
-            <div
-              className="brand-orb top-1/2 left-1/2 size-64 -translate-x-1/2 -translate-y-1/2 bg-[rgba(247,197,24,0.2)]"
-              aria-hidden
-            />
-            <div className="animate-brand-float relative">
+          <SpineLink label="See What's Possible" href="#stores" accent />
+        </section>
+
+        {/* Proof river */}
+        <section
+          id="stores"
+          className="scroll-mt-12 px-4 pt-12 pb-16 sm:scroll-mt-16 sm:px-6 sm:pt-14 sm:pb-20"
+          aria-labelledby="stores-heading"
+        >
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <h2
+              id="stores-heading"
+              className="font-display text-2xl font-extrabold tracking-[-0.02em] text-balance sm:text-3xl lg:text-[2.15rem]"
+            >
+              See how different businesses come to life with Nomi.
+            </h2>
+          </Reveal>
+          <div className="mt-6 sm:mt-8">
+            <StoreTour />
+          </div>
+          <SpineLink label="PayNow integrated" href="#paynow" accent />
+        </section>
+
+        {/* PayNow USP */}
+        <section
+          id="paynow"
+          className="scroll-mt-24 px-4 py-8 sm:scroll-mt-28 sm:px-6 sm:py-12"
+          aria-labelledby="paynow-heading"
+        >
+          <div className="mx-auto grid max-w-5xl items-center gap-12 rounded-[2rem] border border-border/80 bg-card/75 px-6 py-12 shadow-[0_20px_60px_-30px_rgba(22,19,14,0.35)] backdrop-blur-md sm:px-10 sm:py-16 lg:grid-cols-2 lg:gap-16">
+            <Reveal>
+              <h2
+                id="paynow-heading"
+                className="font-display text-3xl leading-[1.08] font-extrabold tracking-[-0.02em] text-balance sm:text-4xl"
+              >
+                Exact PayNow.{" "}
+                <span className="brand-hl">Every order.</span>
+              </h2>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
+                Amount + reference. Built for you.
+              </p>
+            </Reveal>
+            <Reveal delay={100} className="flex justify-center lg:justify-end">
               <PayNowQrCard showBadge={false} />
+            </Reveal>
+          </div>
+          <div className="flex justify-center pt-10" aria-hidden>
+            <div className="h-16 w-px bg-gradient-to-b from-foreground/30 to-transparent sm:h-20" />
+          </div>
+        </section>
+
+        {/* Three bites */}
+        <section className="px-4 py-8 sm:px-6 sm:py-16" aria-label="Why Nomi">
+          <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-3 sm:gap-5">
+            {BITES.map((bite, i) => (
+              <Reveal key={bite.title} delay={i * 80}>
+                <div className="h-full rounded-[1.5rem] border border-border/80 bg-card/70 p-6 shadow-sm backdrop-blur-sm sm:p-7">
+                  <h3 className="font-display text-xl font-extrabold tracking-[-0.02em]">
+                    {bite.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
+                    {bite.body}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* Soft close */}
+        <section className="px-4 py-16 text-center sm:px-6 sm:py-24">
+          <Reveal className="mx-auto max-w-xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-[-0.025em] text-balance sm:text-4xl">
+              Ready when you are.
+            </h2>
+            <div className="mt-8 flex justify-center">
+              <PrimaryCta href={createStoreUrl}>Create my store</PrimaryCta>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------ Yellow CTA band */}
-      <section className="relative overflow-hidden bg-primary px-4 py-20 text-primary-foreground sm:px-6 sm:py-28">
-        <div
-          className="brand-grain-light pointer-events-none absolute inset-0"
-          aria-hidden
-        />
-        <span
-          className="absolute top-10 right-[12%] text-2xl select-none"
-          aria-hidden
-        >
-          ✦
-        </span>
-        <span
-          className="absolute bottom-12 left-[10%] text-lg text-[var(--brand-purple)] select-none"
-          aria-hidden
-        >
-          ✦
-        </span>
-        <Reveal className="relative mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-4xl leading-[1.08] font-extrabold tracking-[-0.025em] text-balance sm:text-5xl">
-            Your bio is one link away from a{" "}
-            <span className="underline decoration-foreground decoration-4 underline-offset-[6px]">
-              real store
-            </span>
-            .
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-base leading-relaxed opacity-80">
-            Set up in minutes. 0% fees on every PayNow sale.
-          </p>
-          <div className="mt-9 flex justify-center">
-            <BlackPillCta href={createStoreUrl}>Create my store</BlackPillCta>
-          </div>
-        </Reveal>
-      </section>
+        </section>
       </main>
 
-      {/* ------------------------------------------------ Footer */}
-      <footer className="border-t border-border bg-[var(--brand-bg-soft)] px-4 py-10 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
-          <div className="flex flex-col items-center gap-2 sm:items-start">
-            <Wordmark />
-            <p className="text-sm text-muted-foreground">
-              Simple PayNow storefronts, made for Singapore social sellers.
-            </p>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Demo store:{" "}
-            <a
-              href={demoUrl}
-              className="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-              target="_blank"
-              rel="noreferrer"
+      <footer className="border-t border-border/60 px-4 py-10 sm:px-6">
+        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 text-sm sm:flex-row">
+          <p className="font-extrabold tracking-[-0.03em]">nomi</p>
+          <nav aria-label="Legal" className="flex gap-5">
+            <Link
+              href={termsUrl}
+              className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              {demoLabel}
-            </a>
-          </p>
+              Terms
+            </Link>
+            <Link
+              href={privacyUrl}
+              className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              Privacy
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>

@@ -1,4 +1,6 @@
-/** Public demo storefront slug (PRD §15.1 — e.g. jigwave.nomi.store). */
-export function getDemoStoreSlug(): string {
-  return process.env.NEXT_PUBLIC_DEMO_STORE_SLUG ?? "jigwave";
-}
+/** @deprecated Import from `@/lib/marketing/demo-stores` instead. */
+export {
+  DEMO_CONCEPTS,
+  getDemoConceptUrl,
+  getDemoStoreSlug,
+} from "@/lib/marketing/demo-stores";

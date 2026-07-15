@@ -237,6 +237,27 @@
   animation: brand-float 7s ease-in-out infinite;
 }
 
+/* Hero logo: soft float + tiny breathe (marketing only) */
+@keyframes brand-logo {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+.animate-brand-logo {
+  animation: brand-logo 5.5s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.animate-brand-logo:hover {
+  animation-play-state: paused;
+  transform: scale(1.06);
+}
+
 /* Pulsing status dot (social-proof chip) */
 @keyframes brand-pulse {
   0% {
@@ -284,6 +305,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-brand-float,
+  .animate-brand-logo,
   .animate-brand-drift-1,
   .animate-brand-drift-2,
   .animate-brand-marquee,

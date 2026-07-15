@@ -94,10 +94,10 @@ The customer journey through a Nomi storefront follows a fixed sequence. This se
 - **Why it exists:** This is the core commercial surface. Every product must be visible, browsable, and actionable.
 
 #### Sticky Cart Bar
-- **Purpose:** Persistent, non-intrusive purchase intent indicator.
-- **Required content:** Item count, running subtotal, and navigation to cart. Visible on the shop homepage at all times.
-- **User expectation:** "I can always see what I've added and get to checkout."
-- **Why it exists:** Mobile commerce has no sidebar. The sticky cart replaces the physical shopping basket — always visible, never in the way.
+- **Purpose:** Persistent, non-intrusive purchase intent indicator once the buyer has items.
+- **Required content:** Item count, running subtotal, and navigation to cart/checkout. Hidden while the cart is empty; slides in when the first item is added.
+- **User expectation:** "Once I've added something, I can always see what I've added and get to checkout."
+- **Why it exists:** Mobile commerce has no sidebar. The sticky cart replaces the physical shopping basket — present when useful, out of the way when not.
 
 #### Product Detail
 - **Purpose:** Full product information and quantity selection before adding to cart.
@@ -173,10 +173,10 @@ This sequence reflects progressive commitment: see what you owe → choose how t
 These rules define behavior, not appearance. They must be preserved across every theme.
 
 ### Cart Interactions
-- The sticky cart bar is always visible on the shop homepage, regardless of whether items have been added.
-- When the cart is empty, the bar displays a neutral state (e.g., "Cart · 0"). It does not hide.
-- When items are added, the bar reveals item count, subtotal, and a checkout affordance.
-- The cart is reachable within one tap from any page in the storefront.
+- The sticky cart bar is hidden while the cart is empty (no “empty cart” chrome on the shop home).
+- When the first item is added, the bar slides in with a short ease animation and shows item count, subtotal, and a checkout affordance.
+- When the cart returns to empty, the bar slides out the same way.
+- While visible, the cart is reachable within one tap from shop/cart/product pages (still hidden on checkout/order).
 
 ### Product Interactions
 - Products with short descriptions (≤ 100 characters) support quick-add directly from the catalog card and featured section.

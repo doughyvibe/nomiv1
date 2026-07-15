@@ -2526,6 +2526,7 @@
 /* --------------------------------------------------------------------------
  * Candyland — neo-brutalist candy pop (docs/candyland_storefront)
  * Hot pink / electric purple / lime; thick black borders; hard offset shadows
+ * Type: Fredoka display · League Spartan labels/prices/CTAs · Satoshi body
  * Locks: no cover, no hero CTA, sticky checkout, no fake specs, no image tints
  * ------------------------------------------------------------------------ */
 [data-vibe="candyland"] {
@@ -2544,93 +2545,110 @@
   --vibe-surface-elevated: 255 255 255;
   --vibe-radius: 1.25rem;
   --font-body: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-league-spartan), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), ui-sans-serif, system-ui, sans-serif;
+  --font-label: var(--font-league-spartan), ui-sans-serif, system-ui, sans-serif;
 
   background-color: rgb(var(--vibe-bg));
   color: rgb(var(--vibe-text));
   font-family: var(--font-body);
 }
 
-/* Candyland hero — candy-wrapper band; no cover/CTA */
+/* Candyland hero — white stage + pink sticker wordmark (matches shop body) */
 [data-vibe="candyland"] .hero-candyland-band {
-  background: linear-gradient(
-    160deg,
-    rgb(200 20 110) 0%,
-    rgb(var(--vibe-primary)) 38%,
-    rgb(90 30 190) 100%
-  );
-  border-bottom: 4px solid rgb(0 0 0);
-  box-shadow: 0 5px 0 0 rgb(var(--vibe-accent));
+  background: rgb(var(--vibe-bg));
+  border-bottom: none;
+  box-shadow: none;
+  /* Tighten default mb-6/md:mb-8 — large void under hero is not intentional */
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="candyland"] .hero-candyland-band {
+    margin-bottom: 1rem;
+  }
+}
+
+[data-vibe="candyland"] .featured-candyland-section {
+  padding-top: 0;
 }
 
 [data-vibe="candyland"] .hero-candyland-inner {
-  /* Soft scrim so white type stays readable on the neon wash */
-  background: linear-gradient(
-    180deg,
-    rgb(0 0 0 / 0.12) 0%,
-    rgb(0 0 0 / 0.22) 100%
-  );
+  background: transparent;
+}
+
+[data-vibe="candyland"] .hero-candyland-logo {
+  border: 3px solid rgb(0 0 0);
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0 0 rgb(var(--vibe-primary));
+  overflow: hidden;
+  background: rgb(var(--vibe-surface));
 }
 
 [data-vibe="candyland"] .hero-candyland-eyebrow {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
+  display: inline-flex;
+  font-family: var(--font-label);
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgb(255 255 255);
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.45);
+  color: rgb(var(--vibe-text-bright));
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  padding: 0.45rem 0.95rem;
+  background: rgb(var(--vibe-accent));
+  box-shadow: 3px 3px 0 0 rgb(0 0 0);
 }
 
 [data-vibe="candyland"] .hero-candyland-title {
   font-family: var(--font-display);
-  font-size: 1.85rem;
+  font-size: clamp(2.5rem, 12vw, 3.75rem);
   font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: 1;
+  letter-spacing: -0.03em;
   text-transform: uppercase;
-  color: rgb(255 255 255);
-  text-shadow:
-    0 2px 0 rgb(0 0 0 / 0.35),
-    0 4px 16px rgb(0 0 0 / 0.35);
+  color: rgb(var(--vibe-primary));
+  text-shadow: 4px 4px 0 rgb(0 0 0);
+}
+
+[data-vibe="candyland"] .hero-candyland-rule {
+  width: 4.5rem;
+  height: 0.45rem;
+  margin-top: 1rem;
+  border: 2px solid rgb(0 0 0);
+  border-radius: 9999px;
+  background: rgb(var(--vibe-accent));
+  box-shadow: 2px 2px 0 0 rgb(0 0 0);
 }
 
 [data-vibe="candyland"] .hero-candyland-tagline {
   max-width: 22rem;
   font-family: var(--font-body);
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.5;
-  color: rgb(255 255 255);
-  text-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
-}
-
-@media (min-width: 768px) {
-  [data-vibe="candyland"] .hero-candyland-title {
-    font-size: 2.75rem;
-  }
+  color: rgb(var(--vibe-text));
 }
 
 /* Candyland featured — pink frame, hard pink shadow */
 [data-vibe="candyland"] .featured-candyland-header {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   justify-content: center;
 }
 
 [data-vibe="candyland"] .featured-candyland-header-title {
   display: inline-flex;
   width: fit-content;
-  font-family: var(--font-body);
-  font-size: 0.6875rem;
+  font-family: var(--font-label);
+  font-size: 0.9375rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgb(var(--vibe-text-bright));
-  border: 2px solid rgb(0 0 0);
+  border: 3px solid rgb(0 0 0);
   border-radius: 9999px;
-  padding: 0.35rem 0.75rem;
+  padding: 0.55rem 1.15rem;
   background: rgb(var(--vibe-accent));
-  box-shadow: 2px 2px 0 0 rgb(0 0 0);
+  box-shadow: 4px 4px 0 0 rgb(0 0 0);
 }
 
 [data-vibe="candyland"] .vibe-card.featured-candyland-card {
@@ -2680,7 +2698,8 @@
   line-height: 1.05;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  color: rgb(var(--vibe-secondary));
+  /* Charcoal ink — purple competed with pink frame/CTA; keep purple for accents */
+  color: rgb(var(--vibe-text-bright));
 }
 
 @media (min-width: 768px) {
@@ -2707,7 +2726,7 @@
 }
 
 [data-vibe="candyland"] .featured-candyland-price {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 1rem;
   font-weight: 700;
   color: rgb(var(--vibe-text-bright));
@@ -2728,7 +2747,7 @@
   border: 2px solid rgb(0 0 0);
   background: rgb(var(--vibe-primary));
   color: rgb(var(--vibe-primary-fg));
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2748,7 +2767,7 @@
   border-radius: 9999px;
   background: rgb(var(--vibe-primary));
   color: rgb(255 255 255);
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-weight: 700;
   letter-spacing: 0.06em;
   box-shadow: 3px 3px 0 0 rgb(0 0 0);
@@ -2759,7 +2778,7 @@
   border-radius: 9999px;
   background: rgb(255 255 255);
   color: rgb(0 0 0);
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -2815,7 +2834,7 @@
 }
 
 [data-vibe="candyland"] .catalog-card-price {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 0.8125rem;
   font-weight: 700;
   color: rgb(var(--vibe-text-bright));
@@ -2854,7 +2873,7 @@
 }
 
 [data-vibe="candyland"] .vibe-display {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   text-transform: uppercase;
   letter-spacing: -0.01em;
   font-weight: 700;
@@ -2879,7 +2898,7 @@
   border: 2px solid rgb(0 0 0);
   background: rgb(var(--vibe-secondary));
   color: rgb(255 255 255);
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2888,7 +2907,7 @@
 }
 
 [data-vibe="candyland"] .checkout-bar .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: rgb(0 0 0);
@@ -2920,7 +2939,7 @@
 }
 
 [data-vibe="candyland"] .pdp-candyland-price {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-weight: 700;
   color: rgb(var(--vibe-text-bright));
   background: rgb(var(--vibe-accent));
@@ -2935,7 +2954,7 @@
 [data-vibe="candyland"] .pdp-candyland-add,
 [data-vibe="candyland"] .cart-candyland-cta,
 [data-vibe="candyland"] .checkout-candyland-cta {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -2976,7 +2995,7 @@
 }
 
 [data-vibe="candyland"] .checkout-candyland-section-label {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -2985,7 +3004,7 @@
 }
 
 [data-vibe="candyland"] .pay-candyland-secondary {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2999,7 +3018,7 @@
 }
 
 [data-vibe="candyland"] .pay-candyland-amount {
-  font-family: var(--font-display);
+  font-family: var(--font-label);
   font-weight: 700;
   letter-spacing: -0.02em;
   text-transform: none;
@@ -5367,6 +5386,19 @@
   color: rgb(var(--vibe-text) / 0.58);
 }
 
+/* Ensure accent utilities resolve to lime (not inherited charcoal) */
+[data-vibe="vows"] .text-vibe-primary {
+  color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="vows"] .bg-vibe-primary {
+  background-color: rgb(var(--vibe-primary));
+}
+
+[data-vibe="vows"] .border-vibe-primary {
+  border-color: rgb(var(--vibe-primary));
+}
+
 [data-vibe="vows"] .vibe-card,
 [data-vibe="vows"] .metal-panel {
   background: rgb(var(--vibe-surface));
@@ -5381,7 +5413,39 @@
   letter-spacing: -0.01em;
 }
 
-/* Featured title — centered on mobile */
+/* Hero — charcoal type + lime wordmark */
+[data-vibe="vows"] .hero-vows-band {
+  background: rgb(var(--vibe-bg));
+}
+
+[data-vibe="vows"] .hero-vows-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--vibe-text) / 0.55);
+}
+
+[data-vibe="vows"] .hero-vows-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 11vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .hero-vows-tagline {
+  max-width: 24rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgb(var(--vibe-text) / 0.58);
+}
+
+/* Featured */
 @media (max-width: 767px) {
   [data-vibe="vows"] .featured-vows-header {
     justify-content: center;
@@ -5393,7 +5457,104 @@
   }
 }
 
-/* Vows category — underline only; restore readable size (was text-xs pills) */
+[data-vibe="vows"] .featured-vows-header-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .vibe-card.featured-vows-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgb(36 31 33 / 0.06);
+}
+
+[data-vibe="vows"] .featured-vows-image-wrap {
+  aspect-ratio: 4 / 3;
+  background: rgb(var(--vibe-bg));
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: 1px solid rgb(var(--vibe-border) / 0.08);
+}
+
+@media (min-width: 768px) {
+  [data-vibe="vows"] .featured-vows-image-wrap {
+    aspect-ratio: auto;
+    min-height: 18rem;
+    border-radius: 1rem 0 0 1rem;
+    border-bottom: none;
+    border-right: 1px solid rgb(var(--vibe-border) / 0.08);
+  }
+}
+
+[data-vibe="vows"] .featured-vows-image-fade {
+  display: none;
+}
+
+[data-vibe="vows"] .featured-vows-body {
+  gap: 0.65rem;
+  padding: 1.35rem 1.35rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  [data-vibe="vows"] .featured-vows-body {
+    padding: 1.75rem 2rem;
+  }
+}
+
+[data-vibe="vows"] .featured-vows-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .featured-vows-desc {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: rgb(var(--vibe-text) / 0.58);
+}
+
+[data-vibe="vows"] .featured-vows-price-row {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+[data-vibe="vows"] .featured-vows-price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .featured-vows-add {
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  border-radius: 9999px;
+  border: none;
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 16px rgb(233 231 120 / 0.45);
+}
+
+[data-vibe="vows"] .featured-vows-add.bg-vibe-primary {
+  background: rgb(var(--vibe-text-bright));
+  color: rgb(250 251 252);
+  box-shadow: none;
+}
+
+/* Vows category — underline; lime marks the active filter */
 [data-vibe="vows"] .catalog-tabs {
   border-bottom: none;
 }
@@ -5402,7 +5563,7 @@
 [data-vibe="vows"] .catalog-tab-active {
   border: none;
   border-radius: 0;
-  border-bottom: 2px solid rgb(var(--vibe-text-bright));
+  border-bottom: 2px solid rgb(var(--vibe-primary));
   background: transparent;
   color: rgb(var(--vibe-text-bright));
   font-family: var(--font-body);
@@ -5430,6 +5591,68 @@
   padding-inline: 0.15rem;
   padding-bottom: 0.4rem;
   min-height: auto;
+}
+
+[data-vibe="vows"] .vibe-card.catalog-vows-card {
+  background: rgb(var(--vibe-surface));
+  border: 1px solid rgb(var(--vibe-border) / 0.1);
+  border-radius: 0.875rem;
+  box-shadow: 0 6px 18px rgb(36 31 33 / 0.05);
+}
+
+[data-vibe="vows"] .catalog-vows-image {
+  border-radius: 0.875rem 0.875rem 0 0;
+  background: rgb(var(--vibe-bg));
+}
+
+[data-vibe="vows"] .catalog-vows-image-fade {
+  display: none;
+}
+
+[data-vibe="vows"] .catalog-vows-body {
+  gap: 0.4rem;
+  padding: 0.85rem 0.9rem 1rem;
+}
+
+[data-vibe="vows"] .catalog-vows-card .catalog-card-title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .catalog-vows-card .catalog-card-price {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
+}
+
+[data-vibe="vows"] .catalog-vows-price-row {
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+/* Outline + icon in charcoal — lime fails contrast as a thin stroke on white */
+[data-vibe="vows"] .catalog-vows-add {
+  border-radius: 9999px;
+  border: 1.5px solid rgb(var(--vibe-border) / 0.55);
+  background: transparent;
+  color: rgb(var(--vibe-text-bright));
+  box-shadow: none;
+}
+
+[data-vibe="vows"] .catalog-vows-add.bg-vibe-primary {
+  background: rgb(var(--vibe-primary));
+  border-color: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+  box-shadow: none;
+}
+
+[data-vibe="vows"] .pdp-vows-price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(var(--vibe-text-bright));
 }
 
 /*

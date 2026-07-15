@@ -108,7 +108,7 @@ export function FeaturedProduct({
   const vows = isVowsVibe(vibe);
   const strada = isStradaVibe(vibe);
   const heading = resolveFeaturedSectionTitle(sectionTitle);
-  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada;
+  const fullWidthCta = atelier || expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || vows || strada;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -196,6 +196,7 @@ export function FeaturedProduct({
           studio && "featured-studio-card",
           laura && "featured-laura-card",
           atlantic && "featured-atlantic-card",
+          vows && "featured-vows-card",
           strada && "featured-strada-card",
         )}
       >
@@ -212,6 +213,7 @@ export function FeaturedProduct({
             studio && "featured-studio-image-wrap",
             laura && "featured-laura-image-wrap",
             atlantic && "featured-atlantic-image-wrap",
+            vows && "featured-vows-image-wrap",
             strada && "featured-strada-image-wrap",
           )}
         >
@@ -246,6 +248,8 @@ export function FeaturedProduct({
                                     ? "featured-laura-image-fade"
                                     : atlantic
                                       ? "featured-atlantic-image-fade"
+                                      : vows
+                                        ? "featured-vows-image-fade"
                                       : strada
                                         ? "featured-strada-image-fade"
                                         : "bg-gradient-to-t from-vibe-surface to-transparent",
@@ -270,6 +274,7 @@ export function FeaturedProduct({
             studio && "featured-studio-body",
             laura && "featured-laura-body",
             atlantic && "featured-atlantic-body",
+            vows && "featured-vows-body",
             strada && "featured-strada-body",
           )}
         >
@@ -300,6 +305,7 @@ export function FeaturedProduct({
                 studio && "featured-studio-name",
                 laura && "featured-laura-name",
                 atlantic && "featured-atlantic-name",
+                vows && "featured-vows-name",
                 strada && "featured-strada-name",
               )}
             >
@@ -321,6 +327,7 @@ export function FeaturedProduct({
                 studio && "featured-studio-desc",
                 laura && "featured-laura-desc",
                 atlantic && "featured-atlantic-desc",
+                vows && "featured-vows-desc",
                 strada && "featured-strada-desc",
               )}
             >
@@ -341,6 +348,7 @@ export function FeaturedProduct({
               studio && "featured-studio-price-row",
               laura && "featured-laura-price-row",
               atlantic && "featured-atlantic-price-row",
+              vows && "featured-vows-price-row",
               strada && "featured-strada-price-row",
             )}
           >
@@ -357,6 +365,7 @@ export function FeaturedProduct({
                   studio && "featured-studio-price",
                   laura && "featured-laura-price",
                   atlantic && "featured-atlantic-price",
+                  vows && "featured-vows-price",
                   strada && "featured-strada-price",
                 )}
               >
@@ -380,6 +389,7 @@ export function FeaturedProduct({
                   studio && "featured-studio-add",
                   laura && "featured-laura-add",
                   atlantic && "featured-atlantic-add",
+                  vows && "featured-vows-add",
                   strada && "featured-strada-add",
                 added && "bg-vibe-primary text-vibe-primary-fg",
               )}
@@ -388,7 +398,7 @@ export function FeaturedProduct({
                 added ? (
                   <span>Added</span>
                 ) : (
-                  <span>{expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || strada ? "Add to cart" : "Add to Cart"}</span>
+                  <span>{expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || vows || strada ? "Add to cart" : "Add to Cart"}</span>
                 )
               ) : added ? (
                 <span className="text-xs font-semibold">✓</span>

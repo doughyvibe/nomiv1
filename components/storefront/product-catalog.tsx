@@ -70,6 +70,12 @@ function isAtlanticVibe(
   return vibe === "atlantic";
 }
 
+function isVowsVibe(
+  vibe: Vibe | "industrial" | "unicorn" | "outback" | "futuristic" | undefined,
+): boolean {
+  return vibe === "vows";
+}
+
 function ProductCard({
   product,
   index,
@@ -82,6 +88,7 @@ function ProductCard({
   studio,
   laura,
   atlantic,
+  vows,
   strada,
 }: {
   product: Product;
@@ -95,13 +102,14 @@ function ProductCard({
   studio: boolean;
   laura: boolean;
   atlantic: boolean;
+  vows: boolean;
   strada: boolean;
 }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const category = normalizeCategory(product.category);
   const blurb =
-    atelier || expedition || cyberpunk || candyland || market || gallery || laura || atlantic || strada
+    atelier || expedition || cyberpunk || candyland || market || gallery || laura || atlantic || vows || strada
       ? product.description?.trim()
       : null;
 
@@ -123,6 +131,7 @@ function ProductCard({
         studio && "catalog-studio-add",
         laura && "catalog-laura-add",
         atlantic && "catalog-atlantic-add",
+        vows && "catalog-vows-add",
         strada && "catalog-strada-add",
         added && "bg-vibe-primary text-vibe-primary-fg",
       )}
@@ -152,6 +161,7 @@ function ProductCard({
         studio && "catalog-studio-card",
         laura && "catalog-laura-card",
         atlantic && "catalog-atlantic-card",
+        vows && "catalog-vows-card",
         strada && "catalog-strada-card",
       )}
       style={{
@@ -172,6 +182,7 @@ function ProductCard({
           studio && "catalog-studio-image",
           laura && "catalog-laura-image",
           atlantic && "catalog-atlantic-image",
+          vows && "catalog-vows-image",
           strada && "catalog-strada-image",
         )}
       >
@@ -204,6 +215,7 @@ function ProductCard({
             studio && "catalog-studio-image-fade",
             laura && "catalog-laura-image-fade",
             atlantic && "catalog-atlantic-image-fade",
+            vows && "catalog-vows-image-fade",
             strada && "catalog-strada-image-fade",
           )}
         />
@@ -221,6 +233,7 @@ function ProductCard({
           studio && "catalog-studio-body",
           laura && "catalog-laura-body",
           atlantic && "catalog-atlantic-body",
+          vows && "catalog-vows-body",
           strada && "catalog-strada-body",
         )}
       >
@@ -270,6 +283,7 @@ function ProductCard({
                 market && "catalog-market-price-row",
                 laura && "catalog-laura-price-row",
                 atlantic && "catalog-atlantic-price-row",
+                vows && "catalog-vows-price-row",
                 strada && "catalog-strada-price-row",
               )}
             >
@@ -303,8 +317,9 @@ export function ProductCatalog({
   const studio = isStudioVibe(vibe);
   const laura = isLauraVibe(vibe);
   const atlantic = isAtlanticVibe(vibe);
+  const vows = isVowsVibe(vibe);
   const strada = isStradaVibe(vibe);
-  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market || laura || atlantic || vibe === "vows" || vibe === "strada";
+  const pillsOnDesktop = atelier || expedition || cyberpunk || candyland || market || laura || atlantic || vows || strada;
   const textFilters = gallery || studio;
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -421,6 +436,7 @@ export function ProductCatalog({
               studio={studio}
               laura={laura}
               atlantic={atlantic}
+              vows={vows}
               strada={strada}
             />
           ))

@@ -19,52 +19,39 @@ export function StickyCheckoutBar() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]"
+      className={cn(
+        "pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
+        "transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "motion-reduce:transition-none",
+        hasItems
+          ? "translate-y-0 opacity-100"
+          : "translate-y-[calc(100%+1.25rem)] opacity-0",
+      )}
+      aria-hidden={!hasItems}
       aria-live="polite"
     >
-      <div
-        className={cn(
-          "checkout-bar pointer-events-auto mx-auto flex max-w-[1280px] items-center gap-4 rounded-2xl border border-vibe-border/30 bg-vibe-surface/95 px-4 py-3 shadow-lg backdrop-blur-md transition-all",
-          hasItems ? "justify-between" : "justify-center",
-        )}
-      >
+      <div className="checkout-bar pointer-events-auto mx-auto flex max-w-[1280px] items-center justify-between gap-4 rounded-2xl border border-vibe-border/30 bg-vibe-surface/95 px-4 py-3 shadow-lg backdrop-blur-md">
         <Link
           href="/cart"
-          className={cn(
-            "flex min-h-11 items-center gap-2.5 text-vibe-text transition-colors",
-            !hasItems && "justify-center px-2",
-          )}
+          tabIndex={hasItems ? undefined : -1}
+          className="flex min-h-11 items-center gap-2.5 text-vibe-text transition-colors"
         >
-          <ShoppingCart
-            className={cn(
-              "size-6 shrink-0",
-              hasItems ? "checkout-bar-icon-active" : "text-vibe-text-muted",
-            )}
-          />
-          {hasItems ? (
-            <>
-              <span className="text-base text-vibe-text-muted">
-                {count} {count === 1 ? "item" : "items"}
-              </span>
-              <span className="font-display text-xl font-semibold text-vibe-text-bright">
-                {formatPrice(subtotalCents)}
-              </span>
-            </>
-          ) : (
-            <span className="text-base font-medium text-vibe-text-muted">
-              Your cart is empty
-            </span>
-          )}
+          <ShoppingCart className="checkout-bar-icon-active size-6 shrink-0" />
+          <span className="text-base text-vibe-text-muted">
+            {count} {count === 1 ? "item" : "items"}
+          </span>
+          <span className="font-display text-xl font-semibold text-vibe-text-bright">
+            {formatPrice(subtotalCents)}
+          </span>
         </Link>
 
-        {hasItems ? (
-          <Link
-            href="/checkout"
-            className="checkout-bar-cta inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-vibe-primary px-5 text-base font-semibold text-vibe-primary-fg transition-transform active:scale-95"
-          >
-            Checkout
-          </Link>
-        ) : null}
+        <Link
+          href="/checkout"
+          tabIndex={hasItems ? undefined : -1}
+          className="checkout-bar-cta inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-vibe-primary px-5 text-base font-semibold text-vibe-primary-fg transition-transform active:scale-95"
+        >
+          Checkout
+        </Link>
       </div>
     </div>
   );
