@@ -15,8 +15,22 @@ function scrollToHash(hash: string, durationMs = 1100) {
   if (!el) return;
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const marginTop = Number.parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
-  const top = el.getBoundingClientRect().top + window.scrollY - marginTop;
+
+  // If the section has a curiosity marker, frame so the pill + a short spine
+  // stub sit near the bottom of the viewport (not flush to the section top).
+  const curiosity = el.querySelector<HTMLElement>("[data-spine-curiosity]");
+  let top: number;
+  if (curiosity) {
+    const stubPx = 64;
+    const curiosityBottom =
+      curiosity.getBoundingClientRect().bottom + window.scrollY;
+    top = Math.max(0, curiosityBottom - window.innerHeight + stubPx);
+  } else {
+    const marginTop =
+      Number.parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    top = el.getBoundingClientRect().top + window.scrollY - marginTop;
+  }
+
   if (reduce || durationMs <= 0) {
     window.scrollTo(0, top);
     return;
@@ -35,15 +49,32 @@ function scrollToHash(hash: string, durationMs = 1100) {
   requestAnimationFrame(frame);
 }
 
+/** Fades in from above — place at the top of a chapter so the spine continues. */
+export function SpineInbound({ accent = false }: { accent?: boolean }) {
+  return (
+    <div className="flex flex-col items-center" aria-hidden>
+      <div
+        className={cn(
+          "h-14 w-px bg-gradient-to-b from-transparent sm:h-20",
+          accent ? "to-[#7c36e0]/45" : "to-foreground/40",
+        )}
+      />
+    </div>
+  );
+}
+
 export function SpineLink({
   label,
   href,
   accent = false,
+  curiosityAnchor = false,
 }: {
   label: string;
   href: `#${string}`;
   /** Purple treatment for the primary curiosity CTA */
   accent?: boolean;
+  /** Mark as the frame target when scrolling into the parent section */
+  curiosityAnchor?: boolean;
 }) {
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -55,10 +86,11 @@ export function SpineLink({
   );
 
   return (
-    <div className="flex flex-col items-center pt-16 pb-4 sm:pt-20">
+    <div className="flex flex-col items-center pt-10 pb-0 sm:pt-12">
       <a
         href={href}
         onClick={onClick}
+        {...(curiosityAnchor ? { "data-spine-curiosity": "" } : {})}
         className={cn(
           "inline-flex min-h-11 items-center rounded-full border-[1.5px] px-5 text-sm font-semibold backdrop-blur-sm transition-colors focus-visible:outline-none focus-visible:ring-3",
           accent
@@ -70,7 +102,7 @@ export function SpineLink({
       </a>
       <div
         className={cn(
-          "mt-3 h-16 w-px bg-gradient-to-b to-transparent sm:h-24",
+          "mt-3 h-16 w-px bg-gradient-to-b to-transparent sm:h-20",
           accent ? "from-[#7c36e0]/45" : "from-foreground/40",
         )}
         aria-hidden

@@ -170,6 +170,19 @@
   animation: fade-up 0.5s ease-out;
 }
 
+/* Store tour carousel — direction-aware entrance.
+   --tour-enter-from is set inline by the component (+10% / -10%). */
+@keyframes store-tour-enter {
+  from {
+    opacity: 0;
+    transform: translateX(var(--tour-enter-from, 10%)) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
 /* --------------------------------------------------------------------------
  * Nomi brand surface helpers (marketing + future platform restyle)
  * Warm tactile system — dot grid, drifting orbs, floats, marquee, reveals.

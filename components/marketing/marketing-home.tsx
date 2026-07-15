@@ -1,10 +1,10 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageCircleOff, Percent, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { PayNowQrCard } from "@/components/marketing/paynow-qr-card";
 import { Reveal } from "@/components/marketing/reveal";
-import { SpineLink } from "@/components/marketing/spine-link";
+import { SpineInbound, SpineLink } from "@/components/marketing/spine-link";
 import { StoreTour } from "@/components/marketing/store-tour";
 import { getLoginUrl, getMarketingUrl } from "@/lib/host";
 
@@ -50,16 +50,22 @@ function GhostCta({
 
 const BITES = [
   {
-    title: "Real shop",
-    body: "Buyers browse and cart — not another link list in your bio.",
+    title: "0% Transaction Fees",
+    body: "Keep 100% of what you earn. No platform commission. No hidden payment fees. Your earnings stay yours.",
+    Icon: Percent,
+    tint: "bg-[var(--brand-yellow)]/20 text-[#9a7b00]",
   },
   {
-    title: "Exact PayNow",
-    body: "Amount and order reference locked into every QR.",
+    title: "Get paid instantly",
+    body: "Unlike payment gateways that hold your funds for days, PayNow transfers money directly into your bank account the moment your customer pays.",
+    Icon: Zap,
+    tint: "bg-[var(--brand-purple-soft)] text-[var(--brand-purple)]",
   },
   {
-    title: "Made for SG",
-    body: "Built for Instagram, TikTok, and WhatsApp sellers.",
+    title: "Sell without the back-and-forth",
+    body: "Customers browse, add to cart, and check out in one seamless flow. No more replying to DMs or chasing payment screenshots.",
+    Icon: MessageCircleOff,
+    tint: "bg-[var(--brand-mint-soft)] text-[var(--brand-mint)]",
   },
 ] as const;
 
@@ -167,10 +173,11 @@ export function MarketingHome() {
         {/* Proof river */}
         <section
           id="stores"
-          className="scroll-mt-12 px-4 pt-12 pb-16 sm:scroll-mt-16 sm:px-6 sm:pt-14 sm:pb-20"
+          className="scroll-mt-0 px-4 pt-0 pb-16 sm:px-6 sm:pb-20"
           aria-labelledby="stores-heading"
         >
-          <Reveal className="mx-auto max-w-3xl text-center">
+          <SpineInbound accent />
+          <Reveal className="mx-auto max-w-3xl pt-6 text-center sm:pt-8">
             <h2
               id="stores-heading"
               className="font-display text-2xl font-extrabold tracking-[-0.02em] text-balance sm:text-3xl lg:text-[2.15rem]"
@@ -181,44 +188,64 @@ export function MarketingHome() {
           <div className="mt-6 sm:mt-8">
             <StoreTour />
           </div>
-          <SpineLink label="PayNow integrated" href="#paynow" accent />
+          <SpineLink
+            label="Learn About Dynamic Paynow System"
+            href="#paynow"
+            accent
+            curiosityAnchor
+          />
         </section>
 
         {/* PayNow USP */}
         <section
           id="paynow"
-          className="scroll-mt-24 px-4 py-8 sm:scroll-mt-28 sm:px-6 sm:py-12"
+          className="scroll-mt-0 px-4 pt-0 pb-8 sm:px-6 sm:pb-12"
           aria-labelledby="paynow-heading"
         >
-          <div className="mx-auto grid max-w-5xl items-center gap-12 rounded-[2rem] border border-border/80 bg-card/75 px-6 py-12 shadow-[0_20px_60px_-30px_rgba(22,19,14,0.35)] backdrop-blur-md sm:px-10 sm:py-16 lg:grid-cols-2 lg:gap-16">
+          <SpineInbound accent />
+          <div className="mx-auto mt-6 grid max-w-5xl items-center gap-12 rounded-[2rem] border border-border/80 bg-card/75 px-6 py-12 shadow-[0_20px_60px_-30px_rgba(22,19,14,0.35)] backdrop-blur-md sm:mt-8 sm:px-10 sm:py-16 lg:grid-cols-2 lg:gap-16">
             <Reveal>
               <h2
                 id="paynow-heading"
                 className="font-display text-3xl leading-[1.08] font-extrabold tracking-[-0.02em] text-balance sm:text-4xl"
               >
-                Exact PayNow.{" "}
-                <span className="brand-hl">Every order.</span>
+                Dynamic PayNow QR System.{" "}
+                <span className="brand-hl">No human error.</span>
               </h2>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Amount + reference. Built for you.
+              <p className="mt-5 max-w-lg text-lg leading-relaxed text-foreground/80 sm:text-xl">
+                Customers get an auto-generated QR code for every order that
+                embeds the exact payment amount, reference number, and merchant
+                details.
+              </p>
+              <p className="mt-3 max-w-lg text-lg leading-relaxed text-foreground/80 sm:text-xl">
+                Getting paid should be the easiest part of selling.
               </p>
             </Reveal>
             <Reveal delay={100} className="flex justify-center lg:justify-end">
               <PayNowQrCard showBadge={false} />
             </Reveal>
           </div>
-          <div className="flex justify-center pt-10" aria-hidden>
-            <div className="h-16 w-px bg-gradient-to-b from-foreground/30 to-transparent sm:h-20" />
-          </div>
+          <SpineLink label="And The Best Part...." href="#why" accent />
         </section>
 
         {/* Three bites */}
-        <section className="px-4 py-8 sm:px-6 sm:py-16" aria-label="Why Nomi">
-          <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-3 sm:gap-5">
+        <section
+          id="why"
+          className="scroll-mt-0 px-4 pt-0 pb-8 sm:px-6 sm:pb-16"
+          aria-label="Why Nomi"
+        >
+          <SpineInbound accent />
+          <div className="mx-auto mt-6 grid max-w-5xl gap-4 sm:mt-8 sm:grid-cols-3 sm:gap-5">
             {BITES.map((bite, i) => (
               <Reveal key={bite.title} delay={i * 80}>
                 <div className="h-full rounded-[1.5rem] border border-border/80 bg-card/70 p-6 shadow-sm backdrop-blur-sm sm:p-7">
-                  <h3 className="font-display text-xl font-extrabold tracking-[-0.02em]">
+                  <span
+                    className={`flex size-12 items-center justify-center rounded-2xl ${bite.tint}`}
+                    aria-hidden
+                  >
+                    <bite.Icon className="size-5" strokeWidth={2} />
+                  </span>
+                  <h3 className="mt-5 font-display text-xl font-extrabold tracking-[-0.02em]">
                     {bite.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">

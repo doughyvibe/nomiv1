@@ -10,12 +10,11 @@ import {
 } from "@/lib/marketing/demo-stores";
 import { cn } from "@/lib/utils";
 
-type Phase = "idle" | "exit" | "enter";
-
 export function StoreTour() {
   const [index, setIndex] = useState(0);
-  const [phase, setPhase] = useState<Phase>("idle");
-  const [dir, setDir] = useState<1 | -1>(1);
+  const [isExiting, setIsExiting] = useState(false);
+  const [enterDir, setEnterDir] = useState<1 | -1>(1);
+  const [enterKey, setEnterKey] = useState(0);
   const busy = useRef(false);
   const count = DEMO_CONCEPTS.length;
   const concept = DEMO_CONCEPTS[index]!;
@@ -26,18 +25,15 @@ export function StoreTour() {
       const wrapped = ((next % count) + count) % count;
       if (wrapped === index || busy.current) return;
       busy.current = true;
-      setDir(direction);
-      setPhase("exit");
+      setEnterDir(direction);
+      setIsExiting(true);
+
       window.setTimeout(() => {
         setIndex(wrapped);
-        setPhase("enter");
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setPhase("idle");
-            busy.current = false;
-          });
-        });
-      }, 280);
+        setIsExiting(false);
+        setEnterKey((k) => k + 1);
+        busy.current = false;
+      }, 260);
     },
     [count, index],
   );
@@ -60,18 +56,6 @@ export function StoreTour() {
   }, [prev, next]);
 
   const [touchX, setTouchX] = useState<number | null>(null);
-
-  // next (+1): exit left, enter from right · prev (-1): exit right, enter from left
-  const slideClass =
-    phase === "idle"
-      ? "translate-x-0 scale-100 opacity-100"
-      : phase === "exit"
-        ? dir === 1
-          ? "-translate-x-[18%] scale-[0.96] opacity-0"
-          : "translate-x-[18%] scale-[0.96] opacity-0"
-        : dir === 1
-          ? "translate-x-[18%] scale-[0.96] opacity-0"
-          : "-translate-x-[18%] scale-[0.96] opacity-0";
 
   return (
     <div
@@ -106,23 +90,33 @@ export function StoreTour() {
           }}
         >
           <div
+            key={enterKey}
             className={cn(
-              "relative w-full will-change-transform",
-              phase === "exit"
-                ? "transition-[transform,opacity] duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
-                : phase === "enter"
-                  ? "transition-none"
-                  : "transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
-              slideClass,
+              "relative w-full will-change-[transform,opacity]",
+              isExiting
+                ? cn(
+                    "transition-[transform,opacity] duration-[260ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
+                    enterDir === 1
+                      ? "-translate-x-[14%] scale-[0.97] opacity-0"
+                      : "translate-x-[14%] scale-[0.97] opacity-0",
+                  )
+                : "animate-[store-tour-enter_380ms_ease-out_both]",
             )}
+            style={
+              !isExiting
+                ? ({
+                    "--tour-enter-from": enterDir === 1 ? "10%" : "-10%",
+                  } as React.CSSProperties)
+                : undefined
+            }
           >
             <Image
               src={concept.image}
               alt={concept.alt}
-              width={1160}
-              height={2276}
+              width={1001}
+              height={2117}
               priority={index === 0}
-              className="h-auto w-full drop-shadow-[0_28px_50px_rgba(22,19,14,0.22)]"
+              className="h-auto w-full"
               sizes="(max-width: 640px) 260px, 300px"
             />
           </div>
@@ -155,3 +149,4 @@ export function StoreTour() {
     </div>
   );
 }
+
