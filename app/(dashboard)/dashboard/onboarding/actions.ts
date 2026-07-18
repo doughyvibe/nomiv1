@@ -144,6 +144,8 @@ export async function createStore(
     owner_id: user.id,
     name: trimmedName,
     slug,
+    // ponytail: hero title mirrors store name at claim — Step 3 can polish later
+    hero: { title: trimmedName.slice(0, 80) },
   });
 
   if (error) {

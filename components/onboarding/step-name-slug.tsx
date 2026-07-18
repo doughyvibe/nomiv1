@@ -76,26 +76,23 @@ export function StepNameSlug({ onDone }: { onDone: () => void }) {
 
   return (
     <section className="flex flex-col gap-5">
-      <div>
-        <h1 className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]">What is your store called?</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your store name and link. You can change the name later — the link is
-          yours once claimed.
-        </p>
-      </div>
+      <h1
+        id="store-name-heading"
+        className="font-display text-[1.75rem] font-extrabold tracking-[-0.02em]"
+      >
+        What is the name of your store?
+      </h1>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="store-name">Store name</Label>
-        <Input
-          id="store-name"
-          value={name}
-          onChange={(e) => handleNameChange(e.target.value)}
-          placeholder="Sarah Bakes"
-          maxLength={60}
-          autoFocus
-          aria-invalid={Boolean(error && !name.trim()) || undefined}
-        />
-      </div>
+      <Input
+        id="store-name"
+        value={name}
+        onChange={(e) => handleNameChange(e.target.value)}
+        placeholder="Sarah Bakes"
+        maxLength={60}
+        autoFocus
+        aria-labelledby="store-name-heading"
+        aria-invalid={Boolean(error && !name.trim()) || undefined}
+      />
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="store-slug">Your store link</Label>

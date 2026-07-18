@@ -279,7 +279,7 @@ function CandylandHero({
     <section className="storefront-hero hero-candyland-band mb-3 md:mb-4">
       <div className="hero-candyland-inner flex flex-col items-center px-5 py-10 text-center sm:px-6 md:py-12">
         {hero.logo_url ? (
-          <div className="hero-candyland-logo mb-5">
+          <div className="mb-5">
             <HeroLogo
               url={hero.logo_url}
               alt={title}

@@ -2576,14 +2576,6 @@
   background: transparent;
 }
 
-[data-vibe="candyland"] .hero-candyland-logo {
-  border: 3px solid rgb(0 0 0);
-  border-radius: 1.25rem;
-  box-shadow: 4px 4px 0 0 rgb(var(--vibe-primary));
-  overflow: hidden;
-  background: rgb(var(--vibe-surface));
-}
-
 [data-vibe="candyland"] .hero-candyland-eyebrow {
   display: inline-flex;
   font-family: var(--font-label);

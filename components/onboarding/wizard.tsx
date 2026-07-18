@@ -52,62 +52,63 @@ export function OnboardingWizard({ store, products, derivedStep }: WizardProps) 
         aria-hidden
       />
 
-      <main className="relative mx-auto flex min-h-dvh w-full max-w-xl flex-col gap-6 p-4 pb-16 sm:p-8">
-        <div className="flex items-center justify-between gap-4">
-          <Wordmark />
-          <SignOutButton />
+      <main className="relative mx-auto flex min-h-dvh w-full max-w-xl flex-col p-4 sm:p-8">
+        <div className="flex shrink-0 flex-col gap-6">
+          <div className="flex items-center justify-between gap-4">
+            <Wordmark />
+            <SignOutButton />
+          </div>
+
+          <header>
+            <ol className="flex items-center gap-1.5">
+              {ONBOARDING_STEPS.map(({ step: s, label }) => (
+                <li key={s} className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => goTo(s as OnboardingStep)}
+                    disabled={s > derivedStep}
+                    aria-label={`Step ${s}: ${label}`}
+                    aria-current={s === step ? "step" : undefined}
+                    className={cn(
+                      "flex h-11 w-full items-center",
+                      s <= derivedStep && s !== step && "cursor-pointer",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "block h-2.5 w-full rounded-full transition-colors",
+                        s < derivedStep && "bg-primary/50",
+                        s === step && "bg-primary",
+                        s > derivedStep && "bg-border",
+                      )}
+                    />
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </header>
         </div>
 
-        <header className="flex flex-col gap-3">
-          <p className="text-sm font-medium text-muted-foreground">
-            Set up your store
-          </p>
-          <ol className="flex items-center gap-1.5">
-            {ONBOARDING_STEPS.map(({ step: s, label }) => (
-              <li key={s} className="flex-1">
-                <button
-                  type="button"
-                  onClick={() => goTo(s as OnboardingStep)}
-                  disabled={s > derivedStep}
-                  aria-label={`Step ${s}: ${label}`}
-                  aria-current={s === step ? "step" : undefined}
-                  className={cn(
-                    "flex h-11 w-full items-center",
-                    s <= derivedStep && s !== step && "cursor-pointer",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "block h-2.5 w-full rounded-full transition-colors",
-                      s < derivedStep && "bg-primary/50",
-                      s === step && "bg-primary",
-                      s > derivedStep && "bg-border",
-                    )}
-                  />
-                </button>
-              </li>
-            ))}
-          </ol>
-          <p className="text-xs text-muted-foreground">
-            Step {step} of 7 — {ONBOARDING_STEPS[step - 1].label}
-          </p>
-        </header>
-
-        {step === 1 && <StepNameSlug onDone={advance} />}
-        {step === 2 && store && (
-          <StepVibe store={store} onDone={advance} />
-        )}
-        {step === 3 && store && <StepHero store={store} onDone={advance} />}
-        {step === 4 && store && (
-          <StepProduct store={store} products={products} onDone={advance} />
-        )}
-        {step === 5 && store && (
-          <StepFulfillment store={store} onDone={advance} />
-        )}
-        {step === 6 && store && <StepPayNow store={store} onDone={advance} />}
-        {step === 7 && store && (
-          <StepPublish store={store} products={products} />
-        )}
+        {/* Center short steps; scroll when content is taller than the viewport */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div className="my-auto w-full py-8">
+            {step === 1 && <StepNameSlug onDone={advance} />}
+            {step === 2 && store && (
+              <StepVibe store={store} onDone={advance} />
+            )}
+            {step === 3 && store && <StepHero store={store} onDone={advance} />}
+            {step === 4 && store && (
+              <StepProduct store={store} products={products} onDone={advance} />
+            )}
+            {step === 5 && store && (
+              <StepFulfillment store={store} onDone={advance} />
+            )}
+            {step === 6 && store && <StepPayNow store={store} onDone={advance} />}
+            {step === 7 && store && (
+              <StepPublish store={store} products={products} />
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );

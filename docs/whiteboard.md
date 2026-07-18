@@ -10,9 +10,77 @@
 **Phase 7 — Vibes + Marketing:** ✅ COMPLETE (storefront vibes all shipped)
 **Phase 8 — Polish, Hardening & Launch:** in progress → **Product Refinement**
 **Just finished:** Sprints 0–4 (non-marketing polish)
-**Next up:** Landing carousel **built** (Bucks-style stage) — founder review; then continue polish / PayNow chapter.
+**Next up:** Landing carousel **v2 built** — founder visual QA (CSS phone + peeks + slide track).
 
 **Launch note (H4):** Real PayNow already verified. **Production deploy + domain purchase deferred** until polish is complete and founder is confident.
+
+---
+
+## Carousel polish v2 — DaisyUI study + proposal
+
+> **Status:** ✅ **Built** (2026-07-17). Founder review.  
+> **Date:** 2026-07-17  
+> **Docs:** (via Context7, lib: daisyUI) [carousel](https://daisyui.com/components/carousel), [mockup-phone](https://daisyui.com/components/mockup-phone), [stack](https://daisyui.com/components/stack)  
+> **Code:** `components/marketing/store-tour.tsx`, `lib/marketing/demo-stores.ts` (raw screens)  
+> **Shipped (v2.1):** [shadcn Carousel / Embla](https://ui.shadcn.com/docs/components/base/carousel) — whole phone (bezel+screen) per slide; center align + loop; neighbor peeks via `basis`; contact shadow on active.
+
+### What’s wrong today
+
+| Issue | Cause |
+|-------|--------|
+| Clunky ←→ swap | Exit → remount → CSS keyframe enter. Two-phase JS, short travel (~14%), feels like a fade not a slide |
+| Phone looks flat | Soft CSS halo removed; PNG bezels sit on white with no depth layer |
+| Old halo looked bad | Hard-edged radial / baked PNG glow — not a soft contact shadow |
+| Layout feels busy | Arrows float in empty space; stage has no “device pedestal” |
+
+### What DaisyUI actually teaches (steal these)
+
+**1. Carousel = scroll-snap track, not opacity swap**  
+`carousel` + `carousel-item w-full` is a horizontal scroller. Next/prev use snap/`scrollIntoView` (Daisy uses `#slideN` anchors). Browser-native smooth scroll reads as a real carousel.
+
+**2. Full-width items**  
+One item owns the track width → only one phone centered; neighbors live off-canvas until you scroll.
+
+**3. `mockup-phone`**  
+Real CSS bezel: `mockup-phone` → `mockup-phone-camera` → `mockup-phone-display`. Screen content goes *inside* the display — we already have `*-raw.png` screen captures for this.
+
+**4. `stack` (stacked images)**  
+Peek of 2–3 layered cards behind the hero → depth + “more demos” without a harsh glow blob.
+
+**Also useful:** circular prev/next (`btn-circle` pattern), keep our yellow **View Demo Store** CTA under the stage.
+
+### Recommended Nomi system (don’t install daisyUI)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  See how different businesses come to life with Nomi.       │
+│                                                             │
+│        ←                                            →       │
+│                                                             │
+│              ╭── soft contact shadow (ellipse) ──╮          │
+│              │   ┌─────────────────────────┐     │          │
+│   [peek]     │   │  CSS phone bezel        │     │  [peek]  │
+│   scaled     │   │  ┌───────────────────┐  │     │  scaled  │
+│   dimmed     │   │  │ raw store screen  │  │     │  dimmed  │
+│              │   │  └───────────────────┘  │     │          │
+│              │   └─────────────────────────┘     │          │
+│              ╰───────────────────────────────────╯          │
+│                                                             │
+│                   [ View Demo Store ]                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Motion:** inner screen track `translate3d` 500ms ease; peeks update to prev/next.
+
+**Depth:** soft ellipse contact shadow + side peeks; no colored halo.
+
+**Bezel:** CSS mockup (Daisy structure, our Tailwind) + `*-raw.png` in the display.
+
+### Founder decisions (locked 2026-07-17)
+
+1. Bezel: CSS phone + raw screens ✅  
+2. Side peeks: yes ✅  
+3. Build carousel v2 ✅  
 
 ---
 
@@ -496,11 +564,8 @@ If each vibe was designed with real store concept + photography + copy, **skip p
 3. **Then say “build the landing”** — wire tour to those images.
 4. **Live demos (optional, after):** create real published stores for click-through (see §10).
 
-**Asset progress:** All 4 locked concepts framed in `public/marketing/demos/`:
-- `bakery-noir-eatnight.png`
-- `florist-atelier-botanica.png`
-- `music-cyberpunk-audio-lab.png`
-- `candy-candyland-mira-k.png`
+**Asset progress:** Tall scroll captures in `public/marketing/demos/tall/` (~430px wide):
+- `eatnight-scroll.png` · `cyberpunk-scroll.png` · `botanica-scroll.png` · `candyshop-scroll.png`
 Next: founder says **“build the landing”** when ready (live demo links can follow).
 
 #### How a demo store works (plain English) — §10
@@ -522,6 +587,7 @@ You do **not** need a special “demo mode.” Four concepts = up to **four publ
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-07-17 | Carousel **v2 built**: CSS phone + raw screens, side peeks, translate3d slide, contact shadow | Founder approved DaisyUI-inspired plan |
 | 2026-07-16 | Carousel declutter: drop STORE rail + dots; ghost **View Demo Store**; tighter gaps; directional slide easing | Founder screenshot feedback |
 | 2026-07-15 | Demo **carousel built**: single-hero stage, rail labels, ←→, dots, Open demo CTA | Founder said build carousel |
 | 2026-07-15 | Demo labels → Artisan Cafe / Audio Lab / Exotic Succulents / Sweet Treats | Founder rename |

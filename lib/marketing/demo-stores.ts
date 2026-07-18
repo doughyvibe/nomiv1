@@ -1,34 +1,42 @@
 import { getStorefrontUrl } from "@/lib/host";
 
-/** Curated marketing tour concepts (static mockups + live demo slugs). */
+/** Curated marketing tour concepts (tall scroll screens + live demo slugs). */
 export const DEMO_CONCEPTS = [
   {
     id: "bakery",
     label: "Artisan Cafe",
     slug: "eatnightdemo",
-    image: "/marketing/demos/bakery-noir-eatnight.png",
+    demoCta: "Demo EATNight",
+    image: "/marketing/demos/tall/eatnight-scroll.png",
     alt: "EATNight artisan cafe storefront preview on Noir",
+    scrollable: true,
   },
   {
     id: "music",
     label: "Audio Lab",
     slug: "cpaldemo",
-    image: "/marketing/demos/music-cyberpunk-audio-lab.png",
+    demoCta: "Demo CYBERPUNK AUDIO",
+    image: "/marketing/demos/tall/cyberpunk-scroll.png",
     alt: "Cyberpunk Audio Lab storefront preview",
+    scrollable: true,
   },
   {
     id: "florist",
     label: "Exotic Succulents",
     slug: "botanicademo",
-    image: "/marketing/demos/florist-atelier-botanica.png",
+    demoCta: "Demo BOTANICA",
+    image: "/marketing/demos/tall/botanica-scroll.png",
     alt: "BOTANICA exotic succulents storefront preview on Atelier",
+    scrollable: true,
   },
   {
     id: "candy",
     label: "Sweet Treats",
     slug: "mira-kdemo",
-    image: "/marketing/demos/candy-candyland-mira-k.png",
+    demoCta: "Demo CANDYSHOP",
+    image: "/marketing/demos/tall/candyshop-scroll.png",
     alt: "CANDYSHOP sweet treats storefront preview on Candyland",
+    scrollable: true,
   },
 ] as const;
 
