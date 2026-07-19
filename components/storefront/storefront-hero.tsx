@@ -625,7 +625,7 @@ function DefaultHero({
 export function StorefrontHero({
   storeName,
   hero,
-  vibe = "strada",
+  vibe = "atelier",
 }: StorefrontHeroProps) {
   const title = hero.title?.trim() || storeName;
 

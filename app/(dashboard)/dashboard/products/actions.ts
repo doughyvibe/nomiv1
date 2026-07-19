@@ -156,7 +156,8 @@ export async function updateProductAction(
   const validationError = validateProductInput(product);
   if (validationError) return { error: validationError };
 
-  const ctx = await sellerContext();
+  // ownedStoreContext: allow edits during onboarding revisit (not only post-done)
+  const ctx = await ownedStoreContext();
   if ("error" in ctx) return ctx;
 
   const { supabase, store } = ctx;

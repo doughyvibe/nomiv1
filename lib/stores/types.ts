@@ -46,6 +46,8 @@ export type HeroConfig = {
   logo_size?: HeroLogoSize;
   /** Frame style — default plain (no crop). Circle uses contain, not cover. */
   logo_style?: HeroLogoStyle;
+  /** Set when seller continues past onboarding Store Branding (optional fields). */
+  onboarding_branding_done?: boolean;
   /** @deprecated */
   cta?: string;
   /** @deprecated Cover/banner — not used (product lock: no hero banner) */
@@ -107,12 +109,7 @@ export function heroIsComplete(hero: Partial<HeroConfig>): boolean {
 }
 
 export function fulfillmentIsComplete(f: FulfillmentConfig): boolean {
-  const pickupOk = f.pickup?.enabled && f.pickup.instructions?.trim();
-  const deliveryOk =
-    f.delivery?.enabled &&
-    typeof f.delivery.fee_cents === "number" &&
-    f.delivery.instructions?.trim();
-  return Boolean(pickupOk || deliveryOk);
+  return Boolean(f.pickup?.enabled || f.delivery?.enabled);
 }
 
 export function paynowIsComplete(p: Partial<PayNowConfig>): boolean {

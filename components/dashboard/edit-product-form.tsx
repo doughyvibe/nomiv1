@@ -4,17 +4,13 @@ import { useRouter } from "next/navigation";
 
 import { updateProductAction } from "@/app/(dashboard)/dashboard/products/actions";
 import { ProductForm } from "@/components/dashboard/product-form";
-import type { Product, TradeHint } from "@/lib/stores/types";
+import type { Product } from "@/lib/stores/types";
 
 export function EditProductForm({
   product,
-  existingCategories,
-  tradeHint,
   storeSlug,
 }: {
   product: Product;
-  existingCategories: string[];
-  tradeHint: TradeHint | null;
   storeSlug: string;
 }) {
   const router = useRouter();
@@ -28,8 +24,6 @@ export function EditProductForm({
         image_url: product.image_url ?? undefined,
         category: product.category ?? undefined,
       }}
-      existingCategories={existingCategories}
-      tradeHint={tradeHint}
       storeSlug={storeSlug}
       submitLabel="Save changes"
       disabled={product.archived}

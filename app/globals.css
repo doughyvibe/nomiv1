@@ -155,6 +155,92 @@
   }
 }
 
+/* Onboarding: larger type + touch targets (no CSS zoom — avoids overflow) */
+[data-onboarding] {
+  --onboarding-touch: 3rem;
+}
+
+[data-onboarding] h1 {
+  font-size: 2rem !important;
+  line-height: 1.15;
+}
+
+@media (min-width: 640px) {
+  [data-onboarding] h1 {
+    font-size: 2.25rem !important;
+  }
+}
+
+[data-onboarding] [data-slot="button"] {
+  min-height: var(--onboarding-touch);
+  font-size: 1.0625rem;
+  padding-inline: 1.25rem;
+}
+
+[data-onboarding] [data-slot="input"],
+[data-onboarding] textarea {
+  min-height: var(--onboarding-touch);
+  font-size: 1.0625rem;
+}
+
+[data-onboarding] [data-slot="label"],
+[data-onboarding] .text-sm {
+  font-size: 1rem;
+}
+
+[data-onboarding] .text-xs {
+  font-size: 0.875rem;
+}
+
+/* Dashboard: mobile-first type + touch targets (matches onboarding scale) */
+[data-dashboard] {
+  --dashboard-touch: 3rem;
+}
+
+[data-dashboard] h1 {
+  font-size: 2rem !important;
+  line-height: 1.15;
+}
+
+@media (min-width: 640px) {
+  [data-dashboard] h1 {
+    font-size: 2.25rem !important;
+  }
+}
+
+[data-dashboard] h2 {
+  font-size: 1.25rem !important;
+  line-height: 1.25;
+}
+
+[data-dashboard] [data-slot="button"] {
+  min-height: var(--dashboard-touch);
+  font-size: 1.0625rem;
+  padding-inline: 1.25rem;
+}
+
+[data-dashboard] [data-slot="input"],
+[data-dashboard] textarea {
+  min-height: var(--dashboard-touch);
+  font-size: 1.0625rem;
+}
+
+[data-dashboard] [data-slot="label"],
+[data-dashboard] .text-sm {
+  font-size: 1rem;
+}
+
+[data-dashboard] .text-xs {
+  font-size: 0.875rem;
+}
+
+[data-dashboard] .btn-brand-dark,
+[data-dashboard] .btn-brand-outline {
+  height: var(--dashboard-touch);
+  font-size: 1.0625rem;
+  padding-inline: 1.35rem;
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;

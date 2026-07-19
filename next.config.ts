@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: import.meta.dirname,
   },
+  images: {
+    qualities: [75, 90],
+  },
 };
 
 export default nextConfig;

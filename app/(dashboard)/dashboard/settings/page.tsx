@@ -15,6 +15,7 @@ import { PayNowForm } from "@/components/dashboard/paynow-form";
 import { PushAlertsSettings } from "@/components/dashboard/push-alerts-settings";
 import { StoreIdentityForm } from "@/components/dashboard/store-identity-form";
 import { StoreStatusSettings } from "@/components/dashboard/store-status-settings";
+import { ResetOnboardingButton } from "@/components/onboarding/reset-onboarding-button";
 import { listUserPushSubscriptions } from "@/lib/push/subscriptions";
 import { getVapidPublicKey } from "@/lib/push/vapid";
 import { storePublishIssues } from "@/lib/stores/publish-readiness";
@@ -23,6 +24,8 @@ import { requireSellerStore } from "@/lib/stores/require-seller";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Settings — Nomi" };
+
+const isDev = process.env.NODE_ENV === "development";
 
 export default async function SettingsPage() {
   const { supabase, store } = await requireSellerStore();
@@ -102,6 +105,18 @@ export default async function SettingsPage() {
             />
           </DashboardPanelBody>
         </DashboardPanel>
+
+        {isDev ? (
+          <DashboardPanel>
+            <DashboardPanelHeader
+              title="Developer"
+              description="Local-only tools for retesting onboarding"
+            />
+            <DashboardPanelBody>
+              <ResetOnboardingButton align="start" />
+            </DashboardPanelBody>
+          </DashboardPanel>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border pt-6 lg:hidden">

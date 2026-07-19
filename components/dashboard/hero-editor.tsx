@@ -5,10 +5,10 @@ import { useState, useTransition } from "react";
 
 import { MiniPreview } from "@/components/storefront/mini-preview";
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/ui/image-upload-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { uploadStoreImage } from "@/lib/images/compress";
-import { heroLogoClassName } from "@/lib/stores/hero-logo";
 import {
   HERO_LOGO_SIZES,
   HERO_LOGO_STYLES,
@@ -65,8 +65,7 @@ export function HeroEditor({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  async function handleLogo(file: File | undefined) {
-    if (!file) return;
+  async function handleLogo(file: File) {
     setError(null);
     setUploading(true);
     try {
@@ -119,43 +118,19 @@ export function HeroEditor({
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-6 sm:flex-row">
         <div className="flex flex-1 flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="hero-logo">Your logo (optional)</Label>
-            <p className="text-muted-foreground text-xs leading-relaxed">
-              Shows above your shop name. A square image with a clear background
-              works best. We show your full logo — nothing gets cut off.
-            </p>
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={logoUrl}
-                alt={title || store.name}
-                className={cn(
-                  "border border-border bg-muted/30",
-                  heroLogoClassName(logoSize, logoStyle),
-                )}
-              />
-            ) : null}
-            <Input
-              id="hero-logo"
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleLogo(e.target.files?.[0])}
-              disabled={uploading}
-            />
-            {uploading && (
-              <p className="text-muted-foreground text-xs">Uploading…</p>
-            )}
-            {logoUrl ? (
-              <button
-                type="button"
-                className="text-muted-foreground w-fit text-xs underline"
-                onClick={() => setLogoUrl("")}
-              >
-                Remove logo
-              </button>
-            ) : null}
-          </div>
+          <ImageUploadField
+            id="hero-logo"
+            label="Your logo (optional)"
+            valueUrl={logoUrl}
+            onFile={handleLogo}
+            onClear={() => setLogoUrl("")}
+            uploading={uploading}
+            disabled={pending}
+            emptyTitleMobile="Tap to add your logo"
+            emptyTitleDesktop="Drop an image or click to browse"
+            hint="JPG or PNG · square works best"
+            objectFit="contain"
+          />
 
           {logoUrl ? (
             <>

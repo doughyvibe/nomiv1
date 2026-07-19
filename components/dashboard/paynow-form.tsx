@@ -21,6 +21,11 @@ type PayNowFormProps = {
   submitLabel?: string;
   onSave: (config: PayNowConfig) => Promise<{ error: string } | { success: true }>;
   onSuccess?: () => void;
+  /** Onboarding hides this; Settings keeps optional buyer-facing copy. */
+  showInstructions?: boolean;
+  notice?: string;
+  /** Off for onboarding so celebration can show before leaving the page. */
+  refreshOnSuccess?: boolean;
 };
 
 export function PayNowForm({
@@ -28,6 +33,9 @@ export function PayNowForm({
   submitLabel = "Save PayNow",
   onSave,
   onSuccess,
+  showInstructions = true,
+  notice,
+  refreshOnSuccess = true,
 }: PayNowFormProps) {
   const router = useRouter();
   const p = store.paynow;
@@ -70,7 +78,9 @@ export function PayNowForm({
         proxy_type: proxyType,
         proxy_value: proxyValue,
         recipient_name: recipientName,
-        instructions: instructions || undefined,
+        instructions: showInstructions
+          ? instructions || undefined
+          : p.instructions || undefined,
       });
       if ("error" in result) {
         setError(result.error);
@@ -79,15 +89,19 @@ export function PayNowForm({
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       onSuccess?.();
-      router.refresh();
+      if (refreshOnSuccess) router.refresh();
     });
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
-        Payment is <strong>not automatically verified</strong>. Check your bank
-        or PayLah app before marking an order as paid.
+        {notice ?? (
+          <>
+            Payment is <strong>not automatically verified</strong>. Check your
+            bank or PayLah app before marking an order as paid.
+          </>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -156,17 +170,19 @@ export function PayNowForm({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="paynow-instructions">
-          Additional payment instruction (optional)
-        </Label>
-        <Input
-          id="paynow-instructions"
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-          maxLength={200}
-        />
-      </div>
+      {showInstructions ? (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="paynow-instructions">
+            Additional payment instruction (optional)
+          </Label>
+          <Input
+            id="paynow-instructions"
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            maxLength={200}
+          />
+        </div>
+      ) : null}
 
       {sampleQr && (
         <div className="flex flex-col items-center gap-2 rounded-md border p-4">

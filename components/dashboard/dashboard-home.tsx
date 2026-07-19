@@ -19,7 +19,7 @@ import {
   DashboardPanelHeader,
   DashboardStatCard,
 } from "@/components/dashboard/dashboard-ui";
-import { StoreStatusBadge } from "@/components/dashboard/store-status-badge";
+import { StoreReadinessChecklist } from "@/components/dashboard/store-readiness-checklist";
 import type { OrderSummary } from "@/lib/orders/order-summary";
 import type { Store } from "@/lib/stores/types";
 
@@ -27,6 +27,7 @@ type DashboardHomeProps = {
   store: Store;
   storeUrl: string;
   summary: OrderSummary;
+  productCount: number;
 };
 
 const QUICK_ACTIONS = [
@@ -54,6 +55,7 @@ export function DashboardHome({
   store,
   storeUrl,
   summary,
+  productCount,
 }: DashboardHomeProps) {
   const hasOrders = summary.total > 0;
   const displayUrl = storeUrl.replace(/^https?:\/\//, "");
@@ -61,17 +63,16 @@ export function DashboardHome({
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <div className="flex flex-wrap items-center gap-2.5">
-          <h1 className="font-display text-[1.75rem] leading-tight font-extrabold tracking-[-0.02em] sm:text-[2.125rem]">
-            {store.name}
-          </h1>
-          <StoreStatusBadge status={store.status} />
-        </div>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Your PayNow storefront — share the link, verify payments, confirm
-          orders.
-        </p>
+        <h1 className="font-display text-[2rem] leading-tight font-extrabold tracking-[-0.02em] sm:text-[2.25rem]">
+          👋 Welcome Back
+        </h1>
       </header>
+
+      <StoreReadinessChecklist
+        store={store}
+        productCount={productCount}
+        storeUrl={storeUrl}
+      />
 
       <DashboardPanel>
         <DashboardPanelHeader
@@ -85,18 +86,18 @@ export function DashboardHome({
           }
         />
         <DashboardPanelBody className="space-y-4">
-          <div className="rounded-2xl border border-border bg-[var(--brand-bg-soft)] px-4 py-3.5">
-            <p className="break-all font-mono text-sm font-medium text-foreground">
+          <div className="rounded-2xl border border-border bg-[var(--brand-bg-soft)] px-4 py-4">
+            <p className="break-all font-mono text-base font-medium text-foreground">
               {displayUrl}
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
             <CopyStoreLinkButton url={storeUrl} />
             <a
               href={storeUrl}
               target="_blank"
               rel="noreferrer"
-              className="btn-brand-dark inline-flex h-11 items-center justify-center gap-2 px-5"
+              className="btn-brand-dark inline-flex h-12 items-center justify-center gap-2 px-5 text-base"
             >
               Open storefront
               <ArrowUpRight className="size-4" strokeWidth={2.5} />
@@ -108,10 +109,10 @@ export function DashboardHome({
       <section className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <h2 className="font-display text-lg font-bold">
+            <h2 className="font-display text-xl font-bold">
               Orders
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-base text-muted-foreground">
               {hasOrders
                 ? "Tap a stat to filter your order list."
                 : "Your first order will show up here."}
@@ -120,7 +121,7 @@ export function DashboardHome({
           {hasOrders ? (
             <Link
               href="/orders"
-              className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
+              className="text-base font-semibold text-foreground underline-offset-2 hover:underline"
             >
               View all
             </Link>
@@ -172,7 +173,7 @@ export function DashboardHome({
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="font-display text-lg font-bold">
+        <h2 className="font-display text-xl font-bold">
           Quick actions
         </h2>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -180,22 +181,22 @@ export function DashboardHome({
             <Link
               key={action.href}
               href={action.href}
-              className="dashboard-stat group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-foreground/15 hover:shadow-[0_4px_20px_rgba(22,19,14,0.06)] sm:p-5"
+              className="dashboard-stat group flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-foreground/15 hover:shadow-[0_4px_20px_rgba(22,19,14,0.06)] sm:p-5"
             >
               <span
-                className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${action.tint}`}
+                className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${action.tint}`}
               >
-                <action.Icon className="size-[18px]" strokeWidth={2} />
+                <action.Icon className="size-5" strokeWidth={2} />
               </span>
-              <span className="flex-1 text-sm font-semibold">{action.label}</span>
-              <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              <span className="flex-1 text-base font-semibold">{action.label}</span>
+              <ArrowRight className="size-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
             </Link>
           ))}
         </div>
       </section>
 
       {!hasOrders ? (
-        <ul className="space-y-2 rounded-2xl border border-dashed border-border bg-card/50 px-5 py-4 text-sm text-muted-foreground">
+        <ul className="space-y-2.5 rounded-2xl border border-dashed border-border bg-card/50 px-5 py-4 text-base text-muted-foreground">
           <li className="flex gap-2">
             <span className="text-foreground">·</span>
             Copy your store link and add it to Instagram or TikTok

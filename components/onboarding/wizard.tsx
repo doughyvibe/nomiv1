@@ -5,13 +5,12 @@ import { useState } from "react";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Wordmark } from "@/components/marketing/wordmark";
+import { ResetOnboardingButton } from "@/components/onboarding/reset-onboarding-button";
+import { StepBranding } from "@/components/onboarding/step-branding";
 import { StepFulfillment } from "@/components/onboarding/step-fulfillment";
-import { StepHero } from "@/components/onboarding/step-hero";
 import { StepNameSlug } from "@/components/onboarding/step-name-slug";
 import { StepPayNow } from "@/components/onboarding/step-paynow";
 import { StepProduct } from "@/components/onboarding/step-product";
-import { StepPublish } from "@/components/onboarding/step-publish";
-import { StepVibe } from "@/components/onboarding/step-vibe";
 import { ONBOARDING_STEPS, type OnboardingStep } from "@/lib/stores/progress";
 import type { Product, Store } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
@@ -38,7 +37,11 @@ export function OnboardingWizard({ store, products, derivedStep }: WizardProps) 
   }
 
   return (
-    <div data-brand className="relative min-h-dvh text-foreground">
+    <div
+      data-brand
+      data-onboarding
+      className="relative min-h-dvh overflow-x-clip text-foreground"
+    >
       <div
         className="brand-grain pointer-events-none absolute inset-0 opacity-40"
         aria-hidden
@@ -52,11 +55,14 @@ export function OnboardingWizard({ store, products, derivedStep }: WizardProps) 
         aria-hidden
       />
 
-      <main className="relative mx-auto flex min-h-dvh w-full max-w-xl flex-col p-4 sm:p-8">
+      <main className="relative mx-auto flex min-h-dvh w-full max-w-xl flex-col p-4 sm:max-w-2xl sm:p-8">
         <div className="flex shrink-0 flex-col gap-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center justify-between gap-2">
             <Wordmark />
-            <SignOutButton />
+            <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2">
+              <ResetOnboardingButton />
+              <SignOutButton />
+            </div>
           </div>
 
           <header>
@@ -89,26 +95,34 @@ export function OnboardingWizard({ store, products, derivedStep }: WizardProps) 
           </header>
         </div>
 
-        {/* Center short steps; scroll when content is taller than the viewport */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="my-auto w-full py-8">
-            {step === 1 && <StepNameSlug onDone={advance} />}
+        {/* Center short steps vertically; taller steps will push the
+            container and the page scrolls naturally (no inner scrollbox). */}
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-1">
+          <div className="w-full py-8">
+            {step === 1 && (
+              <StepNameSlug store={store} onDone={advance} />
+            )}
             {step === 2 && store && (
-              <StepVibe store={store} onDone={advance} />
+              <StepBranding store={store} onDone={advance} />
             )}
-            {step === 3 && store && <StepHero store={store} onDone={advance} />}
+            {step === 3 && store && (
+              <StepProduct
+                store={store}
+                products={products}
+                onDone={advance}
+              />
+            )}
             {step === 4 && store && (
-              <StepProduct store={store} products={products} onDone={advance} />
-            )}
-            {step === 5 && store && (
               <StepFulfillment store={store} onDone={advance} />
             )}
-            {step === 6 && store && <StepPayNow store={store} onDone={advance} />}
-            {step === 7 && store && (
-              <StepPublish store={store} products={products} />
-            )}
+            {step === 5 && store && <StepPayNow store={store} />}
           </div>
         </div>
+
+        {/* Invisible counterweight — matches the header chrome height so that
+            the flex centering above yields the true visual center of the page
+            rather than the center of the remaining space below the header. */}
+        <div className="shrink-0 h-[6.5rem] sm:h-[7rem]" aria-hidden />
       </main>
     </div>
   );

@@ -42,4 +42,21 @@ describe("storePublishIssues", () => {
     } as Store;
     assert.deepEqual(storePublishIssues(ready, 1), []);
   });
+
+  it("treats method-only fulfillment as complete", () => {
+    const ready = {
+      ...base,
+      vibe: "strada",
+      hero: { title: "Shop" },
+      fulfillment: {
+        delivery: { enabled: true, fee_cents: 0, instructions: "" },
+      },
+      paynow: {
+        proxy_type: "mobile",
+        proxy_value: "91234567",
+        recipient_name: "Test",
+      },
+    } as Store;
+    assert.deepEqual(storePublishIssues(ready, 1), []);
+  });
 });

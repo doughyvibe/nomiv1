@@ -12,10 +12,22 @@ export type VibeMeta = {
 
 export const VIBES: VibeMeta[] = [
   {
+    id: "atelier",
+    name: "Atelier",
+    tagline: "Quiet luxury, organic minimalism.",
+    suitableFor: "Any trade — the Nomi default",
+    swatch: {
+      bg: "rgb(251 249 244)",
+      primary: "rgb(51 69 55)",
+      secondary: "rgb(103 93 80)",
+    },
+    provisional: false,
+  },
+  {
     id: "strada",
     name: "Strada",
     tagline: "Black, white, and type that works everywhere.",
-    suitableFor: "Any trade — the Nomi default",
+    suitableFor: "Any trade — clean and minimal",
     swatch: {
       bg: "rgb(255 255 255)",
       primary: "rgb(17 17 17)",
@@ -32,18 +44,6 @@ export const VIBES: VibeMeta[] = [
       bg: "rgb(18 20 20)",
       primary: "rgb(255 181 152)",
       secondary: "rgb(154 241 49)",
-    },
-    provisional: false,
-  },
-  {
-    id: "atelier",
-    name: "Atelier",
-    tagline: "Quiet luxury, organic minimalism.",
-    suitableFor: "Plants, ceramics, handmade, lifestyle, florals",
-    swatch: {
-      bg: "rgb(251 249 244)",
-      primary: "rgb(51 69 55)",
-      secondary: "rgb(103 93 80)",
     },
     provisional: false,
   },

@@ -28,21 +28,21 @@ export default async function StorefrontPage({
       <StorefrontHero
         storeName={store.name}
         hero={store.hero}
-        vibe={store.vibe ?? "strada"}
+        vibe={store.vibe ?? "atelier"}
       />
 
       {featured ? (
         <FeaturedProduct
           product={featured}
           sectionTitle={store.featured_section_title}
-          vibe={store.vibe ?? "strada"}
+          vibe={store.vibe ?? "atelier"}
         />
       ) : null}
 
       {catalog.length > 0 ? (
         <ProductCatalog
           products={catalog}
-          vibe={store.vibe ?? "strada"}
+          vibe={store.vibe ?? "atelier"}
         />
       ) : products.length === 0 ? (
         <section className="px-5 py-12 text-center sm:px-6">

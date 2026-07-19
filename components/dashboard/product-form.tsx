@@ -4,13 +4,13 @@ import { useState, useTransition } from "react";
 
 import { CategoryPicker } from "@/components/dashboard/category-picker";
 import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "@/components/ui/image-upload-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getStorefrontUrl } from "@/lib/host";
 import { uploadStoreImage } from "@/lib/images/compress";
-import { collectCategories, normalizeCategory } from "@/lib/products/category";
+import { normalizeCategory } from "@/lib/products/category";
 import { parsePriceToCents, type ProductInput } from "@/lib/products/validate";
-import type { TradeHint } from "@/lib/stores/types";
 import { createClient } from "@/lib/supabase/client";
 import { useSavedFlash } from "@/lib/ui/use-saved-flash";
 
@@ -18,8 +18,6 @@ type ProductFormProps = {
   initial?: Partial<ProductInput>;
   submitLabel: string;
   disabled?: boolean;
-  existingCategories?: string[];
-  tradeHint?: TradeHint | null;
   storeSlug?: string;
   onSubmit: (product: ProductInput) => Promise<
     | { error: string }
@@ -32,8 +30,6 @@ export function ProductForm({
   initial,
   submitLabel,
   disabled = false,
-  existingCategories = [],
-  tradeHint = null,
   storeSlug,
   onSubmit,
   onSuccess,
@@ -54,8 +50,7 @@ export function ProductForm({
   const [pending, startTransition] = useTransition();
   const { flashSaved, saveLabel } = useSavedFlash();
 
-  async function handleImage(file: File | undefined) {
-    if (!file) return;
+  async function handleImage(file: File) {
     setError(null);
     setUploading(true);
     try {
@@ -136,7 +131,7 @@ export function ProductForm({
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="product-price">Price (S$)</Label>
+        <Label htmlFor="product-price">Price</Label>
         <Input
           id="product-price"
           inputMode="decimal"
@@ -148,36 +143,24 @@ export function ProductForm({
           aria-describedby={error && fieldError === "price" ? "product-form-error" : undefined}
         />
       </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="product-image">Product image</Label>
-        {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageUrl}
-            alt=""
-            className="aspect-square w-24 rounded-md border object-cover"
-          />
-        ) : null}
-        <Input
-          id="product-image"
-          type="file"
-          accept="image/*"
-          onChange={(e) => handleImage(e.target.files?.[0])}
-          disabled={disabled || uploading}
-        />
-        {uploading && (
-          <p className="text-muted-foreground text-xs">Uploading…</p>
-        )}
-      </div>
+      <ImageUploadField
+        id="product-image"
+        label="Product image"
+        valueUrl={imageUrl}
+        onFile={handleImage}
+        onClear={() => setImageUrl("")}
+        uploading={uploading}
+        disabled={disabled}
+        emptyTitleMobile="Tap to add a photo"
+        emptyTitleDesktop="Drop a photo or click to browse"
+        hint="Recommended 1200×1200 or larger"
+        objectFit="cover"
+      />
       <div className="flex flex-col gap-2">
         <Label htmlFor="product-category">Category</Label>
         <CategoryPicker
           value={category}
           onChange={setCategory}
-          existingCategories={collectCategories(
-            existingCategories.map((c) => ({ category: c })),
-          )}
-          tradeHint={tradeHint}
           disabled={disabled}
         />
       </div>
@@ -191,7 +174,7 @@ export function ProductForm({
           maxLength={300}
           disabled={disabled}
           rows={3}
-          className="w-full min-w-0 rounded-lg border border-input bg-transparent px-3 py-2 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm resize-none"
+          className="w-full min-w-0 resize-none rounded-lg border border-input bg-transparent px-3.5 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50"
         />
         <p className="text-muted-foreground text-xs">
           Shown on the product page and as a short blurb on catalog cards.

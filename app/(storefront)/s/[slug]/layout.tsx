@@ -29,7 +29,7 @@ export default async function StorefrontSlugLayout({
     if (isOrderRoute) {
       const chrome = await getOrderStorefrontChrome(slug);
       if (chrome) {
-        const vibe = chrome.store.vibe ?? "strada";
+        const vibe = chrome.store.vibe ?? "atelier";
         return (
           <div
             data-surface="storefront"
@@ -54,7 +54,7 @@ export default async function StorefrontSlugLayout({
   const storefront = await getPublishedStorefront(slug);
   if (!storefront) notFound();
 
-  const vibe = storefront.store.vibe ?? "strada";
+  const vibe = storefront.store.vibe ?? "atelier";
 
   return (
     <div

@@ -71,21 +71,21 @@ function NavLink({
       <Link
         href={item.href}
         className={cn(
-          "relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold transition-colors",
+          "relative flex min-h-14 flex-1 flex-col items-center justify-center gap-1 py-2 text-xs font-semibold transition-colors",
           active ? "text-foreground" : "text-muted-foreground",
         )}
       >
         <span
           className={cn(
-            "flex size-9 items-center justify-center rounded-xl transition-colors",
+            "flex size-11 items-center justify-center rounded-xl transition-colors",
             active ? "bg-primary text-foreground" : "bg-transparent",
           )}
         >
-          <item.Icon className="size-[18px]" strokeWidth={2} />
+          <item.Icon className="size-5" strokeWidth={2} />
         </span>
         {item.label}
         {showBadge ? (
-          <span className="absolute top-1 right-[calc(50%-1.25rem)] flex size-4 items-center justify-center rounded-full bg-[var(--brand-purple)] text-[9px] font-bold text-white">
+          <span className="absolute top-1.5 right-[calc(50%-1.4rem)] flex size-5 items-center justify-center rounded-full bg-[var(--brand-purple)] text-[10px] font-bold text-white">
             {pendingCount > 9 ? "9+" : pendingCount}
           </span>
         ) : null}
@@ -97,16 +97,16 @@ function NavLink({
     <Link
       href={item.href}
       className={cn(
-        "relative flex min-h-11 items-center gap-3 rounded-2xl px-3.5 text-sm font-semibold transition-colors",
+        "relative flex min-h-12 items-center gap-3 rounded-2xl px-3.5 text-base font-semibold transition-colors",
         active
           ? "bg-primary text-foreground shadow-[0_2px_8px_rgba(247,197,24,0.25)]"
           : "text-muted-foreground hover:bg-accent hover:text-foreground",
       )}
     >
-      <item.Icon className="size-[18px] shrink-0" strokeWidth={2} />
+      <item.Icon className="size-5 shrink-0" strokeWidth={2} />
       {item.label}
       {showBadge ? (
-        <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-[var(--brand-purple)] text-[10px] font-bold text-white">
+        <span className="ml-auto flex size-6 items-center justify-center rounded-full bg-[var(--brand-purple)] text-xs font-bold text-white">
           {pendingCount > 9 ? "9+" : pendingCount}
         </span>
       ) : null}
@@ -130,6 +130,7 @@ export function DashboardShell({
   return (
     <div
       data-brand
+      data-dashboard
       className="relative flex min-h-dvh flex-col text-foreground lg:flex-row"
     >
       <div
@@ -167,14 +168,14 @@ export function DashboardShell({
       </aside>
 
       {/* Mobile top bar */}
-      <header className="relative z-10 flex items-center justify-between border-b border-border/80 bg-card/80 px-4 py-3 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top,0px))] lg:hidden">
+      <header className="relative z-10 flex items-center justify-between border-b border-border/80 bg-card/80 px-4 py-3.5 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top,0px))] lg:hidden">
         <Link href="/" aria-label="Dashboard home">
           <Wordmark />
         </Link>
       </header>
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:max-w-4xl lg:px-10 lg:py-10 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-10">
+        <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:max-w-4xl lg:px-10 lg:py-10 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:pb-10">
           {children}
         </div>
       </div>

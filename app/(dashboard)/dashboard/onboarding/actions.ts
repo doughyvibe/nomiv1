@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import {
   addProductAction,
   type ProductInput,
@@ -104,25 +106,46 @@ export async function checkSlugAvailability(
   const formatError = validateSlugFormat(slug);
   if (formatError) return { available: false, error: formatError };
 
-  const [{ data: reserved }, { data: existing }] = await Promise.all([
-    supabase.from("reserved_slugs").select("slug").eq("slug", slug).maybeSingle(),
-    supabase.from("stores").select("id").eq("slug", slug).maybeSingle(),
-  ]);
+  // Bypass stores RLS via SECURITY DEFINER — draft slugs must count as taken
+  // without exposing other merchants' rows (see is_store_slug_available).
+  const { data: available, error: rpcError } = await supabase.rpc(
+    "is_store_slug_available",
+    { p_slug: slug },
+  );
+
+  if (rpcError) {
+    return { available: false, error: friendlyDbError(rpcError) };
+  }
+
+  if (available) return { available: true };
+
+  // Own current slug is fine when revisiting step 1
+  const { data: ownStore } = await supabase
+    .from("stores")
+    .select("slug")
+    .eq("owner_id", user.id)
+    .neq("status", "deleted")
+    .maybeSingle();
+  if (ownStore?.slug === slug) return { available: true };
+
+  const { data: reserved } = await supabase
+    .from("reserved_slugs")
+    .select("slug")
+    .eq("slug", slug)
+    .maybeSingle();
 
   if (reserved) {
     return { available: false, error: "This name is reserved" };
   }
-  if (existing) {
-    return {
-      available: false,
-      error: "Already taken",
-      suggestions: suggestAlternatives(slug),
-    };
-  }
-  return { available: true };
+  return {
+    available: false,
+    error: "Already taken",
+    suggestions: suggestAlternatives(slug),
+  };
 }
 
-export async function createStore(
+/** Create draft store, or update name/slug while still draft (step 1 revisit). */
+export async function saveStoreNameSlug(
   name: string,
   slug: string,
 ): Promise<ActionResult> {
@@ -138,18 +161,49 @@ export async function createStore(
   }
 
   const { supabase, user, store } = await getOwnedStore();
-  if (store) return { ok: false, error: "You already have a store" };
 
-  const { error } = await supabase.from("stores").insert({
-    owner_id: user.id,
-    name: trimmedName,
-    slug,
-    // ponytail: hero title mirrors store name at claim — Step 3 can polish later
-    hero: { title: trimmedName.slice(0, 80) },
-  });
+  if (!store) {
+    const { error } = await supabase.from("stores").insert({
+      owner_id: user.id,
+      name: trimmedName,
+      slug,
+      // ponytail: Atelier + hero title at claim — vibe/hero polish later on /storefront
+      vibe: "atelier",
+      hero: { title: trimmedName.slice(0, 80) },
+    });
+
+    if (error) {
+      if (error.code === "23505") {
+        return { ok: false, error: "Already taken" };
+      }
+      return { ok: false, error: friendlyDbError(error) };
+    }
+    return { ok: true };
+  }
+
+  if (store.status !== "draft") {
+    return {
+      ok: false,
+      error: "Store link can only be changed while setting up",
+    };
+  }
+
+  if (store.name === trimmedName && store.slug === slug) {
+    return { ok: true };
+  }
+
+  const hero =
+    (store.hero.title ?? "").trim() === store.name.trim()
+      ? { ...store.hero, title: trimmedName.slice(0, 80) }
+      : store.hero;
+
+  const { error } = await supabase
+    .from("stores")
+    .update({ name: trimmedName, slug, hero })
+    .eq("id", store.id)
+    .eq("owner_id", user.id);
 
   if (error) {
-    // unique violation = lost a race for the slug
     if (error.code === "23505") {
       return { ok: false, error: "Already taken" };
     }
@@ -214,13 +268,21 @@ export async function saveTradeHint(
 // ---------------------------------------------------------------------------
 
 export async function saveHero(hero: HeroConfig): Promise<ActionResult> {
-  if (!heroIsComplete(hero)) {
+  const { supabase, store } = await getOwnedStore();
+  if (!store) return { ok: false, error: "No store yet" };
+
+  const title = (hero.title?.trim() || store.name).slice(0, 80);
+  if (!title) {
     return { ok: false, error: "Hero title is required" };
   }
 
+  const brandingDone =
+    hero.onboarding_branding_done === true ||
+    store.hero.onboarding_branding_done === true;
+
   const clean: HeroConfig = {
     eyebrow: hero.eyebrow?.trim() || undefined,
-    title: hero.title.trim().slice(0, 80),
+    title,
     subheading: hero.subheading?.trim() || undefined,
     logo_url: hero.logo_url || undefined,
     logo_size:
@@ -237,10 +299,12 @@ export async function saveHero(hero: HeroConfig): Promise<ActionResult> {
         hero.logo_style === "circle")
         ? hero.logo_style
         : undefined,
+    onboarding_branding_done: brandingDone || undefined,
   };
 
-  const { supabase, store } = await getOwnedStore();
-  if (!store) return { ok: false, error: "No store yet" };
+  if (!heroIsComplete(clean)) {
+    return { ok: false, error: "Hero title is required" };
+  }
 
   const { error } = await supabase
     .from("stores")
@@ -274,8 +338,7 @@ export async function saveFulfillment(
   if (!fulfillmentIsComplete(config)) {
     return {
       ok: false,
-      error:
-        "Enable at least one method with its details (delivery needs a fee and instructions).",
+      error: "Enable at least one fulfillment method",
     };
   }
 
@@ -283,15 +346,16 @@ export async function saveFulfillment(
   if (config.pickup?.enabled) {
     clean.pickup = {
       enabled: true,
-      instructions: config.pickup.instructions.trim(),
+      instructions: config.pickup.instructions?.trim() ?? "",
       location: config.pickup.location?.trim() || undefined,
     };
   }
   if (config.delivery?.enabled) {
+    const fee = Number(config.delivery.fee_cents);
     clean.delivery = {
       enabled: true,
-      fee_cents: Math.round(config.delivery.fee_cents),
-      instructions: config.delivery.instructions.trim(),
+      fee_cents: Number.isFinite(fee) && fee >= 0 ? Math.round(fee) : 0,
+      instructions: config.delivery.instructions?.trim() ?? "",
     };
   }
 
@@ -345,7 +409,7 @@ export async function savePayNow(config: PayNowConfig): Promise<ActionResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Step 7 — publish
+// Publish (auto after PayNow onboarding; also used from Settings)
 // ---------------------------------------------------------------------------
 
 export async function publishStore(): Promise<ActionResult> {
@@ -375,4 +439,32 @@ export async function publishStore(): Promise<ActionResult> {
     .eq("id", store.id);
 
   return error ? { ok: false, error: friendlyDbError(error) } : { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Dev-only — hard-delete store so onboarding can restart (frees slug)
+// ---------------------------------------------------------------------------
+
+export async function resetOnboarding(): Promise<ActionResult> {
+  if (process.env.NODE_ENV !== "development") {
+    return { ok: false, error: "Reset is only available in development" };
+  }
+
+  const { supabase, user, store } = await getOwnedStore();
+  if (!store) {
+    revalidatePath("/onboarding");
+    return { ok: true };
+  }
+
+  const { error } = await supabase
+    .from("stores")
+    .delete()
+    .eq("id", store.id)
+    .eq("owner_id", user.id);
+
+  if (error) return { ok: false, error: friendlyDbError(error) };
+
+  revalidatePath("/onboarding");
+  revalidatePath("/");
+  return { ok: true };
 }

@@ -34,11 +34,11 @@ export function DashboardPanelHeader({
       )}
     >
       <div className="min-w-0">
-        <h2 className="font-display text-lg font-bold">
+        <h2 className="font-display text-xl font-bold">
           {title}
         </h2>
         {description ? (
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-1.5 text-base leading-relaxed text-muted-foreground">
             {description}
           </p>
         ) : null}
@@ -75,15 +75,15 @@ export function DashboardPageHeader({
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          <p className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="font-display text-[1.75rem] leading-tight font-extrabold tracking-[-0.02em] sm:text-[2rem]">
+        <h1 className="font-display text-[2rem] leading-tight font-extrabold tracking-[-0.02em] sm:text-[2.25rem]">
           {title}
         </h1>
         {description ? (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 max-w-xl text-base leading-relaxed text-muted-foreground">
             {description}
           </p>
         ) : null}
@@ -116,8 +116,8 @@ export function DashboardStatCard({
 }) {
   const inner = (
     <>
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="font-display mt-2 text-3xl font-extrabold tabular-nums tracking-[-0.02em]">
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="font-display mt-2 text-4xl font-extrabold tabular-nums tracking-[-0.02em]">
         {value}
       </p>
     </>
@@ -173,15 +173,17 @@ export function DashboardEmptyState({
 }) {
   return (
     <div className="flex flex-col items-center px-4 py-10 text-center sm:py-12">
-      <p className="font-display text-lg font-bold">
+      <p className="font-display text-xl font-bold">
         {title}
       </p>
       {description ? (
-        <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-2 max-w-sm text-base leading-relaxed text-muted-foreground">
           {description}
         </p>
       ) : null}
-      {children ? <div className="mt-6 flex flex-wrap justify-center gap-2">{children}</div> : null}
+      {children ? (
+        <div className="mt-6 flex flex-wrap justify-center gap-2.5">{children}</div>
+      ) : null}
     </div>
   );
 }
