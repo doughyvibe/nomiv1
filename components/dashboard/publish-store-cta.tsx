@@ -14,11 +14,13 @@ export function PublishStoreCta({
   issues,
   billingEnabled,
   hasActivePlan,
+  previewUrl,
 }: {
   isPublished: boolean;
   issues: PublishIssue[];
   billingEnabled: boolean;
   hasActivePlan: boolean;
+  previewUrl: string;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -53,19 +55,14 @@ export function PublishStoreCta({
       )}
     >
       <p className="text-xs font-semibold tracking-wide text-primary uppercase">
-        {ready ? "Ready to launch" : "Publish your store"}
+        Ready when you are
       </p>
       <h2 className="mt-2 font-display text-xl font-bold text-foreground">
-        {ready
-          ? "Your store is ready to go live"
-          : "Finish setup before you publish"}
+        Publish when you’re happy with your store
       </h2>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-        {ready
-          ? needsCheckout
-            ? "Pick a plan to publish — free to build, pay when you go live."
-            : "Publishing makes your link open for customers and lets them place orders."
-          : "Complete the items below, then you can publish."}
+        Complete the checklist to prepare your store, or publish anytime when
+        you’re ready to start accepting orders.
       </p>
 
       {!ready ? (
@@ -83,13 +80,13 @@ export function PublishStoreCta({
         </ul>
       ) : null}
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
         {needsCheckout && ready ? (
           <Button
             render={<Link href="/billing/publish" />}
             className="w-full sm:w-auto"
           >
-            Choose plan & publish
+            Publish Store
           </Button>
         ) : (
           <Button
@@ -98,9 +95,18 @@ export function PublishStoreCta({
             onClick={publish}
             className="w-full sm:w-auto"
           >
-            {pending ? "Publishing…" : "Publish your store"}
+            {pending ? "Publishing…" : "Publish Store"}
           </Button>
         )}
+        <Button
+          render={
+            <a href={previewUrl} target="_blank" rel="noreferrer" />
+          }
+          variant="outline"
+          className="w-full sm:w-auto"
+        >
+          Preview store
+        </Button>
       </div>
 
       {error ? (

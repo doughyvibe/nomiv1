@@ -18,6 +18,7 @@ import {
 import {
   countDone,
   deriveReadiness,
+  initialChecklistOpen,
   isItemDone,
   loadReadinessStorage,
   READINESS_ITEM_IDS,
@@ -46,19 +47,26 @@ export function StoreReadinessChecklist({
 
   const [storage, setStorage] = useState<ReadinessStorage>({ overrides: {} });
   const [hydrated, setHydrated] = useState(false);
+  // ponytail: incomplete collapse is session-only — next visit re-opens
+  const [sessionOpen, setSessionOpen] = useState(true);
   const [focusedId, setFocusedId] = useState<ReadinessItemId | null>(null);
 
   useEffect(() => {
-    setStorage(loadReadinessStorage(store.id));
+    const loaded = loadReadinessStorage(store.id);
+    const done =
+      countDone(deriveReadiness(store, productCount), loaded.overrides) ===
+      READINESS_ITEM_IDS.length;
+    setStorage(loaded);
+    setSessionOpen(initialChecklistOpen(done, loaded.open));
     setHydrated(true);
-  }, [store.id]);
+  }, [store, productCount]);
 
   const doneCount = countDone(derived, storage.overrides);
   const total = READINESS_ITEM_IDS.length;
   const allDone = doneCount === total;
   const percent = Math.round((doneCount / total) * 100);
 
-  const open = storage.open ?? (hydrated ? !allDone : true);
+  const open = sessionOpen;
 
   const nextId = READINESS_ITEM_IDS.find(
     (id) => !isItemDone(id, derived, storage.overrides),
@@ -79,7 +87,11 @@ export function StoreReadinessChecklist({
   }
 
   function setOpen(nextOpen: boolean) {
-    persist({ ...storage, open: nextOpen });
+    setSessionOpen(nextOpen);
+    // Incomplete: session-only. Complete: remember preference.
+    if (allDone) {
+      persist({ ...storage, open: nextOpen });
+    }
   }
 
   function setItemDone(id: ReadinessItemId, next: boolean) {

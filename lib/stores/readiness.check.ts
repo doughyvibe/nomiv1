@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   countDone,
   deriveReadiness,
+  initialChecklistOpen,
   isItemDone,
   READINESS_ITEM_IDS,
   type ReadinessDerived,
@@ -69,5 +70,12 @@ assert.equal(
   countDone(derived, { preview: true, style: true, install: true }),
   9,
 );
+
+assert.equal(initialChecklistOpen(false, false), true);
+assert.equal(initialChecklistOpen(false, true), true);
+assert.equal(initialChecklistOpen(false, undefined), true);
+assert.equal(initialChecklistOpen(true, undefined), false);
+assert.equal(initialChecklistOpen(true, true), true);
+assert.equal(initialChecklistOpen(true, false), false);
 
 console.log("readiness.check.ts: ok");

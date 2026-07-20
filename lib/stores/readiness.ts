@@ -97,9 +97,9 @@ export const READINESS_ITEMS: ReadinessItemDef[] = [
     id: "publish",
     title: "Publish with confidence",
     description:
-      "You’ve done the hard work. Publish your store and start taking your first orders.",
-    href: "/billing/publish",
-    ctaLabel: "Publish store",
+      "You’ve done the hard work. Use Publish below when you’re ready to go live.",
+    href: "/dashboard",
+    // ponytail: no ctaLabel — dedicated PublishStoreCta sits under the checklist
   },
 ];
 
@@ -144,8 +144,17 @@ export function countDone(
 
 export type ReadinessStorage = {
   overrides: Partial<Record<ReadinessItemId, boolean>>;
+  /** Only meaningful when checklist is 100% — incomplete always starts open. */
   open?: boolean;
 };
+
+/** Incomplete → always open on load; complete → remember preference (default collapsed). */
+export function initialChecklistOpen(
+  allDone: boolean,
+  storedOpen?: boolean,
+): boolean {
+  return allDone ? (storedOpen ?? false) : true;
+}
 
 export function storageKey(storeId: string): string {
   return `nomi:readiness:${storeId}`;
