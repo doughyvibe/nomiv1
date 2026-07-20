@@ -11,6 +11,7 @@ import {
   DashboardPanelBody,
   DashboardPanelHeader,
 } from "@/components/dashboard/dashboard-ui";
+import { ManageBillingButton } from "@/components/dashboard/manage-billing-button";
 import { PayNowForm } from "@/components/dashboard/paynow-form";
 import { PushAlertsSettings } from "@/components/dashboard/push-alerts-settings";
 import { StoreIdentityForm } from "@/components/dashboard/store-identity-form";
@@ -18,6 +19,10 @@ import { StoreStatusSettings } from "@/components/dashboard/store-status-setting
 import { ResetOnboardingButton } from "@/components/onboarding/reset-onboarding-button";
 import { listUserPushSubscriptions } from "@/lib/push/subscriptions";
 import { getVapidPublicKey } from "@/lib/push/vapid";
+import {
+  isBillingEnabled,
+  subscriptionAllowsPublish,
+} from "@/lib/billing/plans";
 import { storePublishIssues } from "@/lib/stores/publish-readiness";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
@@ -43,6 +48,8 @@ export default async function SettingsPage() {
   ]);
 
   const publishIssues = storePublishIssues(store, productCount ?? 0);
+  const billingEnabled = isBillingEnabled();
+  const hasActivePlan = subscriptionAllowsPublish(store.subscription_status);
 
   return (
     <div className="flex flex-col gap-8">
@@ -69,7 +76,17 @@ export default async function SettingsPage() {
             description="Publish or hide your storefront"
           />
           <DashboardPanelBody>
-            <StoreStatusSettings store={store} publishIssues={publishIssues} />
+            <StoreStatusSettings
+              store={store}
+              publishIssues={publishIssues}
+              billingEnabled={billingEnabled}
+              hasActivePlan={hasActivePlan}
+            />
+            {billingEnabled && hasActivePlan ? (
+              <div className="mt-4 border-t border-border pt-4">
+                <ManageBillingButton />
+              </div>
+            ) : null}
           </DashboardPanelBody>
         </DashboardPanel>
 

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { generateOrderReference } from "@/lib/orders/reference";
 import { sendVerificationRequestPush } from "@/lib/push/send-verification-alert";
-import { getPublishedStorefront } from "@/lib/stores/load-storefront";
+import { getCheckoutStorefront } from "@/lib/stores/load-storefront";
 import type { FulfillmentConfig } from "@/lib/stores/types";
 import { paynowIsComplete } from "@/lib/stores/types";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -59,7 +59,7 @@ export async function createOrderAction(
     return { error: "Your cart is empty" };
   }
 
-  const storefront = await getPublishedStorefront(slug);
+  const storefront = await getCheckoutStorefront(slug);
   if (!storefront) return { error: "Store not found" };
 
   const { store, products } = storefront;

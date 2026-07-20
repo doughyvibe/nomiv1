@@ -18,8 +18,7 @@ export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
  * Progress is derived from store data, not a stored counter — resume-safe by
  * construction: the next incomplete step is always recomputed from what exists.
  * Branding is optional content-wise; completion is flagged on Continue.
- * Publish happens automatically after PayNow — draft + complete PayNow stays
- * on step 5 so Continue can retry publish.
+ * Onboarding is done when PayNow is complete — publishing is a separate paid step.
  */
 export function deriveOnboardingStep(
   store: Store | null,
@@ -29,6 +28,6 @@ export function deriveOnboardingStep(
   if (!store.hero.onboarding_branding_done) return 2;
   if (productCount === 0) return 3;
   if (!fulfillmentIsComplete(store.fulfillment)) return 4;
-  if (!paynowIsComplete(store.paynow) || store.status === "draft") return 5;
+  if (!paynowIsComplete(store.paynow)) return 5;
   return "done";
 }

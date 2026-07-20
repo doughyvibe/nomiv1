@@ -24,9 +24,13 @@ import type { Store } from "@/lib/stores/types";
 export function StoreStatusSettings({
   store,
   publishIssues,
+  billingEnabled = false,
+  hasActivePlan = false,
 }: {
   store: Store;
   publishIssues: PublishIssue[];
+  billingEnabled?: boolean;
+  hasActivePlan?: boolean;
 }) {
   const router = useRouter();
   const [publishOpen, setPublishOpen] = useState(false);
@@ -36,6 +40,7 @@ export function StoreStatusSettings({
 
   const isPublished = store.status === "published";
   const canPublish = publishIssues.length === 0;
+  const needsCheckout = billingEnabled && !hasActivePlan;
 
   function run(action: () => Promise<{ error: string } | { success: true }>) {
     setError(null);
@@ -84,13 +89,22 @@ export function StoreStatusSettings({
               ))}
             </ul>
           )}
-          <Button
-            type="button"
-            disabled={!canPublish}
-            onClick={() => setPublishOpen(true)}
-          >
-            Publish store
-          </Button>
+          {needsCheckout ? (
+            <Button
+              render={<Link href="/billing/publish" />}
+              disabled={!canPublish}
+            >
+              Choose plan & publish
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              disabled={!canPublish}
+              onClick={() => setPublishOpen(true)}
+            >
+              Publish store
+            </Button>
+          )}
         </>
       )}
 

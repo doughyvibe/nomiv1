@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { resolveSurface } from "@/lib/host";
+import { sharedAuthCookieOptions } from "@/lib/supabase/cookie-options";
 import {
   copyCookies,
   getMiddlewareUser,
@@ -57,10 +58,37 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     const suffix = pathname === "/" ? "" : pathname;
     url.pathname = `/s/${slug}${suffix}`;
-    // Request header so the storefront layout can allow /order/* when unpublished
+
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-nomi-pathname", url.pathname);
-    return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
+
+    const wantsPreview =
+      request.nextUrl.searchParams.get("preview") === "1" ||
+      request.cookies.get("nomi_preview")?.value === "1";
+    if (wantsPreview) {
+      requestHeaders.set("x-nomi-preview", "1");
+    }
+
+    let response = NextResponse.rewrite(url, {
+      request: { headers: requestHeaders },
+    });
+
+    // Refresh session on storefront so owner preview can see dashboard login
+    const { response: sessionResponse } = await getMiddlewareUser(
+      request,
+      response,
+    );
+    response = sessionResponse;
+
+    if (request.nextUrl.searchParams.get("preview") === "1") {
+      response.cookies.set("nomi_preview", "1", {
+        ...sharedAuthCookieOptions(),
+        maxAge: 60 * 60,
+        httpOnly: true,
+      });
+    }
+
+    return response;
   }
 
   return NextResponse.next();

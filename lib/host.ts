@@ -42,6 +42,13 @@ export function getStorefrontUrl(slug: string, path = "/"): string {
   return `${protocol}://${slug}.${root}${port}${normalizedPath}`;
 }
 
+/** Owner-only private preview of a non-live storefront */
+export function getStorefrontPreviewUrl(slug: string, path = "/"): string {
+  const base = getStorefrontUrl(slug, path);
+  const join = base.includes("?") ? "&" : "?";
+  return `${base}${join}preview=1`;
+}
+
 /** ponytail: naive hostname parse; upgrade path = shared util + unit tests if edge cases appear */
 export function resolveSurface(host: string | null): {
   surface: AppSurface;

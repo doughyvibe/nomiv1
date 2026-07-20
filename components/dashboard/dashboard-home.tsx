@@ -19,8 +19,15 @@ import {
   DashboardPanelHeader,
   DashboardStatCard,
 } from "@/components/dashboard/dashboard-ui";
+import { PublishStoreCta } from "@/components/dashboard/publish-store-cta";
 import { StoreReadinessChecklist } from "@/components/dashboard/store-readiness-checklist";
+import {
+  isBillingEnabled,
+  subscriptionAllowsPublish,
+} from "@/lib/billing/plans";
+import { getStorefrontPreviewUrl } from "@/lib/host";
 import type { OrderSummary } from "@/lib/orders/order-summary";
+import { storePublishIssues } from "@/lib/stores/publish-readiness";
 import type { Store } from "@/lib/stores/types";
 
 type DashboardHomeProps = {
@@ -59,6 +66,8 @@ export function DashboardHome({
 }: DashboardHomeProps) {
   const hasOrders = summary.total > 0;
   const displayUrl = storeUrl.replace(/^https?:\/\//, "");
+  const isPublished = store.status === "published";
+  const publishIssues = storePublishIssues(store, productCount);
 
   return (
     <div className="flex flex-col gap-8">
@@ -67,6 +76,13 @@ export function DashboardHome({
           👋 Welcome Back
         </h1>
       </header>
+
+      <PublishStoreCta
+        isPublished={isPublished}
+        issues={publishIssues}
+        billingEnabled={isBillingEnabled()}
+        hasActivePlan={subscriptionAllowsPublish(store.subscription_status)}
+      />
 
       <StoreReadinessChecklist
         store={store}
@@ -77,12 +93,22 @@ export function DashboardHome({
       <DashboardPanel>
         <DashboardPanelHeader
           title="Store link"
-          description="Drop this in your bio, Stories, or WhatsApp status."
+          description={
+            isPublished
+              ? "Drop this in your bio, Stories, or WhatsApp status."
+              : "Share this while you build — visitors will see Coming Soon until you publish."
+          }
           action={
-            <span className="hidden items-center gap-1.5 rounded-full bg-[var(--brand-mint-soft)] px-3 py-1 text-xs font-semibold text-[var(--brand-mint)] sm:inline-flex">
-              <Share2 className="size-3.5" strokeWidth={2.5} />
-              Ready to share
-            </span>
+            isPublished ? (
+              <span className="hidden items-center gap-1.5 rounded-full bg-[var(--brand-mint-soft)] px-3 py-1 text-xs font-semibold text-[var(--brand-mint)] sm:inline-flex">
+                <Share2 className="size-3.5" strokeWidth={2.5} />
+                Ready to share
+              </span>
+            ) : (
+              <span className="hidden items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground sm:inline-flex">
+                Coming soon
+              </span>
+            )
           }
         />
         <DashboardPanelBody className="space-y-4">
@@ -93,15 +119,27 @@ export function DashboardHome({
           </div>
           <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
             <CopyStoreLinkButton url={storeUrl} />
-            <a
-              href={storeUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-brand-dark inline-flex h-12 items-center justify-center gap-2 px-5 text-base"
-            >
-              Open storefront
-              <ArrowUpRight className="size-4" strokeWidth={2.5} />
-            </a>
+            {isPublished ? (
+              <a
+                href={storeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-brand-dark inline-flex h-12 items-center justify-center gap-2 px-5 text-base"
+              >
+                Open storefront
+                <ArrowUpRight className="size-4" strokeWidth={2.5} />
+              </a>
+            ) : (
+              <a
+                href={getStorefrontPreviewUrl(store.slug)}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-brand-dark inline-flex h-12 items-center justify-center gap-2 px-5 text-base"
+              >
+                Preview store
+                <ArrowUpRight className="size-4" strokeWidth={2.5} />
+              </a>
+            )}
           </div>
         </DashboardPanelBody>
       </DashboardPanel>

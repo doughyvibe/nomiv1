@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ProductDetail } from "@/components/storefront/product-detail";
-import { getPublishedStorefront } from "@/lib/stores/load-storefront";
+import { getCheckoutStorefront } from "@/lib/stores/load-storefront";
 
 export default async function ProductPage({
   params,
@@ -9,7 +9,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string; id: string }>;
 }) {
   const { slug, id } = await params;
-  const storefront = await getPublishedStorefront(slug);
+  const storefront = await getCheckoutStorefront(slug);
   if (!storefront) notFound();
 
   const product = storefront.products.find((p) => p.id === id);

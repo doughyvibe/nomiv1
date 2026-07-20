@@ -89,6 +89,11 @@ export type Store = {
   featured_product_id?: string | null;
   featured_section_title?: string | null;
   trade_hint?: TradeHint | null;
+  stripe_customer_id?: string | null;
+  subscription_id?: string | null;
+  subscription_status?: string | null;
+  subscription_plan?: string | null;
+  subscription_period_end?: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -11,6 +11,10 @@ import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { isValidSgMobile, isValidUen } from "@/lib/paynow";
 import { suggestAlternatives, validateSlugFormat } from "@/lib/slug";
 import {
+  isBillingEnabled,
+  subscriptionAllowsPublish,
+} from "@/lib/billing/plans";
+import {
   fulfillmentIsComplete,
   heroIsComplete,
   paynowIsComplete,
@@ -409,7 +413,7 @@ export async function savePayNow(config: PayNowConfig): Promise<ActionResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Publish (auto after PayNow onboarding; also used from Settings)
+// Publish (seller-initiated; gated on completeness — billing gate in Phase 2)
 // ---------------------------------------------------------------------------
 
 export async function publishStore(): Promise<ActionResult> {
@@ -431,6 +435,13 @@ export async function publishStore(): Promise<ActionResult> {
 
   if (!complete) {
     return { ok: false, error: "Complete all onboarding steps first" };
+  }
+
+  if (
+    isBillingEnabled() &&
+    !subscriptionAllowsPublish(store.subscription_status)
+  ) {
+    return { ok: false, error: "Subscribe to publish your store" };
   }
 
   const { error } = await supabase

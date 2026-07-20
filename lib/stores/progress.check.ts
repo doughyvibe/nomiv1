@@ -64,7 +64,7 @@ assert.equal(
     },
     1,
   ),
-  5,
+  "done",
 );
 assert.equal(
   deriveOnboardingStep(

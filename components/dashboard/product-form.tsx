@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ImageUploadField } from "@/components/ui/image-upload-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getStorefrontUrl } from "@/lib/host";
+import { getStorefrontPreviewUrl } from "@/lib/host";
 import { uploadStoreImage } from "@/lib/images/compress";
 import { normalizeCategory } from "@/lib/products/category";
 import { parsePriceToCents, type ProductInput } from "@/lib/products/validate";
@@ -102,7 +102,7 @@ export function ProductForm({
       flashSaved();
 
       if (result.filtersLive && result.categories?.length) {
-        const preview = storeSlug ? getStorefrontUrl(storeSlug) : null;
+        const preview = storeSlug ? getStorefrontPreviewUrl(storeSlug) : null;
         setToast(
           `Storefront filters are live: ${result.categories.join(", ")}${preview ? " — preview your store to see them." : "."}`,
         );
@@ -194,7 +194,7 @@ export function ProductForm({
             <>
               {" "}
               <a
-                href={getStorefrontUrl(storeSlug)}
+                href={getStorefrontPreviewUrl(storeSlug)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold underline"

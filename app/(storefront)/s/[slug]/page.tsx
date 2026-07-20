@@ -7,7 +7,7 @@ import {
   catalogProducts,
   resolveFeaturedProduct,
 } from "@/lib/products/featured";
-import { getPublishedStorefront } from "@/lib/stores/load-storefront";
+import { getCheckoutStorefront } from "@/lib/stores/load-storefront";
 
 export default async function StorefrontPage({
   params,
@@ -15,7 +15,7 @@ export default async function StorefrontPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const storefront = await getPublishedStorefront(slug);
+  const storefront = await getCheckoutStorefront(slug);
 
   if (!storefront) notFound();
 

@@ -27,3 +27,7 @@ export function useStorefront(): PublishedStorefront {
   }
   return ctx;
 }
+
+export function usePreviewMode(): boolean {
+  return Boolean(useStorefront().previewMode);
+}

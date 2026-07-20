@@ -4,7 +4,7 @@ import { StorefrontEditor } from "@/components/dashboard/storefront-editor";
 import {
   DashboardPageHeader,
 } from "@/components/dashboard/dashboard-ui";
-import { getStorefrontUrl } from "@/lib/host";
+import { getStorefrontPreviewUrl, getStorefrontUrl } from "@/lib/host";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
@@ -15,6 +15,10 @@ export const metadata: Metadata = { title: "Storefront — Nomi" };
 export default async function StorefrontPage() {
   const { supabase, store } = await requireSellerStore();
   const storeUrl = getStorefrontUrl(store.slug);
+  const isPublished = store.status === "published";
+  const openUrl = isPublished
+    ? storeUrl
+    : getStorefrontPreviewUrl(store.slug);
 
   const { data: products } = await supabase
     .from("products")
@@ -32,12 +36,12 @@ export default async function StorefrontPage() {
         description="Choose your vibe, logo, and tagline buyers see first."
         action={
           <a
-            href={storeUrl}
+            href={openUrl}
             target="_blank"
             rel="noreferrer"
             className="btn-brand-dark inline-flex h-11 items-center gap-2 px-5"
           >
-            Open storefront
+            {isPublished ? "Open storefront" : "Preview store"}
             <ArrowUpRight className="size-4" strokeWidth={2.5} />
           </a>
         }
