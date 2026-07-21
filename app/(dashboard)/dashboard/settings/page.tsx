@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   saveFulfillmentAction,
   savePayNowAction,
@@ -17,6 +19,7 @@ import { PushAlertsSettings } from "@/components/dashboard/push-alerts-settings"
 import { StoreIdentityForm } from "@/components/dashboard/store-identity-form";
 import { StoreStatusSettings } from "@/components/dashboard/store-status-settings";
 import { ResetOnboardingButton } from "@/components/onboarding/reset-onboarding-button";
+import { Button } from "@/components/ui/button";
 import { listUserPushSubscriptions } from "@/lib/push/subscriptions";
 import { getVapidPublicKey } from "@/lib/push/vapid";
 import {
@@ -121,6 +124,18 @@ export default async function SettingsPage() {
               serverSubscriptionCount={subscriptions.length}
             />
           </DashboardPanelBody>
+        </DashboardPanel>
+
+        <DashboardPanel>
+          <DashboardPanelHeader
+            title="Install Nomi App"
+            description="Add Nomi to your phone for order alerts and quick access"
+            action={
+              <Button render={<Link href="/settings/install" />} size="sm">
+                Open
+              </Button>
+            }
+          />
         </DashboardPanel>
 
         {isDev ? (

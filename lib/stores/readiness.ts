@@ -90,7 +90,7 @@ export const READINESS_ITEMS: ReadinessItemDef[] = [
     title: "Install Nomi on your phone",
     description:
       "Get instant order notifications and manage your store like an app—right from your home screen.",
-    href: "/dashboard",
+    href: "/settings/install",
     ctaLabel: "How to install",
   },
   {

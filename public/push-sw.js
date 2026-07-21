@@ -1,5 +1,8 @@
 /* ponytail: minimal dashboard push SW — no offline cache; push + notification click only */
 
+// Chrome installability requires a fetch handler (network default; no caching).
+self.addEventListener("fetch", () => {});
+
 self.addEventListener("push", (event) => {
   let payload = { title: "Nomi", body: "", url: "/orders" };
   try {
