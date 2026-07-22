@@ -50,8 +50,8 @@ export function FeaturedProductButton({
         className={cn(
           "flex size-10 items-center justify-center rounded-full border transition-colors",
           isFeatured
-            ? "border-primary bg-primary text-foreground"
-            : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+            ? "border-primary bg-primary text-foreground shadow-[0_2px_10px_rgba(247,197,24,0.35)]"
+            : "border-border/70 bg-[var(--brand-bg-soft)] text-[var(--brand-ink-mute)] hover:border-foreground/25 hover:bg-card hover:text-foreground",
         )}
       >
         <Star className={cn("size-4", isFeatured && "fill-current")} />

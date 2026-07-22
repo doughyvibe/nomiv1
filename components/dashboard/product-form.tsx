@@ -1,7 +1,14 @@
 "use client";
 
 import { ChevronDown, Plus } from "lucide-react";
-import { useState, useTransition, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 
 import {
   ChoicesSection,
@@ -17,6 +24,7 @@ import {
   useStockState,
 } from "@/components/dashboard/stock-editor";
 import { CategoryPicker } from "@/components/dashboard/category-picker";
+import { useUnsavedChangesBlocker } from "@/components/dashboard/unsaved-changes";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -68,6 +76,26 @@ type ProductFormProps = {
   >;
   onSuccess?: (result: { filtersLive?: boolean; categories?: string[] }) => void;
 };
+
+function formSnapshot(parts: {
+  name: string;
+  price: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  prepEnabled: boolean;
+  prepDays: string;
+  choicesEnabled: boolean;
+  choicesOptions: unknown;
+  choicesPrices: unknown;
+  customisationsEnabled: boolean;
+  customisationsRows: unknown;
+  stockEnabled: boolean;
+  productQty: string;
+  stockByKey: unknown;
+}) {
+  return JSON.stringify(parts);
+}
 
 export function ProductForm({
   initial,
@@ -130,6 +158,60 @@ export function ProductForm({
   const [toast, setToast] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const { flashSaved, saveLabel } = useSavedFlash();
+
+  const currentSnapshot = useMemo(
+    () =>
+      formSnapshot({
+        name,
+        price,
+        description,
+        category,
+        imageUrl,
+        prepEnabled,
+        prepDays,
+        choicesEnabled: choicesState.enabled,
+        choicesOptions: choicesState.options,
+        choicesPrices: choicesState.priceByKey,
+        customisationsEnabled: customisationsState.enabled,
+        customisationsRows: customisationsState.rows,
+        stockEnabled: stockState.enabled,
+        productQty: stockState.productQty,
+        stockByKey: stockState.stockByKey,
+      }),
+    [
+      name,
+      price,
+      description,
+      category,
+      imageUrl,
+      prepEnabled,
+      prepDays,
+      choicesState.enabled,
+      choicesState.options,
+      choicesState.priceByKey,
+      customisationsState.enabled,
+      customisationsState.rows,
+      stockState.enabled,
+      stockState.productQty,
+      stockState.stockByKey,
+    ],
+  );
+
+  const baselineRef = useRef(currentSnapshot);
+  const [, bumpClean] = useState(0);
+  const dirty = !disabled && currentSnapshot !== baselineRef.current;
+
+  useUnsavedChangesBlocker(dirty);
+
+  useEffect(() => {
+    if (!dirty) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
 
   async function handleImage(file: File) {
     setError(null);
@@ -219,6 +301,8 @@ export function ProductForm({
         return;
       }
 
+      baselineRef.current = currentSnapshot;
+      bumpClean((n) => n + 1);
       flashSaved();
 
       if (result.filtersLive && result.categories?.length) {
@@ -532,19 +616,31 @@ export function ProductForm({
         </p>
       )}
 
-      {/* Primary page action */}
-      <div className="-mx-1 sticky bottom-3 z-10 sm:static sm:bottom-auto">
-        <Button
-          type="button"
-          onClick={handleSave}
-          disabled={
-            disabled || pending || uploading || !name.trim() || !price.trim()
-          }
-          className="h-14 w-full rounded-2xl text-base font-bold shadow-[0_8px_24px_rgb(0_0_0/0.12)]"
-          aria-live="polite"
-        >
-          {saveLabel(pending, submitLabel)}
-        </Button>
+      {/* Clearance for floating Save (above mobile tab bar) */}
+      <div className="shrink-0 pb-24 lg:pb-24" aria-hidden />
+
+      {/* Save — floating CTA; desktop starts after sidebar (17.5rem) */}
+      <div
+        className={cn(
+          "pointer-events-none fixed z-30 px-4 sm:px-6 lg:px-10",
+          // Match shell nav clearance (6.5rem) + gap so the CTA sits fully above the tab bar
+          "inset-x-0 bottom-[calc(6.5rem+0.75rem+env(safe-area-inset-bottom,0px))]",
+          "lg:inset-x-auto lg:left-[17.5rem] lg:right-0 lg:bottom-6",
+        )}
+      >
+        <div className="pointer-events-auto mx-auto w-full max-w-3xl lg:max-w-4xl">
+          <Button
+            type="button"
+            onClick={handleSave}
+            disabled={
+              disabled || pending || uploading || !name.trim() || !price.trim()
+            }
+            className="h-14 w-full rounded-2xl text-base font-bold shadow-[0_8px_24px_rgb(0_0_0/0.18)]"
+            aria-live="polite"
+          >
+            {saveLabel(pending, submitLabel)}
+          </Button>
+        </div>
       </div>
     </div>
   );

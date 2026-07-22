@@ -60,15 +60,14 @@ export default async function ProductsPage({
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <DashboardPageHeader
-        eyebrow={store.name}
         title="Products"
         action={
           filter !== "archived" ? (
             <Link
               href="/products/new"
-              className="btn-brand-dark inline-flex h-11 items-center px-5"
+              className="inline-flex h-11 items-center rounded-full bg-primary px-5 text-base font-semibold text-foreground shadow-[0_4px_16px_rgba(247,197,24,0.35)] transition-transform active:scale-[0.99]"
             >
               Add product
             </Link>

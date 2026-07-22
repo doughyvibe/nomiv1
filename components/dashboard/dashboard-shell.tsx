@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { UnsavedChangesProvider } from "@/components/dashboard/unsaved-changes";
 import { Wordmark } from "@/components/marketing/wordmark";
 import { cn } from "@/lib/utils";
 
@@ -128,11 +129,12 @@ export function DashboardShell({
   }
 
   return (
-    <div
-      data-brand
-      data-dashboard
-      className="relative flex min-h-dvh flex-col text-foreground lg:flex-row"
-    >
+    <UnsavedChangesProvider>
+      <div
+        data-brand
+        data-dashboard
+        className="relative flex min-h-dvh flex-col text-foreground lg:flex-row"
+      >
       <div
         className="brand-grain pointer-events-none absolute inset-0 opacity-35"
         aria-hidden
@@ -198,6 +200,7 @@ export function DashboardShell({
           ))}
         </div>
       </nav>
-    </div>
+      </div>
+    </UnsavedChangesProvider>
   );
 }

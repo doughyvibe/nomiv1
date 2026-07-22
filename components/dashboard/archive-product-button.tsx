@@ -54,7 +54,7 @@ export function ArchiveProductButton({ productId }: { productId: string }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent showCloseButton>
           <DialogHeader>
-            <DialogTitle>Remove from shop?</DialogTitle>
+            <DialogTitle>Archive product?</DialogTitle>
             <DialogDescription>
               Hidden from buyers. Past orders stay intact.
             </DialogDescription>
@@ -67,7 +67,7 @@ export function ArchiveProductButton({ productId }: { productId: string }) {
               disabled={pending}
               onClick={handleArchive}
             >
-              {pending ? "Removing…" : "Remove"}
+              {pending ? "Archiving…" : "Archive"}
             </Button>
           </DialogFooter>
         </DialogContent>

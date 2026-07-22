@@ -3,12 +3,12 @@ import { cn } from "@/lib/utils";
 
 const LABELS: Record<ProductStatus, string> = {
   live: "Live",
-  archived: "Removed",
+  archived: "Archived",
 };
 
 const TONES: Record<ProductStatus, string> = {
-  live: "bg-emerald-500/15 text-emerald-800",
-  archived: "bg-muted text-muted-foreground",
+  live: "bg-[var(--brand-mint-soft)] text-[var(--brand-mint)]",
+  archived: "bg-[var(--brand-bg-soft)] text-[var(--brand-ink-mute)]",
 };
 
 export function ProductStatusBadge({
