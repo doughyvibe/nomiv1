@@ -1,7 +1,18 @@
 import { cache } from "react";
 
+import { attachProductChoices } from "@/lib/products/load-choices";
+import { attachProductCustomisations } from "@/lib/products/load-customisations";
+import { filterVisibleStorefrontProducts } from "@/lib/products/inventory";
 import type { Product, Store } from "@/lib/stores/types";
 import { createClient } from "@/lib/supabase/server";
+
+async function attachProductExtras(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  products: Product[],
+): Promise<Product[]> {
+  const withChoices = await attachProductChoices(supabase, products);
+  return attachProductCustomisations(supabase, withChoices);
+}
 
 export type StorefrontGate =
   | { kind: "not_found" }
@@ -67,8 +78,8 @@ export const resolveStorefrontGate = cache(
   },
 );
 
-/** Load a published store + active products. Deduped per request via React cache. */
-export const getPublishedStorefront = cache(
+/** Load a published store + live products (includes OOS; catalog callers filter). */
+export const getPublishedStorefrontRaw = cache(
   async (slug: string): Promise<PublishedStorefront | null> => {
     const supabase = await createClient();
 
@@ -85,10 +96,26 @@ export const getPublishedStorefront = cache(
       .from("products")
       .select("*")
       .eq("store_id", store.id)
-      .eq("archived", false)
+      .eq("status", "live")
       .order("created_at", { ascending: true });
 
-    return { store, products: (products as Product[]) ?? [] };
+    const withExtras = await attachProductExtras(
+      supabase,
+      (products as Product[]) ?? [],
+    );
+    return { store, products: withExtras };
+  },
+);
+
+/** Public catalog: hide policy removes sold-out offers. */
+export const getPublishedStorefront = cache(
+  async (slug: string): Promise<PublishedStorefront | null> => {
+    const raw = await getPublishedStorefrontRaw(slug);
+    if (!raw) return null;
+    return {
+      ...raw,
+      products: filterVisibleStorefrontProducts(raw.products),
+    };
   },
 );
 
@@ -121,22 +148,26 @@ export const getOwnerPreviewStorefront = cache(
       .from("products")
       .select("*")
       .eq("store_id", store.id)
-      .eq("archived", false)
+      .eq("status", "live")
       .order("created_at", { ascending: true });
 
+    const withChoices = await attachProductExtras(
+      supabase,
+      (products as Product[]) ?? [],
+    );
     return {
       store,
-      products: (products as Product[]) ?? [],
+      products: withChoices,
       previewMode: true,
     };
   },
 );
 
-/** Published shop, or owner preview of a non-live shop. */
+/** Published shop (unfiltered for stock checks), or owner preview. */
 export async function getCheckoutStorefront(
   slug: string,
 ): Promise<PublishedStorefront | null> {
-  const published = await getPublishedStorefront(slug);
+  const published = await getPublishedStorefrontRaw(slug);
   if (published) return published;
   return getOwnerPreviewStorefront(slug);
 }

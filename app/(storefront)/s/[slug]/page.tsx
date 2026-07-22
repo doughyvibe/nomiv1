@@ -7,6 +7,7 @@ import {
   catalogProducts,
   resolveFeaturedProduct,
 } from "@/lib/products/featured";
+import { filterVisibleStorefrontProducts } from "@/lib/products/inventory";
 import { getCheckoutStorefront } from "@/lib/stores/load-storefront";
 
 export default async function StorefrontPage({
@@ -19,7 +20,11 @@ export default async function StorefrontPage({
 
   if (!storefront) notFound();
 
-  const { store, products } = storefront;
+  const { store } = storefront;
+  // Public catalog respects hide policy; owner preview keeps OOS visible
+  const products = storefront.previewMode
+    ? storefront.products
+    : filterVisibleStorefrontProducts(storefront.products);
   const featured = resolveFeaturedProduct(store, products);
   const catalog = catalogProducts(products, featured);
 

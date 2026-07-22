@@ -4,9 +4,12 @@ import {
   saveFulfillmentAction,
   savePayNowAction,
   saveStoreIdentityAction,
+  startLiveModeAction,
+  stopLiveModeAction,
 } from "@/app/(dashboard)/dashboard/settings/actions";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { FulfillmentForm } from "@/components/dashboard/fulfillment-form";
+import { LiveModePanel } from "@/components/dashboard/live-mode-panel";
 import {
   DashboardPageHeader,
   DashboardPanel,
@@ -46,7 +49,7 @@ export default async function SettingsPage() {
       .from("products")
       .select("*", { count: "exact", head: true })
       .eq("store_id", store.id)
-      .eq("archived", false),
+      .neq("status", "archived"),
     user ? listUserPushSubscriptions(supabase, user.id) : Promise.resolve([]),
   ]);
 
@@ -94,12 +97,20 @@ export default async function SettingsPage() {
         </DashboardPanel>
 
         <DashboardPanel>
-          <DashboardPanelHeader
-            title="Fulfillment"
-            description="Pickup and delivery options for buyers"
-          />
+          <DashboardPanelHeader title="Fulfillment" />
           <DashboardPanelBody>
             <FulfillmentForm store={store} onSave={saveFulfillmentAction} />
+          </DashboardPanelBody>
+        </DashboardPanel>
+
+        <DashboardPanel>
+          <DashboardPanelHeader title="Live mode" />
+          <DashboardPanelBody>
+            <LiveModePanel
+              store={store}
+              onStart={startLiveModeAction}
+              onStop={stopLiveModeAction}
+            />
           </DashboardPanelBody>
         </DashboardPanel>
 

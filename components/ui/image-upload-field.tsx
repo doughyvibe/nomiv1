@@ -13,6 +13,7 @@ type ImageUploadFieldProps = {
   uploading?: boolean;
   disabled?: boolean;
   label?: string;
+  labelClassName?: string;
   emptyTitleMobile?: string;
   emptyTitleDesktop?: string;
   hint?: string;
@@ -29,6 +30,7 @@ export function ImageUploadField({
   uploading = false,
   disabled = false,
   label,
+  labelClassName,
   emptyTitleMobile = "Tap to add an image",
   emptyTitleDesktop = "Drop an image or click to browse",
   hint = "JPG or PNG",
@@ -55,7 +57,11 @@ export function ImageUploadField({
 
   return (
     <div className="flex flex-col gap-2">
-      {label ? <Label htmlFor={inputId}>{label}</Label> : null}
+      {label ? (
+        <Label htmlFor={inputId} className={labelClassName}>
+          {label}
+        </Label>
+      ) : null}
 
       <input
         ref={inputRef}

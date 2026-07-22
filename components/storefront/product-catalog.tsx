@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Plus, ShoppingCart } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
-import { formatPrice } from "@/lib/money";
+import { formatOfferPrice } from "@/lib/products/offer-price";
+import { productRequiresConfig } from "@/lib/products/customisations";
+import {
+  isProductSoldOut,
+} from "@/lib/products/inventory";
 import { normalizeCategory } from "@/lib/products/category";
 import type { Product, Vibe } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
@@ -105,9 +110,14 @@ function ProductCard({
   vows: boolean;
   strada: boolean;
 }) {
+  const router = useRouter();
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
+  const needsChoices = productRequiresConfig(product);
+  const soldOut = isProductSoldOut(product);
   const category = normalizeCategory(product.category);
+  const priceLabel = formatOfferPrice(product);
+  const priceDisplay = priceLabel;
   const blurb =
     atelier || expedition || cyberpunk || candyland || market || gallery || laura || atlantic || vows || strada
       ? product.description?.trim()
@@ -116,16 +126,40 @@ function ProductCard({
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (soldOut) return;
+    if (needsChoices) {
+      router.push(`/product/${product.id}`);
+      return;
+    }
     addToCart(product.id, 1);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }
 
-  const addButton = (
+  const addButton = soldOut ? (
+    <span
+      className={cn(
+        "catalog-card-add inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 px-2.5 text-[10px] font-bold uppercase tracking-wide text-vibe-text-muted",
+        studio && "catalog-studio-add",
+        laura && "catalog-laura-add",
+        atlantic && "catalog-atlantic-add",
+        vows && "catalog-vows-add",
+        strada && "catalog-strada-add",
+      )}
+      aria-label={`${product.name} sold out`}
+    >
+      Sold out
+    </span>
+  ) : (
     <button
       type="button"
       onClick={handleQuickAdd}
-      aria-label={`Add ${product.name} to cart`}
+      aria-label={
+        needsChoices
+          ? `Choose options for ${product.name}`
+          : `Add ${product.name} to cart`
+      }
+      title={needsChoices ? "Choose options" : undefined}
       className={cn(
         "catalog-card-add inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-bg/50 p-0 leading-none transition-colors [&_svg]:block [&_svg]:shrink-0",
         studio && "catalog-studio-add",
@@ -148,8 +182,7 @@ function ProductCard({
 
   return (
     <Link
-      href={`/product/${product.id}`}
-      className={cn(
+      href={`/product/${product.id}`}      className={cn(
         "vibe-card group flex h-full flex-col overflow-hidden rounded-[var(--vibe-radius)] transition-transform active:scale-[0.98]",
         "animate-fade-up opacity-0",
         atelier && "catalog-atelier-card",
@@ -198,9 +231,14 @@ function ProductCard({
         ) : (
           <div className="size-full bg-vibe-border/20" />
         )}
+        {soldOut ? (
+          <span className="absolute left-2 top-2 rounded-md bg-vibe-surface/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-vibe-text-muted shadow-sm">
+            Sold out
+          </span>
+        ) : null}
         {expedition ? (
           <span className="catalog-expedition-price-stamp">
-            {formatPrice(product.price_cents)}
+            {priceDisplay}
           </span>
         ) : null}
         <div
@@ -249,7 +287,7 @@ function ProductCard({
               <p className="catalog-card-desc line-clamp-2">{blurb}</p>
             ) : null}
             <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
-              {formatPrice(product.price_cents)}
+              {priceDisplay}
             </p>
           </>
         ) : studio ? (
@@ -262,7 +300,7 @@ function ProductCard({
             </h3>
             <div className="catalog-studio-price-row mt-auto flex items-center justify-between gap-2 pt-2">
               <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
-                {formatPrice(product.price_cents)}
+                {priceDisplay}
               </p>
               {addButton}
             </div>
@@ -288,7 +326,7 @@ function ProductCard({
               )}
             >
               <p className="catalog-card-price text-sm font-semibold text-vibe-primary md:text-base">
-                {formatPrice(product.price_cents)}
+                {priceDisplay}
               </p>
               {addButton}
             </div>

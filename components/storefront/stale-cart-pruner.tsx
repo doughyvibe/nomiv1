@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
-import { pruneCartToProductIds } from "@/lib/cart/storage";
+import { pruneCartToValidLines } from "@/lib/cart/storage";
 
 /** Drop archived/deleted products from localStorage cart; surface a one-shot notice. */
 export function StaleCartPruner({ slug }: { slug: string }) {
@@ -19,8 +19,7 @@ export function StaleCartPruner({ slug }: { slug: string }) {
     if (products.length === 0) return;
     if (ranForKey.current === productKey) return;
     ranForKey.current = productKey;
-    const ids = new Set(products.map((p) => p.id));
-    const { removedLines } = pruneCartToProductIds(slug, ids);
+    const { removedLines } = pruneCartToValidLines(slug, products);
     if (removedLines > 0) {
       refresh();
       setNotice(

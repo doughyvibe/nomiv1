@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ProductDetail } from "@/components/storefront/product-detail";
+import { shouldHideSoldOut } from "@/lib/products/inventory";
 import { getCheckoutStorefront } from "@/lib/stores/load-storefront";
 
 export default async function ProductPage({
@@ -14,6 +15,7 @@ export default async function ProductPage({
 
   const product = storefront.products.find((p) => p.id === id);
   if (!product) notFound();
+  if (!storefront.previewMode && shouldHideSoldOut(product)) notFound();
 
   return (
     <main>

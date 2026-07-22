@@ -42,7 +42,7 @@ export default async function OnboardingPage() {
       .from("products")
       .select("*")
       .eq("store_id", store.id)
-      .eq("archived", false)
+      .neq("status", "archived")
       .order("created_at", { ascending: true });
     products = (data as Product[]) ?? [];
   }

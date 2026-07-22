@@ -37,7 +37,7 @@ export default async function BillingPublishPage() {
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id)
-    .eq("archived", false);
+    .neq("status", "archived");
 
   const issues = storePublishIssues(store, count ?? 0);
   const ready = issues.length === 0;

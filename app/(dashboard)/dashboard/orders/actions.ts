@@ -37,7 +37,7 @@ async function sellerContext(): Promise<
       .from("products")
       .select("*", { count: "exact", head: true })
       .eq("store_id", store.id)
-      .eq("archived", false);
+      .eq("status", "live");
     productCount = count ?? 0;
   }
 
@@ -46,6 +46,41 @@ async function sellerContext(): Promise<
   }
 
   return { supabase, store };
+}
+
+/**
+ * Atomic status + inventory via DB RPC (decrement on paid; restore on cancel-from-paid).
+ * Falls back to plain update if migration not applied yet.
+ */
+async function transitionViaRpc(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  storeId: string,
+  reference: string,
+  nextStatus: OrderStatus,
+): Promise<ActionResult | null> {
+  const { data, error } = await supabase.rpc("seller_transition_order", {
+    p_store_id: storeId,
+    p_reference: reference,
+    p_next_status: nextStatus,
+  });
+
+  if (error) {
+    // Migration missing → caller uses legacy path
+    if (
+      error.message?.includes("seller_transition_order") ||
+      error.code === "PGRST202" ||
+      error.code === "42883"
+    ) {
+      return null;
+    }
+    return { error: "Could not update order" };
+  }
+
+  const row = data as { ok?: boolean; error?: string } | null;
+  if (!row || row.ok !== true) {
+    return { error: row?.error ?? "Could not update order" };
+  }
+  return { success: true };
 }
 
 async function updateOrderStatus(
@@ -58,6 +93,23 @@ async function updateOrderStatus(
 
   const { supabase, store } = ctx;
 
+  const rpcResult = await transitionViaRpc(
+    supabase,
+    store.id,
+    reference,
+    nextStatus,
+  );
+  if (rpcResult) {
+    if ("success" in rpcResult) {
+      revalidatePath(`/dashboard/orders/${reference}`);
+      revalidatePath(`/s/${store.slug}/order/${reference}`);
+      revalidatePath("/dashboard/orders");
+      revalidatePath(`/s/${store.slug}`);
+    }
+    return rpcResult;
+  }
+
+  // ponytail: legacy path before inventory migration
   const { data: order } = await supabase
     .from("orders")
     .select("status")

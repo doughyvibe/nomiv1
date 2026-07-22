@@ -9,6 +9,11 @@ import {
   updateStoreIdentity,
 } from "@/app/(dashboard)/dashboard/onboarding/actions";
 import { friendlyDbError } from "@/lib/errors/friendly-db";
+import {
+  buildTomorrowDeliveryLiveCampaign,
+  detectCampaignLeadConflicts,
+  normalizeCampaignConfig,
+} from "@/lib/fulfilment/campaigns";
 import { revalidateDashboardStore } from "@/lib/stores/revalidate";
 import { deriveOnboardingStep } from "@/lib/stores/progress";
 import type {
@@ -45,7 +50,7 @@ async function sellerContext(): Promise<
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id)
-    .eq("archived", false);
+    .neq("status", "archived");
 
   if (deriveOnboardingStep(store, count ?? 0) !== "done") {
     return { error: "Store not ready" };
@@ -64,6 +69,67 @@ export async function saveFulfillmentAction(
   if (!result.ok) return { error: result.error };
 
   revalidateDashboardStore(ctx.store);
+  return { success: true };
+}
+
+export async function startLiveModeAction(opts?: {
+  force?: boolean;
+}): Promise<
+  { error: string } | { success: true } | { warning: string }
+> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const { supabase, store } = ctx;
+  if (!store.fulfillment.delivery?.enabled) {
+    return { error: "Turn on local delivery before starting Live" };
+  }
+
+  const campaign = buildTomorrowDeliveryLiveCampaign();
+  const { data: products } = await supabase
+    .from("products")
+    .select("name, lead_time_days")
+    .eq("store_id", store.id)
+    .neq("status", "archived");
+
+  const conflict = detectCampaignLeadConflicts(
+    campaign,
+    (products ?? []) as { name: string; lead_time_days?: number | null }[],
+  );
+  if (conflict && !opts?.force) {
+    return { warning: conflict.warning };
+  }
+
+  const normalized = normalizeCampaignConfig(campaign);
+  if (!normalized) return { error: "Could not build Live campaign" };
+
+  const next: FulfillmentConfig = {
+    ...store.fulfillment,
+    campaign: normalized,
+  };
+  const result = await saveFulfillment(next);
+  if (!result.ok) return { error: result.error };
+
+  revalidateDashboardStore(store);
+  revalidatePath(`/s/${store.slug}`);
+  return { success: true };
+}
+
+export async function stopLiveModeAction(): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const { store } = ctx;
+  const next: FulfillmentConfig = {
+    ...store.fulfillment,
+    campaign: undefined,
+  };
+
+  const result = await saveFulfillment(next);
+  if (!result.ok) return { error: result.error };
+
+  revalidateDashboardStore(store);
+  revalidatePath(`/s/${store.slug}`);
   return { success: true };
 }
 

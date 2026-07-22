@@ -18,6 +18,8 @@ import {
   isPaymentWindowExpired,
 } from "@/lib/orders/status";
 import { isPaymentVerified } from "@/lib/orders/status-transitions";
+import { formatCustomisationSnapshotLines } from "@/lib/products/customisations";
+import { formatFulfilmentDateLabel } from "@/lib/fulfilment/dates";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
 function formatOrderDate(iso: string): string {
@@ -92,16 +94,36 @@ export default async function OrderDetailPage({
         <DashboardPanelHeader title="Items" />
         <DashboardPanelBody>
           <ul className="space-y-2.5">
-            {items.map((item) => (
+            {items.map((item) => {
+              const customLines = formatCustomisationSnapshotLines(
+                item.customisations_snapshot,
+              );
+              return (
               <li key={item.id} className="flex justify-between gap-4 text-sm">
-                <span>
-                  {item.product_name} × {item.quantity}
+                <span className="min-w-0">
+                  <span className="font-medium">
+                    {item.product_name} × {item.quantity}
+                  </span>
+                  {item.variant_label?.trim() ? (
+                    <span className="mt-0.5 block text-muted-foreground">
+                      {item.variant_label}
+                    </span>
+                  ) : null}
+                  {customLines.map((line) => (
+                    <span
+                      key={line}
+                      className="mt-0.5 block text-muted-foreground"
+                    >
+                      {line}
+                    </span>
+                  ))}
                 </span>
                 <span className="shrink-0 font-semibold">
                   {formatPrice(item.price_cents * item.quantity)}
                 </span>
               </li>
-            ))}
+              );
+            })}
           </ul>
           <dl className="mt-5 space-y-1.5 border-t border-border pt-4 text-sm">
             <div className="flex justify-between">
@@ -128,6 +150,14 @@ export default async function OrderDetailPage({
           <p className="text-sm font-semibold capitalize">
             {order.fulfillment_method}
           </p>
+          {order.fulfillment_date ? (
+            <p className="mt-1 text-sm font-medium">
+              {formatFulfilmentDateLabel(order.fulfillment_date)}
+              {order.fulfillment_window_label?.trim()
+                ? ` · ${order.fulfillment_window_label.trim()}`
+                : ""}
+            </p>
+          ) : null}
           <p className="text-muted-foreground mt-1 text-sm">
             {formatFulfillmentSummary(order)}
           </p>

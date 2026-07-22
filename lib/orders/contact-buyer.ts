@@ -1,4 +1,5 @@
 import type { OrderRow } from "./types";
+import { formatFulfilmentDateLabel } from "@/lib/fulfilment/dates";
 
 /** Digits-only international format for wa.me (e.g. 6591234567). */
 export function whatsAppPhoneDigits(phone: string): string {
@@ -36,14 +37,36 @@ export function formatBuyerDetailsCopy(
 export function formatFulfillmentSummary(
   order: Pick<
     OrderRow,
-    "fulfillment_method" | "delivery_address" | "fulfillment_fee_cents"
+    | "fulfillment_method"
+    | "delivery_address"
+    | "fulfillment_fee_cents"
   >,
 ): string {
   if (order.fulfillment_method === "pickup") return "Pickup";
   const fee =
     order.fulfillment_fee_cents > 0
-      ? ` (fee S$${(order.fulfillment_fee_cents / 100).toFixed(2)})`
+      ? ` (fee $${(order.fulfillment_fee_cents / 100).toFixed(2)})`
       : "";
   const addr = order.delivery_address?.trim();
   return addr ? `Delivery${fee}: ${addr}` : `Delivery${fee}`;
+}
+
+/** Method + optional handoff date/window for WhatsApp / email copy. */
+export function formatFulfillmentWithDate(
+  order: Pick<
+    OrderRow,
+    | "fulfillment_method"
+    | "delivery_address"
+    | "fulfillment_fee_cents"
+    | "fulfillment_date"
+    | "fulfillment_window_label"
+  >,
+): string {
+  const base = formatFulfillmentSummary(order);
+  if (!order.fulfillment_date?.trim()) return base;
+  const dateLine = `Date: ${formatFulfilmentDateLabel(order.fulfillment_date.trim())}`;
+  const window = order.fulfillment_window_label?.trim();
+  return window
+    ? `${base}\n${dateLine}\nWindow: ${window}`
+    : `${base}\n${dateLine}`;
 }

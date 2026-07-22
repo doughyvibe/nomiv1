@@ -1,6 +1,7 @@
 import { formatPrice } from "@/lib/money";
+import { formatCustomisationSnapshotLines } from "@/lib/products/customisations";
 
-import { formatFulfillmentSummary } from "./contact-buyer";
+import { formatFulfillmentWithDate } from "./contact-buyer";
 import type { OrderItemRow, OrderRow } from "./types";
 
 export type ConfirmationMessageInput = {
@@ -8,19 +9,41 @@ export type ConfirmationMessageInput = {
   order: Pick<OrderRow, "customer_name" | "reference" | "total_cents"> &
     Pick<
       OrderRow,
-      "fulfillment_method" | "delivery_address" | "fulfillment_fee_cents"
+      | "fulfillment_method"
+      | "delivery_address"
+      | "fulfillment_fee_cents"
+      | "fulfillment_date"
+      | "fulfillment_window_label"
     >;
-  items: Pick<OrderItemRow, "product_name" | "quantity" | "price_cents">[];
+  items: Pick<
+    OrderItemRow,
+    | "product_name"
+    | "quantity"
+    | "price_cents"
+    | "variant_label"
+    | "customisations_snapshot"
+  >[];
 };
 
 function formatOrderItemsLines(
   items: ConfirmationMessageInput["items"],
 ): string {
   return items
-    .map(
-      (i) =>
-        `${i.product_name} × ${i.quantity} — ${formatPrice(i.price_cents * i.quantity)}`,
-    )
+    .map((i) => {
+      const label =
+        "variant_label" in i &&
+        typeof i.variant_label === "string" &&
+        i.variant_label.trim()
+          ? ` (${i.variant_label.trim()})`
+          : "";
+      const customs = formatCustomisationSnapshotLines(
+        i.customisations_snapshot,
+      );
+      const customsSuffix = customs.length
+        ? `\n  ${customs.join("\n  ")}`
+        : "";
+      return `${i.product_name}${label} × ${i.quantity} — ${formatPrice(i.price_cents * i.quantity)}${customsSuffix}`;
+    })
     .join("\n");
 }
 
@@ -28,8 +51,8 @@ export function buildWhatsAppConfirmationMessage(
   input: ConfirmationMessageInput,
 ): string {
   const { order, storeName, items } = input;
-  const fulfillment = formatFulfillmentSummary(order);
-  const total = formatPrice(order.total_cents).replace(/^S\$/, "");
+  const fulfillment = formatFulfillmentWithDate(order);
+  const total = formatPrice(order.total_cents);
 
   return [
     `Hi ${order.customer_name}, your order ${order.reference} from ${storeName} has been confirmed ✅`,
@@ -38,7 +61,7 @@ export function buildWhatsAppConfirmationMessage(
     "Order summary:",
     formatOrderItemsLines(items),
     "",
-    `Total paid: S$${total}`,
+    `Total paid: ${total}`,
     "",
     "Fulfillment:",
     fulfillment,
@@ -51,8 +74,8 @@ export function buildEmailConfirmation(
   input: ConfirmationMessageInput,
 ): { subject: string; body: string } {
   const { order, storeName, items } = input;
-  const fulfillment = formatFulfillmentSummary(order);
-  const total = formatPrice(order.total_cents).replace(/^S\$/, "");
+  const fulfillment = formatFulfillmentWithDate(order);
+  const total = formatPrice(order.total_cents);
 
   return {
     subject: `Your order is confirmed — ${order.reference}`,
@@ -66,7 +89,7 @@ export function buildEmailConfirmation(
       formatOrderItemsLines(items),
       "",
       "Total paid:",
-      `S$${total}`,
+      total,
       "",
       "Fulfillment:",
       fulfillment,

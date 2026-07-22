@@ -34,7 +34,7 @@ async function sellerContext(): Promise<
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id)
-    .eq("archived", false);
+    .eq("status", "live");
 
   if (deriveOnboardingStep(store, count ?? 0) !== "done") {
     return { error: "Store not ready" };

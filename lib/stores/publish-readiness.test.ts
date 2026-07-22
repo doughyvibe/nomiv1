@@ -59,4 +59,22 @@ describe("storePublishIssues", () => {
     } as Store;
     assert.deepEqual(storePublishIssues(ready, 1), []);
   });
+
+  it("does not require calendar, windows, or variants to publish", () => {
+    const ready = {
+      ...base,
+      vibe: "strada",
+      hero: { title: "Shop" },
+      fulfillment: {
+        pickup: { enabled: true, instructions: "Lobby" },
+        // calendar intentionally omitted
+      },
+      paynow: {
+        proxy_type: "mobile",
+        proxy_value: "91234567",
+        recipient_name: "Test",
+      },
+    } as Store;
+    assert.deepEqual(storePublishIssues(ready, 1), []);
+  });
 });

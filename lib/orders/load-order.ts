@@ -49,7 +49,9 @@ export async function getOrderForPayment(
 
   const { data: items } = await admin
     .from("order_items")
-    .select("id, product_name, price_cents, quantity")
+    .select(
+      "id, product_name, price_cents, quantity, variant_label, product_id, variant_id, customisations_snapshot",
+    )
     .eq("order_id", order.id);
 
   return { order, store, items: (items as OrderItemRow[]) ?? [] };

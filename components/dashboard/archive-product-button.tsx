@@ -38,10 +38,11 @@ export function ArchiveProductButton({ productId }: { productId: string }) {
     <>
       <Button
         type="button"
-        variant="destructive"
+        variant="ghost"
+        className="h-auto min-h-12 w-full justify-center rounded-xl px-3 text-sm font-semibold text-destructive/90 hover:bg-destructive/8 hover:text-destructive"
         onClick={() => setOpen(true)}
       >
-        Archive product
+        Archive Product
       </Button>
 
       {error && (
@@ -53,27 +54,20 @@ export function ArchiveProductButton({ productId }: { productId: string }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent showCloseButton>
           <DialogHeader>
-            <DialogTitle>Archive this product?</DialogTitle>
+            <DialogTitle>Remove from shop?</DialogTitle>
             <DialogDescription>
-              It will be hidden from your storefront. Existing orders are not
-              affected.
+              Hidden from buyers. Past orders stay intact.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Keep product
-            </Button>
+          <DialogFooter>
             <Button
               type="button"
               variant="destructive"
+              className="w-full sm:w-auto"
               disabled={pending}
               onClick={handleArchive}
             >
-              {pending ? "Archiving…" : "Archive product"}
+              {pending ? "Removing…" : "Remove"}
             </Button>
           </DialogFooter>
         </DialogContent>

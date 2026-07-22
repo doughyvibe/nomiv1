@@ -82,5 +82,22 @@ assert.equal(
   ),
   "done",
 );
+// Setup complete + empty live catalog (e.g. last product Removed) stays done
+assert.equal(
+  deriveOnboardingStep(
+    {
+      ...branded,
+      fulfillment: { pickup: { enabled: true, instructions: "MRT" } },
+      paynow: {
+        proxy_type: "mobile",
+        proxy_value: "91234567",
+        recipient_name: "Shop",
+      },
+      status: "published",
+    },
+    0,
+  ),
+  "done",
+);
 
 console.log("progress.check.ts: ok");

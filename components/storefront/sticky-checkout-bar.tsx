@@ -5,6 +5,7 @@ import { ShoppingCart } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
+import { resolveCartLineUnitPrice } from "@/lib/cart/line-price";
 import { availableCartSummary } from "@/lib/cart/storage";
 import { formatPrice } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -13,8 +14,10 @@ export function StickyCheckoutBar() {
   const { cart } = useCart();
   const { products } = useStorefront();
 
-  const priceById = new Map(products.map((p) => [p.id, p.price_cents]));
-  const { count, subtotalCents } = availableCartSummary(cart.items, priceById);
+  const productMap = new Map(products.map((p) => [p.id, p]));
+  const { count, subtotalCents } = availableCartSummary(cart.items, (line) =>
+    resolveCartLineUnitPrice(line, productMap.get(line.productId)),
+  );
   const hasItems = count > 0;
 
   return (

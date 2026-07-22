@@ -8,7 +8,7 @@ export default async function DashboardPage() {
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id)
-    .eq("archived", false);
+    .neq("status", "archived");
   const storeUrl = getStorefrontUrl(store.slug);
 
   return (

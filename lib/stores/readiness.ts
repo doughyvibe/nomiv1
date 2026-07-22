@@ -49,7 +49,7 @@ export const READINESS_ITEMS: ReadinessItemDef[] = [
     id: "fulfillment",
     title: "Configure fulfilment",
     description:
-      "Complete your pickup and delivery details before accepting your first order.",
+      "Turn on pickup and/or delivery so buyers can check out. Optional: ask for a fulfilment date or set a calendar in Settings — not required to publish, and products never need variants.",
     href: "/settings",
     ctaLabel: "Open settings",
   },

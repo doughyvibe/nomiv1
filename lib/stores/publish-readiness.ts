@@ -24,6 +24,8 @@ export function storePublishIssues(
   if (productCount === 0) {
     issues.push({ message: "Add at least one product", href: "/products/new" });
   }
+  // Methods only — calendar / windows / Live mode are optional (§8, P9-D-02).
+  // Never gate on variants or product choices.
   if (!fulfillmentIsComplete(store.fulfillment)) {
     issues.push({ message: "Configure fulfillment", href: "/settings" });
   }

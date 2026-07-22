@@ -187,7 +187,7 @@ export function PayNowForm({
       {sampleQr && (
         <div className="flex flex-col items-center gap-2 rounded-md border p-4">
           <p className="text-muted-foreground text-xs font-medium">
-            Sample QR (S$23.00 · SAMPLE-001)
+            Sample QR ($23.00 · SAMPLE-001)
           </p>
           <div className="rounded bg-white p-3">
             <QRCode value={sampleQr} size={140} />

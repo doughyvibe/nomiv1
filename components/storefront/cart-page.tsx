@@ -5,6 +5,11 @@ import { ArrowLeft, Minus, Plus } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
+import {
+  cartLineCustomisationLines,
+  cartLineVariantLabel,
+  resolveCartLineUnitPrice,
+} from "@/lib/cart/line-price";
 import { formatPrice } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
@@ -28,15 +33,22 @@ export function CartPageContent() {
     .map((item) => {
       const product = productMap.get(item.productId);
       if (!product) return null;
-      return { item, product };
+      const unit = resolveCartLineUnitPrice(item, product);
+      if (unit === undefined) return null;
+      const variantLabel = cartLineVariantLabel(item, product);
+      const customLines = cartLineCustomisationLines(item, product);
+      return { item, product, unit, variantLabel, customLines };
     })
     .filter(Boolean) as {
-    item: { productId: string; quantity: number };
+    item: (typeof cart.items)[number];
     product: (typeof products)[number];
+    unit: number;
+    variantLabel: string | null;
+    customLines: string[];
   }[];
 
   const subtotal = lines.reduce(
-    (sum, { item, product }) => sum + product.price_cents * item.quantity,
+    (sum, { item, unit }) => sum + unit * item.quantity,
     0,
   );
 
@@ -157,9 +169,9 @@ export function CartPageContent() {
       </div>
 
       <ul className="flex flex-col gap-3">
-        {lines.map(({ item, product }) => (
+        {lines.map(({ item, product, unit, variantLabel, customLines }) => (
           <li
-            key={product.id}
+            key={item.lineKey}
             className={cn(
               "metal-panel rust-edge flex gap-3 rounded-[var(--vibe-radius)] p-3",
               atelier && "cart-atelier-line",
@@ -207,7 +219,7 @@ export function CartPageContent() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => removeItem(product.id)}
+                  onClick={() => removeItem(item.lineKey)}
                   className={cn(
                     "min-h-11 shrink-0 px-1 text-xs text-vibe-text-muted underline",
                     atelier && "cart-atelier-remove",
@@ -222,13 +234,21 @@ export function CartPageContent() {
                   atelier && "cart-atelier-price",
                 )}
               >
-                {formatPrice(product.price_cents)}
+                {formatPrice(unit)}
               </p>
+              {variantLabel ? (
+                <p className="text-xs text-vibe-text-muted">{variantLabel}</p>
+              ) : null}
+              {customLines.map((line) => (
+                <p key={line} className="text-xs text-vibe-text-muted">
+                  {line}
+                </p>
+              ))}
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   aria-label="Decrease quantity"
-                  onClick={() => setQuantity(product.id, item.quantity - 1)}
+                  onClick={() => setQuantity(item.lineKey, item.quantity - 1)}
                   className={cn(
                     "flex size-11 items-center justify-center rounded border border-vibe-border/40 text-sm",
                     atelier && "cart-atelier-qty-btn",
@@ -242,7 +262,7 @@ export function CartPageContent() {
                 <button
                   type="button"
                   aria-label="Increase quantity"
-                  onClick={() => setQuantity(product.id, item.quantity + 1)}
+                  onClick={() => setQuantity(item.lineKey, item.quantity + 1)}
                   className={cn(
                     "flex size-11 items-center justify-center rounded border border-vibe-border/40 text-sm",
                     atelier && "cart-atelier-qty-btn",

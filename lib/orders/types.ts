@@ -1,3 +1,5 @@
+import type { CustomisationSnapshotEntry } from "@/lib/products/customisations";
+
 export type OrderStatus =
   | "payment_pending"
   | "seller_verification_requested"
@@ -15,6 +17,12 @@ export type OrderRow = {
   customer_phone: string;
   customer_email: string;
   fulfillment_method: "pickup" | "delivery";
+  /** Buyer-chosen handoff date (YYYY-MM-DD), Phase 6. Null when not collected. */
+  fulfillment_date?: string | null;
+  /** Window id snapshot (Phase 7). Null when date-only. */
+  fulfillment_window_id?: string | null;
+  /** Window label snapshot (Phase 7). */
+  fulfillment_window_label?: string | null;
   delivery_address: string | null;
   order_notes: string | null;
   subtotal_cents: number;
@@ -32,4 +40,9 @@ export type OrderItemRow = {
   price_cents: number;
   quantity: number;
   created_at: string;
+  product_id?: string | null;
+  variant_id?: string | null;
+  variant_label?: string | null;
+  /** Snapshotted customisation answers (Phase 3). */
+  customisations_snapshot?: CustomisationSnapshotEntry[] | null;
 };

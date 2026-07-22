@@ -1,6 +1,8 @@
 import { formatFulfillmentSummary } from "@/lib/orders/contact-buyer";
 import { formatPrice } from "@/lib/money";
 import type { LoadedOrder } from "@/lib/orders/load-order";
+import { formatCustomisationSnapshotLines } from "@/lib/products/customisations";
+import { formatFulfilmentDateLabel } from "@/lib/fulfilment/dates";
 import { cn } from "@/lib/utils";
 
 export function OrderReceipt({
@@ -85,16 +87,34 @@ export function OrderReceipt({
       </dl>
 
       <ul className="mt-4 space-y-2 border-t border-vibe-border/30 pt-3">
-        {items.map((item) => (
+        {items.map((item) => {
+          const customLines = formatCustomisationSnapshotLines(
+            item.customisations_snapshot,
+          );
+          return (
           <li key={item.id} className="flex justify-between gap-4">
-            <span>
+            <span className="min-w-0">
               {item.product_name} × {item.quantity}
+              {item.variant_label?.trim() ? (
+                <span className="mt-0.5 block text-xs text-vibe-text-muted">
+                  {item.variant_label}
+                </span>
+              ) : null}
+              {customLines.map((line) => (
+                <span
+                  key={line}
+                  className="mt-0.5 block text-xs text-vibe-text-muted"
+                >
+                  {line}
+                </span>
+              ))}
             </span>
             <span className="shrink-0">
               {formatPrice(item.price_cents * item.quantity)}
             </span>
           </li>
-        ))}
+          );
+        })}
       </ul>
 
       <dl className="mt-3 space-y-1 border-t border-vibe-border/30 pt-3">
@@ -147,6 +167,14 @@ export function OrderReceipt({
           Fulfillment
         </p>
         <p className="mt-1 capitalize">{methodLabel}</p>
+        {order.fulfillment_date ? (
+          <p className="mt-0.5 text-sm font-medium">
+            {formatFulfilmentDateLabel(order.fulfillment_date)}
+            {order.fulfillment_window_label?.trim()
+              ? ` · ${order.fulfillment_window_label.trim()}`
+              : ""}
+          </p>
+        ) : null}
         {showSummaryDetail ? (
           <p className="text-vibe-text-muted mt-0.5 text-xs">
             {fulfillmentSummary}

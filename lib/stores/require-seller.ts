@@ -28,7 +28,7 @@ export async function requireSellerStore(): Promise<{
       .from("products")
       .select("*", { count: "exact", head: true })
       .eq("store_id", store.id)
-      .eq("archived", false);
+      .neq("status", "archived");
     productCount = count ?? 0;
   }
 

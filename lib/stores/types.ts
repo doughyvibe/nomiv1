@@ -1,4 +1,11 @@
 import type { PayNowProxyType } from "@/lib/paynow";
+import type { ProductStatus } from "@/lib/products/contracts";
+import type { ProductCustomisation } from "@/lib/products/customisations";
+import type { SoldOutPolicy } from "@/lib/products/inventory";
+import type {
+  ProductOption,
+  ProductVariant,
+} from "@/lib/products/variants";
 
 export type Vibe =
   | "atelier"
@@ -56,6 +63,56 @@ export type HeroConfig = {
   order?: HeroBlock[];
 };
 
+/** Named handoff window (AM/PM or custom). Phase 7. */
+export type FulfilmentWindow = {
+  /** Stable id stored on the order snapshot. */
+  id: string;
+  /** Buyer-facing label, e.g. "Morning (AM)" or "1–5pm". */
+  label: string;
+  /** Max orders for this window on a given date; omit/null = unlimited. */
+  capacity?: number | null;
+};
+
+/**
+ * Store-level handoff calendar (Phase 6 dates + Phase 7 windows/blackouts/capacity).
+ */
+export type FulfilmentCalendarConfig = {
+  enabled: boolean;
+  /** JS weekday: 0=Sun … 6=Sat */
+  allowed_weekdays: number[];
+  /** Calendar days from earliest to offer (default 28). */
+  horizon_days?: number;
+  /** YYYY-MM-DD dates never offerable. */
+  blackouts?: string[];
+  /** Named windows; empty/absent = date-only checkout. */
+  windows?: FulfilmentWindow[];
+  /** Max orders per day across windows; omit/null = unlimited. */
+  daily_capacity?: number | null;
+};
+
+/**
+ * Live / campaign override (Phase 8). Stored on `stores.fulfillment.campaign`.
+ * When active (and not expired), checkout locks to campaign methods/dates/windows.
+ */
+export type FulfilmentCampaign = {
+  active: boolean;
+  /** Storefront banner copy. */
+  banner?: string;
+  /** Preset id, e.g. tomorrow_delivery_1_5. */
+  preset?: string;
+  /** Methods allowed during Live; omit = keep store methods. */
+  methods?: ("pickup" | "delivery")[];
+  /** Exact YYYY-MM-DD dates; omit = no date lock. */
+  dates?: string[];
+  /** Campaign-owned windows (prefer over calendar when set). */
+  windows?: FulfilmentWindow[];
+  /** Or filter existing calendar windows by id. */
+  window_ids?: string[];
+  /** ISO timestamp; after this, engine treats campaign as off. */
+  expires_at?: string | null;
+  started_at?: string;
+};
+
 export type FulfillmentConfig = {
   pickup?: {
     enabled: boolean;
@@ -67,6 +124,10 @@ export type FulfillmentConfig = {
     fee_cents: number;
     instructions: string;
   };
+  /** Optional calendar; date step also fires when cart max lead_time > 0 (§8 #2). */
+  calendar?: FulfilmentCalendarConfig;
+  /** Optional Live mode override (Phase 8). */
+  campaign?: FulfilmentCampaign;
 };
 
 export type PayNowConfig = {
@@ -106,7 +167,26 @@ export type Product = {
   description: string;
   image_url: string | null;
   category: string | null;
+  /** Source of truth for catalog lifecycle (Phase 1+). */
+  status: ProductStatus;
+  /** Transition mirror of status === 'archived'; prefer `status`. */
   archived: boolean;
+  /**
+   * Prep constraint in whole days (Phase 5). Default 0.
+   * Constraint only — never shown as a buyer date picker on product/catalog.
+   */
+  lead_time_days?: number;
+  /** Opt-in choices (Phase 2). Empty/absent = simple one-tap offer. */
+  options?: ProductOption[];
+  variants?: ProductVariant[];
+  /** Typed prompts (Phase 3). Empty/absent = none. */
+  customisations?: ProductCustomisation[];
+  /** Opt-in stock (Phase 4). Default false = unlimited. */
+  track_inventory?: boolean;
+  /** Product-level qty when tracking and no variants. */
+  stock_qty?: number | null;
+  /** When tracking hits 0: hide from catalog or show as sold out. */
+  sold_out_policy?: SoldOutPolicy;
 };
 
 export function heroIsComplete(hero: Partial<HeroConfig>): boolean {

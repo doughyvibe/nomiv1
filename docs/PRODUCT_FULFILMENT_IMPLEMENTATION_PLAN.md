@@ -20,7 +20,7 @@
 | **6** | Fulfilment dates + checkout step | Store calendar ∩ cart max lead time; checkout collects method + date |
 | **7** | Windows, blackouts, capacity | AM/PM or named windows; blackout days; daily/slot capacity |
 | **8** | Live campaigns | “Tomorrow 1–5 delivery only” override + storefront banner + checkout lock |
-| **9** | Merchant UX polish | Duplicate product, price-range cards, conflict warnings, readiness copy |
+| **9** | Merchant UX polish | Readiness copy; architecture Quick Add sync (**duplicate / compare-at later removed**) |
 
 **Spine rule:** Ship **Product honesty** (variants → customisations → inventory → lead-time *copy*) before full calendar ops. Never put pickup dates on products. Same-day emerges from Fulfilment ∩ lead times — never a product flag.
 
@@ -383,17 +383,17 @@ A0/A1 (types, status) ──► A2 variants ──► A3 customisations ──�
 
 | ID | Description | Area | Acceptance criteria | Notes |
 |----|-------------|------|---------------------|-------|
-| **P6-B-01** | Fulfilment settings: enable date collection; default allowed weekdays | dashboard / db | Merchant can save; methods still required | Open Q: date-only vs windows in v1 — see §8 |
-| **P6-B-02** | Pure function `allowedFulfilmentDates(cart, store, today)` + tests | API | Correct max(lead_time); empty cart edge; all-digital skip later | Self-check tests mandatory |
-| **P6-B-03** | Merchant preview of next N allowed dates in settings | dashboard | Sanity for bakers | |
+| **P6-B-01** | Fulfilment settings: enable date collection; default allowed weekdays | dashboard / db | Merchant can save; methods still required | ✅ Date-only (§8) |
+| **P6-B-02** | Pure function `allowedFulfilmentDates(cart, store, today)` + tests | API | Correct max(lead_time); empty cart edge; all-digital skip later | ✅ `lib/fulfilment/dates.check.ts` |
+| **P6-B-03** | Merchant preview of next N allowed dates in settings | dashboard | Sanity for bakers | ✅ |
 
 #### Epic P6-C — Checkout collection
 
 | ID | Description | Area | Acceptance criteria |
 |----|-------------|------|---------------------|
-| **P6-C-01** | Checkout UI: date control listing only allowed dates | checkout | Impossible dates not selectable |
-| **P6-C-02** | `orders.fulfilment_date` (+ snapshot lead rule version optional) | db / checkout | Seller order detail shows date |
-| **P6-C-03** | Server rejects mismatched date/method | checkout | Tampered POST fails |
+| **P6-C-01** | Checkout UI: date control listing only allowed dates | checkout | Impossible dates not selectable | ✅ |
+| **P6-C-02** | `orders.fulfillment_date` (+ snapshot lead rule version optional) | db / checkout | Seller order detail shows date | ✅ |
+| **P6-C-03** | Server rejects mismatched date/method | checkout | Tampered POST fails | ✅ |
 
 **DoD:** Method-only stores that disable date collection can keep today’s behaviour **or** all stores get dates once P6 ships — **founder call in §8**. Prefer: date step required when any cart line has `lead_time_days > 0` **or** merchant enabled calendar.
 
@@ -414,10 +414,10 @@ A0/A1 (types, status) ──► A2 variants ──► A3 customisations ──�
 
 | ID | Description | Area | Acceptance criteria |
 |----|-------------|------|---------------------|
-| **P7-B-01** | Blackouts CRUD | dashboard / db | Dates excluded from engine |
-| **P7-B-02** | Windows on allowed dates | dashboard / db | Checkout shows window/slot when >1 |
-| **P7-B-03** | Capacity counters; block when full | API / checkout | Concurrent-safe enough for SG social volume |
-| **P7-B-04** | Engine + tests extended | API | Blackout ∩ window ∩ capacity |
+| **P7-B-01** | Blackouts CRUD | dashboard / db | Dates excluded from engine | ✅ |
+| **P7-B-02** | Windows on allowed dates | dashboard / db | Checkout shows window/slot when >1 | ✅ |
+| **P7-B-03** | Capacity counters; block when full | API / checkout | Concurrent-safe enough for SG social volume | ✅ Soft-hold at create |
+| **P7-B-04** | Engine + tests extended | API | Blackout ∩ window ∩ capacity | ✅ `lib/fulfilment/dates.check.ts` |
 
 **DoD:** Capacity exhaustion surfaces clear buyer + merchant messaging.
 
@@ -438,12 +438,12 @@ A0/A1 (types, status) ──► A2 variants ──► A3 customisations ──�
 
 | ID | Description | Area | Acceptance criteria | Notes |
 |----|-------------|------|---------------------|-------|
-| **P8-B-01** | Campaign model + merchant “Live mode” or equivalent UI | dashboard | Can start/stop; auto-expire | Founder UI preference §8 |
-| **P8-B-02** | Engine prefers campaign ∩ lead times; detect empty set | API | Dashboard warns before publish/enable | |
-| **P8-B-03** | Storefront banner while campaign active | storefront | Visible on catalog/cart before checkout | |
-| **P8-B-04** | Checkout locks method/date/window; preselect when single option | checkout | Buyer cannot pick outside campaign | |
+| **P8-B-01** | Campaign model + merchant “Live mode” or equivalent UI | dashboard | Can start/stop; auto-expire | ✅ Live mode UI (§8) |
+| **P8-B-02** | Engine prefers campaign ∩ lead times; detect empty set | API | Dashboard warns before publish/enable | ✅ warn+allow |
+| **P8-B-03** | Storefront banner while campaign active | storefront | Visible on catalog/cart before checkout | ✅ |
+| **P8-B-04** | Checkout locks method/date/window; preselect when single option | checkout | Buyer cannot pick outside campaign | ✅ |
 
-**DoD:** Campaign off restores normal calendar; forgotten campaign cannot silently brick store without merchant signal.
+**DoD:** ✅ Campaign off restores normal calendar; forgotten campaign cannot silently brick store without merchant signal.
 
 **Verification:** Live tomorrow 1–5 delivery only; pickup hidden; date preselected; cart item lead_time=3 → clear error.
 
@@ -453,7 +453,8 @@ A0/A1 (types, status) ──► A2 variants ──► A3 customisations ──�
 
 **Goal:** Speed and clarity after core systems work.
 
-**In scope:** Duplicate product; readiness checklist copy for variants/fulfilment; compare-at optional; conflict warnings polish; architecture doc Quick Add update.  
+**In scope (kept):** readiness checklist copy; architecture Quick Add update.  
+**Removed (mobile trim 2026-07-22):** Duplicate product; compare-at; product draft (`live` \| `archived` only; Remove + Delete forever if never ordered).  
 **Out of scope:** Gallery, collections, CSV, digital.
 
 **Dependencies:** P2+ minimum; best after P6.
@@ -462,10 +463,10 @@ A0/A1 (types, status) ──► A2 variants ──► A3 customisations ──�
 
 | ID | Description | Area | Acceptance criteria |
 |----|-------------|------|---------------------|
-| **P9-D-01** | Duplicate product action | dashboard | Copies offer + options defs; resets stock as specified |
+| **P9-D-01** | Duplicate product action | dashboard | **Removed** — do not reintroduce |
 | **P9-D-02** | Update store readiness / publish gates if needed for fulfilment calendar | dashboard | Does not force variants |
 | **P9-D-03** | Reconcile `NOMI_STOREFRONT_ARCHITECTURE.md` Quick Add rules with P2 policy | docs | Docs match code |
-| **P9-D-04** | Optional compare-at price | Product | Merchandising only; not required |
+| **P9-D-04** | Optional compare-at price | Product | **Removed** — do not reintroduce |
 
 **DoD:** No regression to simple Quick Add; docs aligned.
 
@@ -475,55 +476,55 @@ A0/A1 (types, status) ──► A2 variants ──► A3 customisations ──�
 
 | ID | Phase | Track | Status | Summary |
 |----|-------|-------|--------|---------|
-| P0-A-01 | 0 | A/docs | todo | Boundary docs pointer |
-| P0-A-02 | 0 | A | todo | Future TS contracts / CartLine |
-| P0-A-03 | 0 | A/docs | todo | Call-site inventory |
-| P0-C-01 | 0 | C/docs | todo | Architecture Quick Add discrepancy note |
-| P1-A-01 | 1 | A | todo | Status migration |
-| P1-A-02 | 1 | A | todo | Types + actions for status |
-| P1-A-03 | 1 | D | todo | List badges / archive UX |
-| P1-D-01 | 1 | D | todo | Progressive disclosure form shell |
-| P1-D-02 | 1 | D | todo | Plain-language copy pass |
-| P2-A-01 | 2 | A | todo | Variant tables |
-| P2-A-02 | 2 | A | todo | Variant validation caps |
-| P2-A-03 | 2 | D | todo | Choices toggle UI |
-| P2-C-01 | 2 | C | todo | Cart line identity |
-| P2-C-02 | 2 | C | todo | Shared pickers |
-| P2-C-03 | 2 | C | todo | Quick Add / Choose options sheet |
-| P2-C-04 | 2 | C | todo | From S$ price on cards |
-| P2-C-05 | 2 | C | todo | Order item variant snapshot |
-| P2-C-06 | 2 | D | todo | Seller order shows variants |
-| P3-A-01 | 3 | A | todo | Customisation definitions |
-| P3-A-02 | 3 | D | todo | Ask-customer form section |
-| P3-C-01 | 3 | C | todo | Sheet/PDP custom fields |
-| P3-C-02 | 3 | C | todo | Add-on pricing in totals |
-| P3-C-03 | 3 | C | todo | Customisation snapshots |
-| P4-A-01 | 4 | A | todo | Inventory fields |
-| P4-A-02 | 4 | A/D | todo | Sold-out policy |
-| P4-A-03 | 4 | A | todo | Decrement / concurrency |
-| P4-C-01 | 4 | C | todo | Storefront OOS UI |
-| P4-C-02 | 4 | C | todo | Checkout OOS reject |
-| P5-A-01 | 5 | A | todo | lead_time_days column |
-| P5-A-02 | 5 | D | todo | Prep form section |
-| P5-A-03 | 5 | C | todo | Prep copy on storefront |
-| P6-B-01 | 6 | B | todo | Calendar settings |
-| P6-B-02 | 6 | B | todo | allowedFulfilmentDates engine |
-| P6-B-03 | 6 | D | todo | Merchant date preview |
-| P6-C-01 | 6 | C | todo | Checkout date UI |
-| P6-C-02 | 6 | C | todo | Order fulfilment_date |
-| P6-C-03 | 6 | C | todo | Server date validation |
-| P7-B-01 | 7 | B | todo | Blackouts |
-| P7-B-02 | 7 | B | todo | Windows/slots |
-| P7-B-03 | 7 | B | todo | Capacity |
-| P7-B-04 | 7 | B | todo | Engine extension + tests |
-| P8-B-01 | 8 | B/D | todo | Campaign model + UI |
-| P8-B-02 | 8 | B | todo | Empty-set conflict detection |
-| P8-B-03 | 8 | C | todo | Storefront campaign banner |
-| P8-B-04 | 8 | C | todo | Checkout lock / preselect |
-| P9-D-01 | 9 | D | todo | Duplicate product |
-| P9-D-02 | 9 | D | todo | Readiness / publish gates |
-| P9-D-03 | 9 | docs | todo | Architecture Quick Add reconcile |
-| P9-D-04 | 9 | A | todo | Optional compare-at |
+| P0-A-01 | 0 | A/docs | done | Boundary docs pointer → `docs/SYSTEM_BOUNDARIES.md` |
+| P0-A-02 | 0 | A | done | Future TS contracts / CartLine |
+| P0-A-03 | 0 | A/docs | done | Call-site inventory (appendix below) |
+| P0-C-01 | 0 | C/docs | done | Architecture Quick Add discrepancy note |
+| P1-A-01 | 1 | A | done | Status migration |
+| P1-A-02 | 1 | A | done | Types + actions for status |
+| P1-A-03 | 1 | D | done | List badges / archive UX |
+| P1-D-01 | 1 | D | done | Progressive disclosure form shell |
+| P1-D-02 | 1 | D | done | Plain-language copy pass |
+| P2-A-01 | 2 | A | done | Variant tables |
+| P2-A-02 | 2 | A | done | Variant validation caps |
+| P2-A-03 | 2 | D | done | Choices toggle UI |
+| P2-C-01 | 2 | C | done | Cart line identity |
+| P2-C-02 | 2 | C | done | Shared pickers |
+| P2-C-03 | 2 | C | done | Quick Add / Choose options sheet |
+| P2-C-04 | 2 | C | done | From S$ price on cards |
+| P2-C-05 | 2 | C | done | Order item variant snapshot |
+| P2-C-06 | 2 | D | done | Seller order shows variants |
+| P3-A-01 | 3 | A | done | Customisation definitions |
+| P3-A-02 | 3 | D | done | Ask-customer form section |
+| P3-C-01 | 3 | C | done | Sheet/PDP custom fields |
+| P3-C-02 | 3 | C | done | Add-on pricing in totals |
+| P3-C-03 | 3 | C | done | Customisation snapshots |
+| P4-A-01 | 4 | A | done | Inventory fields |
+| P4-A-02 | 4 | A/D | done | Sold-out policy |
+| P4-A-03 | 4 | A | done | Decrement / concurrency |
+| P4-C-01 | 4 | C | done | Storefront OOS UI |
+| P4-C-02 | 4 | C | done | Checkout OOS reject |
+| P5-A-01 | 5 | A | done | lead_time_days column |
+| P5-A-02 | 5 | D | done | Prep form section |
+| P5-A-03 | 5 | C | done | Prep copy on storefront |
+| P6-B-01 | 6 | B | done | Calendar settings |
+| P6-B-02 | 6 | B | done | allowedFulfilmentDates engine |
+| P6-B-03 | 6 | D | done | Merchant date preview |
+| P6-C-01 | 6 | C | done | Checkout date UI |
+| P6-C-02 | 6 | C | done | Order fulfilment_date |
+| P6-C-03 | 6 | C | done | Server date validation |
+| P7-B-01 | 7 | B | done | Blackouts |
+| P7-B-02 | 7 | B | done | Windows/slots |
+| P7-B-03 | 7 | B | done | Capacity |
+| P7-B-04 | 7 | B | done | Engine extension + tests |
+| P8-B-01 | 8 | B/D | done | Campaign model + UI |
+| P8-B-02 | 8 | B | done | Empty-set conflict detection |
+| P8-B-03 | 8 | C | done | Storefront campaign banner |
+| P8-B-04 | 8 | C | done | Checkout lock / preselect |
+| P9-D-01 | 9 | D | removed | Duplicate product (mobile trim) |
+| P9-D-02 | 9 | D | done | Readiness / publish gates |
+| P9-D-03 | 9 | docs | done | Architecture Quick Add reconcile |
+| P9-D-04 | 9 | A | removed | Optional compare-at (mobile trim) |
 
 ---
 
@@ -545,15 +546,17 @@ If a coding agent “needs” any of the above to finish a task ID — **stop an
 
 ---
 
-## 8. Open questions for founder *(sequencing / schema blockers only)*
+## 8. Founder decisions *(locked by PO 2026-07-22 — override only if founder objects)*
 
-1. **Fulfilment MVP shape:** Date-only in Phase 6, or date + AM/PM windows in the same phase? (Strategy appendix leans either; windows are Phase 7 if we keep slices thin.)
-2. **When must buyers pick a date?** Always once calendar ships, or only when `max(lead_time) > 0` / merchant toggles “ask for date”?
-3. **Campaign UI:** Friendly “Live mode” toggle vs raw rule editor for v1?
-4. **Lead time × campaign conflict:** Block enabling campaign, or warn + allow?
-5. **Inventory decrement timing:** On `seller_confirmed_paid` only, or also soft-hold at order create?
-6. **New product default status:** `live` (today’s behaviour) or `draft`?
-7. **Digital products:** In or out of next two quarters? (Affects whether Fulfilment must model “no date” early.)
+| # | Question | **Locked default** | Why |
+|---|----------|-------------------|-----|
+| 1 | Fulfilment MVP shape | **Date-only in Phase 6**; windows/slots in Phase 7 | Thinner slices; ship impossible-date protection sooner |
+| 2 | When buyers pick a date | **When merchant enables “ask for date” OR cart `max(lead_time_days) > 0`** | Simple shops stay method-only; bakers get dates automatically |
+| 3 | Campaign UI | **Friendly “Live mode”** (presets), not raw rule editor | Non-technical merchants on TikTok Live |
+| 4 | Lead time × campaign conflict | **Warn + allow enable**; checkout/engine must surface empty-set clearly | Don’t brick a live mid-stream; never silently offer zero dates |
+| 5 | Inventory decrement | **On `seller_confirmed_paid` only** (no soft-hold at create) | Matches today’s PayNow confirm flow; soft-hold is a later ops feature |
+| 6 | New product default status | **`live`** (parity with today); draft via explicit control | Don’t surprise existing sellers |
+| 7 | Digital products | **Out of next two quarters** | Stay on physical/social HBB wedge |
 
 Locked decisions **not** reopened: three-system split; single image; ≤2 variant dims; Quick Add honesty; lead time ≠ date picker; same-day emergent; live selling = fulfilment campaign.
 
@@ -571,6 +574,60 @@ Locked decisions **not** reopened: three-system split; single image; ≤2 varian
 8. **Migrations:** One concern per migration; backfill carefully; never rewrite paid `order_items` snapshots.  
 9. **Onboarding:** Keep first-product step basic; advanced Product features live in dashboard form via progressive disclosure.  
 10. **PRD / Implementation.md:** Historical. Do not resurrect bottom nav, email-MVP, or “variants later” as blockers.
+
+---
+
+## Appendix — Call-site inventory (P0-A-03)
+
+> Grepped 2026-07-22. Paths only — do not invent. Feeds Phase 2 cart / order snapshot work.
+
+### `addToCart`
+
+| Path | Role |
+|------|------|
+| `lib/cart/storage.ts` | Core `addToCart(slug, productId, quantity)` — localStorage merge by `productId` |
+| `components/storefront/cart-context.tsx` | Context wrapper; exposes `addToCart` to storefront |
+| `components/storefront/product-catalog.tsx` | Catalog Quick Add → `addToCart(product.id, 1)` |
+| `components/storefront/featured-product.tsx` | Featured CTA → `addToCart(product.id, 1)` |
+| `components/storefront/product-detail.tsx` | PDP add → `addToCart(product.id, quantity)` |
+
+### Cart types / cart consumers
+
+| Path | Role |
+|------|------|
+| `lib/cart/types.ts` | `CartItem` = `{ productId, quantity }`; `Cart` = `{ items }` |
+| `lib/cart/storage.ts` | Read/write, `updateCartItem`, `availableCartSummary`, prune helpers |
+| `components/storefront/cart-context.tsx` | Provider / `useCart` |
+| `components/storefront/cart-page.tsx` | Cart UI qty / remove |
+| `components/storefront/checkout-form.tsx` | Reads cart; posts cart JSON; `clearCart` after success |
+| `components/storefront/storefront-shell.tsx` | Cart summary for chrome |
+| `components/storefront/sticky-checkout-bar.tsx` | Sticky bar summary |
+| `components/storefront/stale-cart-pruner.tsx` | Prunes lines whose products disappeared |
+| `app/(storefront)/s/[slug]/actions.ts` | Local `CartLine` = `{ productId, quantity }` parsed from formData `"cart"` |
+
+### `order_items` insert / schema / reads
+
+| Path | Role |
+|------|------|
+| `supabase/migrations/20260702100000_initial_schema.sql` | Table: `product_name`, `price_cents`, `quantity` (+ ids/timestamps); no `product_id` |
+| `app/(storefront)/s/[slug]/actions.ts` | **Only insert site** — `admin.from("order_items").insert(...)` in `createOrderAction` |
+| `lib/orders/types.ts` | `OrderItemRow` mirrors insert shape |
+| `lib/orders/load-order.ts` | Buyer order load — select `product_name, price_cents, quantity` |
+| `lib/orders/load-seller-orders.ts` | Seller list — joins/selects `order_items` |
+| `lib/orders/confirmation-message.ts` | Formats line snapshot for WhatsApp copy |
+| `components/storefront/order-receipt.tsx` | Buyer receipt lines |
+| `app/(dashboard)/dashboard/orders/[reference]/page.tsx` | Seller order detail lines |
+| `app/api/health/supabase/route.ts` | Health check table list includes `order_items` |
+
+### Product form fields (+ related types / actions)
+
+| Path | Fields / notes |
+|------|----------------|
+| `components/dashboard/product-form.tsx` | UI state + submit: `name`, `price`→`price_cents`, `description`, `category`, `image_url` |
+| `lib/products/validate.ts` | `ProductInput`: `name`, `price_cents`, `description`, `image_url?`, `category?` |
+| `lib/stores/types.ts` | `Product`: + `id`, `store_id`, `archived`, timestamps |
+| `app/(dashboard)/dashboard/products/actions.ts` | Create / update / archive using `ProductInput` |
+| `supabase/migrations/20260702100000_initial_schema.sql` | `products` columns match flat model above |
 
 ---
 

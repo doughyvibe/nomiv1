@@ -119,19 +119,17 @@ export function StoreStatusSettings({
           <DialogHeader>
             <DialogTitle>Publish your store?</DialogTitle>
             <DialogDescription>
-              Buyers will be able to visit your storefront and place orders.
+              Buyers will be able to visit and place orders.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-end">
-            <Button type="button" variant="outline" onClick={() => setPublishOpen(false)}>
-              Cancel
-            </Button>
+          <DialogFooter>
             <Button
               type="button"
+              className="w-full sm:w-auto"
               disabled={pending}
               onClick={() => run(publishStoreAction)}
             >
-              {pending ? "Publishing…" : "Publish store"}
+              {pending ? "Publishing…" : "Publish"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -142,23 +140,18 @@ export function StoreStatusSettings({
           <DialogHeader>
             <DialogTitle>Unpublish your store?</DialogTitle>
             <DialogDescription>
-              Your storefront will be hidden. Existing order links still work.
+              Hidden from buyers. Existing order links still work.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-end">
+          <DialogFooter>
             <Button
               type="button"
-              variant="outline"
-              onClick={() => setUnpublishOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
+              variant="destructive"
+              className="w-full sm:w-auto"
               disabled={pending}
               onClick={() => run(unpublishStoreAction)}
             >
-              {pending ? "Unpublishing…" : "Unpublish store"}
+              {pending ? "Unpublishing…" : "Unpublish"}
             </Button>
           </DialogFooter>
         </DialogContent>

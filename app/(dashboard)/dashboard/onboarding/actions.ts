@@ -7,6 +7,8 @@ import {
   type ProductInput,
 } from "@/app/(dashboard)/dashboard/products/actions";
 import { friendlyDbError } from "@/lib/errors/friendly-db";
+import { normalizeCampaignConfig } from "@/lib/fulfilment/campaigns";
+import { normalizeCalendarConfig } from "@/lib/fulfilment/dates";
 import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { isValidSgMobile, isValidUen } from "@/lib/paynow";
 import { suggestAlternatives, validateSlugFormat } from "@/lib/slug";
@@ -366,6 +368,22 @@ export async function saveFulfillment(
   const { supabase, store } = await getOwnedStore();
   if (!store) return { ok: false, error: "No store yet" };
 
+  // Settings always sends `calendar`; onboarding omits it → preserve existing
+  if ("calendar" in config) {
+    const calendar = normalizeCalendarConfig(config.calendar);
+    if (calendar) clean.calendar = calendar;
+  } else if (store.fulfillment?.calendar?.enabled) {
+    clean.calendar = store.fulfillment.calendar;
+  }
+
+  // Live campaign: settings form omits it → preserve; Live Mode actions set it
+  if ("campaign" in config) {
+    const campaign = normalizeCampaignConfig(config.campaign);
+    if (campaign) clean.campaign = campaign;
+  } else if (store.fulfillment?.campaign?.active) {
+    clean.campaign = store.fulfillment.campaign;
+  }
+
   const { error } = await supabase
     .from("stores")
     .update({ fulfillment: clean })
@@ -424,7 +442,7 @@ export async function publishStore(): Promise<ActionResult> {
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id)
-    .eq("archived", false);
+    .neq("status", "archived");
 
   const complete =
     store.vibe &&

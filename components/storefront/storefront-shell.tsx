@@ -9,6 +9,7 @@ import {
 import { StaleCartPruner } from "@/components/storefront/stale-cart-pruner";
 import { StickyCheckoutBar } from "@/components/storefront/sticky-checkout-bar";
 import { useStorefront } from "@/components/storefront/storefront-context";
+import { resolveCartLineUnitPrice } from "@/lib/cart/line-price";
 import { availableCartSummary } from "@/lib/cart/storage";
 
 function showStickyBar(pathname: string): boolean {
@@ -28,8 +29,10 @@ function StorefrontFrame({
 }) {
   const { cart } = useCart();
   const { products } = useStorefront();
-  const priceById = new Map(products.map((p) => [p.id, p.price_cents]));
-  const { count } = availableCartSummary(cart.items, priceById);
+  const productMap = new Map(products.map((p) => [p.id, p]));
+  const { count } = availableCartSummary(cart.items, (line) =>
+    resolveCartLineUnitPrice(line, productMap.get(line.productId)),
+  );
   const barVisible = sticky && count > 0;
 
   return (

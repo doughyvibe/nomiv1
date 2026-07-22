@@ -17,14 +17,19 @@ import {
   saveCart,
   updateCartItem,
 } from "@/lib/cart/storage";
-import type { Cart } from "@/lib/cart/types";
+import type { Cart, CartLineCustomisations } from "@/lib/cart/types";
 
 type CartContextValue = {
   cart: Cart;
   count: number;
-  addToCart: (productId: string, quantity: number) => void;
-  setQuantity: (productId: string, quantity: number) => void;
-  removeItem: (productId: string) => void;
+  addToCart: (
+    productId: string,
+    quantity: number,
+    variantId?: string | null,
+    customisations?: CartLineCustomisations,
+  ) => void;
+  setQuantity: (lineKey: string, quantity: number) => void;
+  removeItem: (lineKey: string) => void;
   clear: () => void;
   refresh: () => void;
 };
@@ -52,14 +57,16 @@ export function CartProvider({
     () => ({
       cart,
       count: cartItemCount(cart),
-      addToCart: (productId, quantity) => {
-        setCart(addItem(slug, productId, quantity));
+      addToCart: (productId, quantity, variantId, customisations) => {
+        setCart(
+          addItem(slug, { productId, quantity, variantId, customisations }),
+        );
       },
-      setQuantity: (productId, quantity) => {
-        setCart(updateCartItem(slug, productId, quantity));
+      setQuantity: (lineKey, quantity) => {
+        setCart(updateCartItem(slug, lineKey, quantity));
       },
-      removeItem: (productId) => {
-        setCart(removeFromCart(slug, productId));
+      removeItem: (lineKey) => {
+        setCart(removeFromCart(slug, lineKey));
       },
       clear: () => {
         saveCart(slug, { items: [] });

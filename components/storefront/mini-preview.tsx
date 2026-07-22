@@ -93,6 +93,7 @@ export function MiniPreview({
     id: "id" in p && p.id ? p.id : `preview-${i}`,
     description: "description" in p ? (p.description ?? "") : "",
     store_id: "",
+    status: "live",
     archived: false,
   })) as Product[];
   const featured = resolveFeaturedProduct(

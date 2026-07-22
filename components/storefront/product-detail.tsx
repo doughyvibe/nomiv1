@@ -5,7 +5,24 @@ import { useState } from "react";
 import { ArrowLeft, Minus, Plus } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
+import {
+  CustomisationFields,
+  useCustomisationAnswers,
+} from "@/components/storefront/customisation-fields";
 import { useStorefront } from "@/components/storefront/storefront-context";
+import {
+  useVariantPicker,
+  VariantPicker,
+} from "@/components/storefront/variant-picker";
+import { formatOfferPrice } from "@/lib/products/offer-price";
+import { formatPrepCopy } from "@/lib/products/lead-time";
+import { productRequiresConfig } from "@/lib/products/customisations";
+import {
+  availableQty,
+  isProductSoldOut,
+  isVariantSoldOut,
+} from "@/lib/products/inventory";
+import { productHasChoices } from "@/lib/products/variants";
 import { formatPrice } from "@/lib/money";
 import type { Product } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
@@ -15,6 +32,20 @@ export function ProductDetail({ product }: { product: Product }) {
   const { store } = useStorefront();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const picker = useVariantPicker(product);
+  const customs = useCustomisationAnswers(product);
+  const needsChoices = productHasChoices(product);
+  const needsConfig = productRequiresConfig(product);
+  const soldOut = isProductSoldOut(product);
+  const variantOos =
+    needsChoices && picker.variant
+      ? isVariantSoldOut(product, picker.variant)
+      : false;
+  const maxQty = availableQty(
+    product,
+    needsChoices ? picker.variant?.id : null,
+  );
+  const prepCopy = formatPrepCopy(product.lead_time_days ?? 0);
   const atelier = store.vibe === "atelier";
   const expedition = store.vibe === "expedition";
   const cyberpunk = store.vibe === "cyberpunk";
@@ -27,11 +58,36 @@ export function ProductDetail({ product }: { product: Product }) {
   const vows = store.vibe === "vows";
   const strada = store.vibe === "strada";
 
+  const displayPrice =
+    needsChoices || customs.hasCustomisations
+      ? (needsChoices ? picker.complete : true) && customs.complete
+        ? formatPrice(picker.unitPriceCents + customs.feeCents)
+        : formatOfferPrice(product)
+      : formatPrice(product.price_cents);
+
   function handleAdd() {
-    addToCart(product.id, quantity);
+    if (soldOut || variantOos) return;
+    if (needsChoices && !picker.variant) return;
+    if (!customs.complete) return;
+    const limit = maxQty;
+    const qty =
+      limit == null ? quantity : Math.min(quantity, Math.max(0, limit));
+    if (qty < 1) return;
+    addToCart(
+      product.id,
+      qty,
+      picker.variant?.id ?? null,
+      Object.keys(customs.answers).length > 0 ? customs.answers : undefined,
+    );
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
+
+  const canAdd =
+    !soldOut &&
+    !variantOos &&
+    (!needsChoices || picker.complete) &&
+    customs.complete;
 
   return (
     <div
@@ -147,7 +203,7 @@ export function ProductDetail({ product }: { product: Product }) {
           strada && "pdp-strada-price",
             )}
           >
-            {formatPrice(product.price_cents)}
+            {displayPrice}
           </p>
 
           {product.description?.trim() ? (
@@ -160,7 +216,39 @@ export function ProductDetail({ product }: { product: Product }) {
               {product.description}
             </p>
           ) : null}
+
+          {prepCopy ? (
+            <p className="mt-2 text-sm text-vibe-text-muted">{prepCopy}</p>
+          ) : null}
+
+          {soldOut ? (
+            <p className="mt-2 text-sm font-semibold text-vibe-text-muted">
+              Sold out
+            </p>
+          ) : null}
         </div>
+
+        {needsChoices ? (
+          <VariantPicker
+            product={product}
+            selectedByOptionId={picker.selectedByOptionId}
+            onChange={picker.setSelectedByOptionId}
+          />
+        ) : null}
+
+        {needsChoices && picker.allSelected && picker.selectionError ? (
+          <p className="text-sm text-red-600" role="alert">
+            {picker.selectionError}
+          </p>
+        ) : null}
+
+        {customs.hasCustomisations ? (
+          <CustomisationFields
+            customisations={customs.defs}
+            answers={customs.answers}
+            onChange={customs.setAnswers}
+          />
+        ) : null}
 
         {/* Quantity is a secondary control — keep it quiet so Add to cart owns the page */}
         <div
@@ -177,7 +265,10 @@ export function ProductDetail({ product }: { product: Product }) {
               type="button"
               aria-label="Decrease quantity"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="flex size-10 items-center justify-center rounded-full text-vibe-text-muted transition-colors hover:bg-vibe-border/20 hover:text-vibe-text active:scale-95"
+              className={cn(
+                "flex size-10 items-center justify-center rounded-full border border-vibe-border/40 text-vibe-text transition-colors hover:bg-vibe-border/20 active:scale-95",
+                atelier && "cart-atelier-qty-btn",
+              )}
             >
               <Minus className="size-4" />
             </button>
@@ -190,8 +281,18 @@ export function ProductDetail({ product }: { product: Product }) {
             <button
               type="button"
               aria-label="Increase quantity"
-              onClick={() => setQuantity((q) => q + 1)}
-              className="flex size-10 items-center justify-center rounded-full text-vibe-text-muted transition-colors hover:bg-vibe-border/20 hover:text-vibe-text active:scale-95"
+              onClick={() =>
+                setQuantity((q) => {
+                  const next = q + 1;
+                  if (maxQty == null) return next;
+                  return Math.min(next, maxQty);
+                })
+              }
+              disabled={maxQty != null && quantity >= maxQty}
+              className={cn(
+                "flex size-10 items-center justify-center rounded-full border border-vibe-border/40 text-vibe-text transition-colors hover:bg-vibe-border/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40",
+                atelier && "cart-atelier-qty-btn",
+              )}
             >
               <Plus className="size-4" />
             </button>
@@ -201,6 +302,7 @@ export function ProductDetail({ product }: { product: Product }) {
         <button
           type="button"
           onClick={handleAdd}
+          disabled={!canAdd}
           className={cn(
             "pdp-add w-full rounded-full py-4 text-sm font-semibold uppercase tracking-wider transition-transform active:scale-[0.98]",
             atelier && "pdp-atelier-add",
@@ -213,12 +315,20 @@ export function ProductDetail({ product }: { product: Product }) {
           laura && "pdp-laura-add",
           atlantic && "pdp-atlantic-add",
           strada && "pdp-strada-add",
-            added
-              ? "bg-vibe-secondary text-vibe-bg"
-              : "bg-vibe-primary text-vibe-primary-fg",
+            !canAdd
+              ? "cursor-not-allowed bg-vibe-border/40 text-vibe-text-muted"
+              : added
+                ? "bg-vibe-secondary text-vibe-bg"
+                : "bg-vibe-primary text-vibe-primary-fg",
           )}
         >
-          {added ? "Added to cart" : "Add to cart"}
+          {added
+            ? "Added to cart"
+            : soldOut || variantOos
+              ? "Sold out"
+              : needsConfig && !canAdd
+                ? "Choose options"
+                : "Add to cart"}
         </button>
         {added ? (
           <p className="text-center text-sm text-vibe-text-muted">

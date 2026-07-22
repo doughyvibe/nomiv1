@@ -6,8 +6,8 @@ import {
   subscriptionAllowsPublish,
 } from "./plans";
 
-assert.equal(BILLING_COPY.weeklyPrice, "S$3.90");
-assert.equal(BILLING_COPY.yearlyPrice, "S$149");
+assert.equal(BILLING_COPY.weeklyPrice, "$3.90");
+assert.equal(BILLING_COPY.yearlyPrice, "$149");
 assert.equal(subscriptionAllowsPublish("active"), true);
 assert.equal(subscriptionAllowsPublish("trialing"), true);
 assert.equal(subscriptionAllowsPublish("canceled"), false);

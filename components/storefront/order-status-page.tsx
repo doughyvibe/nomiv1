@@ -594,33 +594,26 @@ export function OrderStatusPageContent({
             <span>I have completed payment using the QR code above.</span>
           </label>
 
-          <DialogFooter className="border-vibe-border/30 bg-transparent sm:justify-end">
-            <button
-              type="button"
-              onClick={() => setModalOpen(false)}
-              className="rounded-[var(--vibe-radius)] px-4 py-2 text-sm text-vibe-text-muted"
-            >
-              Cancel
-            </button>
+          <DialogFooter className="border-vibe-border/30 bg-transparent">
             <button
               type="button"
               disabled={!checked || notifyPending}
               onClick={handleNotify}
               className={cn(
-                "vibe-display rounded-[var(--vibe-radius)] bg-vibe-primary px-4 py-2 text-sm font-semibold text-vibe-primary-fg uppercase disabled:opacity-50",
-                atelier && "checkout-atelier-cta px-5 py-2.5",
-                expedition && "checkout-expedition-cta px-5 py-2.5",
-                cyberpunk && "checkout-cyberpunk-cta px-5 py-2.5",
-                candyland && "checkout-candyland-cta px-5 py-2.5",
-          market && "checkout-market-cta px-5 py-2.5",
-          gallery && "checkout-gallery-cta px-5 py-2.5",
-          studio && "checkout-studio-cta px-5 py-2.5",
-          laura && "checkout-laura-cta px-5 py-2.5",
-          atlantic && "checkout-atlantic-cta px-5 py-2.5",
-          strada && "checkout-strada-cta px-5 py-2.5",
+                "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary px-4 py-2.5 text-sm font-semibold text-vibe-primary-fg uppercase disabled:opacity-50",
+                atelier && "checkout-atelier-cta",
+                expedition && "checkout-expedition-cta",
+                cyberpunk && "checkout-cyberpunk-cta",
+                candyland && "checkout-candyland-cta",
+                market && "checkout-market-cta",
+                gallery && "checkout-gallery-cta",
+                studio && "checkout-studio-cta",
+                laura && "checkout-laura-cta",
+                atlantic && "checkout-atlantic-cta",
+                strada && "checkout-strada-cta",
               )}
             >
-              Yes, notify seller
+              Notify seller
             </button>
           </DialogFooter>
         </DialogContent>

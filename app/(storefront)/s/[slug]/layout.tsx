@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { StoreComingSoon } from "@/components/storefront/store-coming-soon";
+import { LiveCampaignBanner } from "@/components/storefront/live-campaign-banner";
 import { StorefrontPreviewBanner } from "@/components/storefront/storefront-preview-banner";
 import { StorefrontShell } from "@/components/storefront/storefront-shell";
 import { StorefrontProvider } from "@/components/storefront/storefront-context";
@@ -12,6 +13,7 @@ import {
   getPublishedStorefront,
   resolveStorefrontGate,
 } from "@/lib/stores/load-storefront";
+import type { FulfillmentConfig } from "@/lib/stores/types";
 
 export default async function StorefrontSlugLayout({
   children,
@@ -39,6 +41,9 @@ export default async function StorefrontSlugLayout({
         className="min-h-dvh bg-vibe-bg text-vibe-text"
       >
         <StorefrontProvider value={storefront}>
+          <LiveCampaignBanner
+            fulfillment={storefront.store.fulfillment as FulfillmentConfig}
+          />
           <StorefrontShell slug={slug}>{children}</StorefrontShell>
         </StorefrontProvider>
       </div>
@@ -58,6 +63,9 @@ export default async function StorefrontSlugLayout({
         >
           <StorefrontProvider value={preview}>
             <StorefrontPreviewBanner />
+            <LiveCampaignBanner
+              fulfillment={preview.store.fulfillment as FulfillmentConfig}
+            />
             <StorefrontShell slug={slug}>{children}</StorefrontShell>
           </StorefrontProvider>
         </div>

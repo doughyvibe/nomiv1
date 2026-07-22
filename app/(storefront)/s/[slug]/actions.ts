@@ -5,6 +5,38 @@ import { revalidatePath } from "next/cache";
 import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { generateOrderReference } from "@/lib/orders/reference";
 import { sendVerificationRequestPush } from "@/lib/push/send-verification-alert";
+import {
+  buildCustomisationSnapshot,
+  totalCustomisationFeesCents,
+  type CustomisationAnswers,
+  type CustomisationSnapshotEntry,
+} from "@/lib/products/customisations";
+import { assertCartStock } from "@/lib/products/inventory";
+import {
+  productHasChoices,
+  variantUnitPrice,
+} from "@/lib/products/variants";
+import {
+  campaignCheckoutEmptyMessage,
+  fulfillmentWithCampaign,
+} from "@/lib/fulfilment/campaigns";
+import {
+  holdFulfilmentCapacity,
+  loadCapacityUsage,
+  releaseFulfilmentCapacitySlot,
+} from "@/lib/fulfilment/capacity";
+import {
+  allowedFulfilmentDates,
+  availableWindowsForDate,
+  capacityHoldCaps,
+  fulfilmentDateRequired,
+  hasCapacityLimits,
+  isAllowedFulfilmentDate,
+  maxCartLeadDays,
+  resolveWindows,
+  todaySgYmd,
+  windowById,
+} from "@/lib/fulfilment/dates";
 import { getCheckoutStorefront } from "@/lib/stores/load-storefront";
 import type { FulfillmentConfig } from "@/lib/stores/types";
 import { paynowIsComplete } from "@/lib/stores/types";
@@ -17,7 +49,13 @@ import {
 const PAYMENT_WINDOW_MS = 10 * 60 * 1000;
 const MAX_LINE_QTY = 99;
 
-type CartLine = { productId: string; quantity: number };
+type CartLinePayload = {
+  productId: string;
+  quantity: number;
+  variantId?: string | null;
+  customisations?: CustomisationAnswers;
+  lineKey?: string;
+};
 
 function normalizePhone(input: string): string {
   const digits = input.replace(/\D/g, "");
@@ -48,9 +86,9 @@ export async function createOrderAction(
     return { error: RATE_LIMIT_MESSAGE };
   }
 
-  let cartLines: CartLine[];
+  let cartLines: CartLinePayload[];
   try {
-    cartLines = JSON.parse(String(formData.get("cart") ?? "[]")) as CartLine[];
+    cartLines = JSON.parse(String(formData.get("cart") ?? "[]")) as CartLinePayload[];
   } catch {
     return { error: "Invalid cart data" };
   }
@@ -69,7 +107,9 @@ export async function createOrderAction(
         "This store isn't ready to take PayNow payments yet. Please contact the seller.",
     };
   }
-  const fulfillment = store.fulfillment as FulfillmentConfig;
+  const fulfillment = fulfillmentWithCampaign(
+    store.fulfillment as FulfillmentConfig,
+  );
 
   const method = String(formData.get("fulfillment_method") ?? "");
   if (method !== "pickup" && method !== "delivery") {
@@ -100,9 +140,13 @@ export async function createOrderAction(
   const productMap = new Map(products.map((p) => [p.id, p]));
   let subtotalCents = 0;
   const lineItems: {
+    product_id: string;
     product_name: string;
     price_cents: number;
     quantity: number;
+    variant_id: string | null;
+    variant_label: string | null;
+    customisations_snapshot: CustomisationSnapshotEntry[] | null;
   }[] = [];
 
   for (const line of cartLines) {
@@ -113,22 +157,181 @@ export async function createOrderAction(
       return { error: "Invalid quantity in cart" };
     }
     const product = productMap.get(line.productId);
-    if (!product) return { error: "A product in your cart is no longer available" };
-    subtotalCents += product.price_cents * line.quantity;
-    lineItems.push({
-      product_name: product.name,
-      price_cents: product.price_cents,
-      quantity: line.quantity,
-    });
+    if (!product) {
+      return { error: "A product in your cart is no longer available" };
+    }
+
+    const defs = product.customisations ?? [];
+    const snapResult = buildCustomisationSnapshot(defs, line.customisations);
+    if ("error" in snapResult) {
+      return { error: snapResult.error };
+    }
+    const addOnFees = totalCustomisationFeesCents(defs, line.customisations);
+    const snapshot =
+      snapResult.entries.length > 0 ? snapResult.entries : null;
+
+    if (productHasChoices(product)) {
+      const variantId = line.variantId ?? null;
+      if (!variantId) {
+        return { error: "Choose options for each product before checkout" };
+      }
+      const variant = (product.variants ?? []).find((v) => v.id === variantId);
+      if (!variant) {
+        return { error: "A chosen option is no longer available — update your cart" };
+      }
+      const unit = variantUnitPrice(product.price_cents, variant) + addOnFees;
+      subtotalCents += unit * line.quantity;
+      lineItems.push({
+        product_id: product.id,
+        product_name: product.name,
+        price_cents: unit,
+        quantity: line.quantity,
+        variant_id: variant.id,
+        variant_label: variant.label,
+        customisations_snapshot: snapshot,
+      });
+    } else {
+      const unit = product.price_cents + addOnFees;
+      subtotalCents += unit * line.quantity;
+      lineItems.push({
+        product_id: product.id,
+        product_name: product.name,
+        price_cents: unit,
+        quantity: line.quantity,
+        variant_id: null,
+        variant_label: null,
+        customisations_snapshot: snapshot,
+      });
+    }
   }
 
   if (lineItems.length === 0) return { error: "Your cart is empty" };
+
+  const stockError = assertCartStock(
+    products.map((p) => ({
+      id: p.id,
+      name: p.name,
+      track_inventory: p.track_inventory,
+      stock_qty: p.stock_qty,
+      sold_out_policy: p.sold_out_policy,
+      variants: p.variants,
+    })),
+    cartLines.map((l) => ({
+      productId: l.productId,
+      quantity: l.quantity,
+      variantId: l.variantId,
+    })),
+  );
+  if (stockError) return { error: stockError };
+
+  const maxLead = maxCartLeadDays(
+    lineItems.map((item) => {
+      const product = productMap.get(item.product_id);
+      return { lead_time_days: product?.lead_time_days ?? 0 };
+    }),
+  );
+  const needsDate = fulfilmentDateRequired(fulfillment, maxLead);
+  const fulfillmentDateRaw = String(formData.get("fulfillment_date") ?? "").trim();
+  const fulfillmentWindowRaw = String(
+    formData.get("fulfillment_window_id") ?? "",
+  ).trim();
+  let fulfillmentDate: string | null = null;
+  let fulfillmentWindowId: string | null = null;
+  let fulfillmentWindowLabel: string | null = null;
+
+  const admin = createAdminClient();
+  let usage = undefined;
+  if (needsDate && hasCapacityLimits(fulfillment)) {
+    usage = await loadCapacityUsage(admin, store.id, todaySgYmd());
+  }
+
+  if (needsDate) {
+    const allowed = allowedFulfilmentDates({
+      cartLeadDays: lineItems.map((item) => {
+        const product = productMap.get(item.product_id);
+        return product?.lead_time_days ?? 0;
+      }),
+      fulfillment,
+      usage,
+    });
+    if (allowed.length === 0) {
+      const liveMsg = campaignCheckoutEmptyMessage(
+        lineItems.map((item) => {
+          const product = productMap.get(item.product_id);
+          return {
+            name: product?.name ?? item.product_name,
+            lead_time_days: product?.lead_time_days ?? 0,
+          };
+        }),
+        store.fulfillment as FulfillmentConfig,
+      );
+      return {
+        error:
+          liveMsg ??
+          "No available dates right now — this week may be fully booked. Please contact the seller.",
+      };
+    }
+    if (!fulfillmentDateRaw) {
+      return { error: "Select a fulfillment date" };
+    }
+    if (!isAllowedFulfilmentDate(fulfillmentDateRaw, allowed)) {
+      return { error: "That date is not available — choose another" };
+    }
+    fulfillmentDate = fulfillmentDateRaw;
+
+    const windows = resolveWindows(fulfillment);
+    if (windows.length > 0) {
+      const open = availableWindowsForDate(
+        fulfillmentDate,
+        fulfillment,
+        usage,
+      );
+      if (open.length === 0) {
+        return {
+          error: "All time windows for this date are full. Pick another date.",
+        };
+      }
+      if (windows.length === 1) {
+        fulfillmentWindowId = open[0]?.id ?? windows[0]!.id;
+      } else {
+        if (!fulfillmentWindowRaw) {
+          return { error: "Select a time window" };
+        }
+        if (!open.some((w) => w.id === fulfillmentWindowRaw)) {
+          return {
+            error: "That time window is not available — choose another",
+          };
+        }
+        fulfillmentWindowId = fulfillmentWindowRaw;
+      }
+      const win = windowById(fulfillment, fulfillmentWindowId!);
+      fulfillmentWindowLabel = win?.label ?? null;
+    }
+  }
 
   const fulfillmentFeeCents =
     method === "delivery" ? (fulfillment.delivery?.fee_cents ?? 0) : 0;
   const totalCents = subtotalCents + fulfillmentFeeCents;
 
-  const admin = createAdminClient();
+  const { dailyCap, windowCap } = capacityHoldCaps(
+    fulfillment,
+    fulfillmentWindowId,
+  );
+  let heldDaily = false;
+  let heldWindow = false;
+  if (fulfillmentDate && (dailyCap !== null || windowCap !== null)) {
+    const hold = await holdFulfilmentCapacity(admin, {
+      storeId: store.id,
+      date: fulfillmentDate,
+      windowId: fulfillmentWindowId,
+      dailyCap,
+      windowCap,
+    });
+    if (!hold.ok) return { error: hold.error };
+    heldDaily = hold.heldDaily;
+    heldWindow = hold.heldWindow;
+  }
+
   const reference = await uniqueReference(admin);
   const paymentExpiresAt = new Date(Date.now() + PAYMENT_WINDOW_MS).toISOString();
 
@@ -142,6 +345,11 @@ export async function createOrderAction(
       customer_phone: normalizePhone(customerPhone),
       customer_email: customerEmail,
       fulfillment_method: method,
+      fulfillment_date: fulfillmentDate,
+      fulfillment_window_id: fulfillmentWindowId,
+      fulfillment_window_label: fulfillmentWindowLabel,
+      capacity_held_daily: heldDaily,
+      capacity_held_window: heldWindow,
       delivery_address: method === "delivery" ? deliveryAddress : null,
       order_notes: orderNotes || null,
       subtotal_cents: subtotalCents,
@@ -153,6 +361,15 @@ export async function createOrderAction(
     .single();
 
   if (orderError || !order) {
+    if (fulfillmentDate && (heldDaily || heldWindow)) {
+      await releaseFulfilmentCapacitySlot(admin, {
+        storeId: store.id,
+        date: fulfillmentDate,
+        windowId: fulfillmentWindowId,
+        heldDaily,
+        heldWindow,
+      });
+    }
     return { error: "Could not create order. Please try again." };
   }
 
@@ -165,6 +382,15 @@ export async function createOrderAction(
 
   if (itemsError) {
     await admin.from("orders").delete().eq("id", order.id);
+    if (fulfillmentDate && (heldDaily || heldWindow)) {
+      await releaseFulfilmentCapacitySlot(admin, {
+        storeId: store.id,
+        date: fulfillmentDate,
+        windowId: fulfillmentWindowId,
+        heldDaily,
+        heldWindow,
+      });
+    }
     return { error: "Could not create order. Please try again." };
   }
 

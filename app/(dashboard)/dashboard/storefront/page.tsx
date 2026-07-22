@@ -24,7 +24,7 @@ export default async function StorefrontPage() {
     .from("products")
     .select("name, price_cents, image_url, category")
     .eq("store_id", store.id)
-    .eq("archived", false)
+    .eq("status", "live")
     .order("created_at", { ascending: true })
     .limit(4);
 

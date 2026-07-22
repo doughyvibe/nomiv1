@@ -1,7 +1,11 @@
 import Link from "next/link";
 
-import { ProductsListView } from "@/components/dashboard/products-list";
+import {
+  ProductsListView,
+  type ProductsListFilter,
+} from "@/components/dashboard/products-list";
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
+import type { ProductStatus } from "@/lib/products/contracts";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
@@ -9,40 +13,59 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Products — Nomi" };
 
+function parseFilter(
+  status: string | undefined,
+  archived: string | undefined,
+): ProductsListFilter {
+  if (archived === "1" || status === "archived") return "archived";
+  return "active";
+}
+
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ archived?: string }>;
+  searchParams: Promise<{ status?: string; archived?: string }>;
 }) {
-  const { archived } = await searchParams;
-  const showArchived = archived === "1";
+  const params = await searchParams;
+  const filter = parseFilter(params.status, params.archived);
   const { supabase, store } = await requireSellerStore();
 
-  const { data: products } = await supabase
+  let query = supabase
     .from("products")
     .select("*")
     .eq("store_id", store.id)
-    .eq("archived", showArchived)
     .order("created_at", { ascending: true });
 
-  const { count: archivedCount } = await supabase
+  if (filter === "active") {
+    query = query.neq("status", "archived");
+  } else {
+    query = query.eq("status", "archived");
+  }
+
+  const { data: products } = await query;
+
+  const { data: statusRows } = await supabase
     .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("store_id", store.id)
-    .eq("archived", true);
+    .select("status")
+    .eq("store_id", store.id);
+
+  const counts = { active: 0, archived: 0 };
+  for (const row of statusRows ?? []) {
+    const s = (row as { status: ProductStatus }).status;
+    if (s === "archived") {
+      counts.archived += 1;
+    } else {
+      counts.active += 1;
+    }
+  }
 
   return (
     <div className="flex flex-col gap-8">
       <DashboardPageHeader
         eyebrow={store.name}
-        title={showArchived ? "Archived products" : "Products"}
-        description={
-          showArchived
-            ? "Hidden from your public storefront."
-            : "Manage what buyers see when they visit your store."
-        }
+        title="Products"
         action={
-          !showArchived ? (
+          filter !== "archived" ? (
             <Link
               href="/products/new"
               className="btn-brand-dark inline-flex h-11 items-center px-5"
@@ -55,8 +78,8 @@ export default async function ProductsPage({
       <ProductsListView
         products={(products as Product[]) ?? []}
         store={store}
-        showArchived={showArchived}
-        archivedCount={archivedCount ?? 0}
+        filter={filter}
+        counts={counts}
       />
     </div>
   );

@@ -179,8 +179,8 @@ These rules define behavior, not appearance. They must be preserved across every
 - While visible, the cart is reachable within one tap from shop/cart/product pages (still hidden on checkout/order).
 
 ### Product Interactions
-- Products with short descriptions (≤ 100 characters) support quick-add directly from the catalog card and featured section.
-- Products with longer descriptions require the buyer to visit the detail page before adding to cart. This is intentional — it forces the buyer to read before committing.
+- **Quick Add (canonical — Phase 2 / P2-C-03):** Instant one-tap add from catalog and featured when the product has **no variants and no required customisations**. If the product has choices (variants) or required customisations, the same control reads as “Choose options” (or keeps the + icon) and navigates to the **PDP** to complete config before add. Never auto-pick a random variant. Description length must **not** gate Quick Add.
+- Lead time and fulfilment dates never appear in Quick Add — only at Checkout (Fulfilment step).
 - Product images scale subtly on hover (desktop) to signal interactivity.
 - Product cards compress subtly on press (mobile) to provide tactile feedback.
 - Every product card is a link to its detail page, regardless of whether quick-add is available.

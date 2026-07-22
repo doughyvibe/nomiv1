@@ -8,17 +8,44 @@ import { ArrowLeft } from "lucide-react";
 import { createOrderAction } from "@/app/(storefront)/s/[slug]/actions";
 import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
+import {
+  cartLineCustomisationLines,
+  cartLineVariantLabel,
+  resolveCartLineUnitPrice,
+} from "@/lib/cart/line-price";
 import { clearCart } from "@/lib/cart/storage";
+import {
+  campaignCheckoutEmptyMessage,
+  fulfillmentWithCampaign,
+  resolveActiveCampaign,
+} from "@/lib/fulfilment/campaigns";
+import {
+  allowedFulfilmentDates,
+  availableWindowsForDate,
+  EMPTY_CAPACITY_USAGE,
+  formatFulfilmentDateLabel,
+  fulfilmentDateRequired,
+  maxCartLeadDays,
+  resolveWindows,
+  type CapacityUsage,
+} from "@/lib/fulfilment/dates";
 import { formatPrice } from "@/lib/money";
 import type { FulfillmentConfig } from "@/lib/stores/types";
 import { paynowIsComplete } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
-export function CheckoutForm({ slug }: { slug: string }) {
+export function CheckoutForm({
+  slug,
+  capacityUsage = EMPTY_CAPACITY_USAGE,
+}: {
+  slug: string;
+  capacityUsage?: CapacityUsage;
+}) {
   const router = useRouter();
   const { cart } = useCart();
   const { store, products } = useStorefront();
-  const fulfillment = store.fulfillment as FulfillmentConfig;
+  const rawFulfillment = store.fulfillment as FulfillmentConfig;
+  const fulfillment = fulfillmentWithCampaign(rawFulfillment);
   const paynowReady = paynowIsComplete(store.paynow);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const atelier = store.vibe === "atelier";
@@ -37,29 +64,110 @@ export function CheckoutForm({ slug }: { slug: string }) {
     .map((item) => {
       const product = productMap.get(item.productId);
       if (!product) return null;
-      return { item, product };
+      const unit = resolveCartLineUnitPrice(item, product);
+      if (unit === undefined) return null;
+      const variantLabel = cartLineVariantLabel(item, product);
+      const customLines = cartLineCustomisationLines(item, product);
+      return { item, product, unit, variantLabel, customLines };
     })
     .filter(Boolean) as {
-    item: { productId: string; quantity: number };
+    item: (typeof cart.items)[number];
     product: (typeof products)[number];
+    unit: number;
+    variantLabel: string | null;
+    customLines: string[];
   }[];
 
   const subtotal = lines.reduce(
-    (sum, { item, product }) => sum + product.price_cents * item.quantity,
+    (sum, { item, unit }) => sum + unit * item.quantity,
     0,
   );
 
   const pickupEnabled = Boolean(fulfillment.pickup?.enabled);
   const deliveryEnabled = Boolean(fulfillment.delivery?.enabled);
   const deliveryFee = fulfillment.delivery?.fee_cents ?? 0;
-  const defaultMethod = pickupEnabled
-    ? "pickup"
-    : deliveryEnabled
-      ? "delivery"
-      : "pickup";
+  const liveCampaign = resolveActiveCampaign(rawFulfillment);
+  const campaignLocked =
+    Boolean(liveCampaign) &&
+    (Boolean(liveCampaign?.dates?.length) ||
+      Boolean(liveCampaign?.methods?.length) ||
+      Boolean(liveCampaign?.windows?.length));
+  const defaultMethod = deliveryEnabled && !pickupEnabled
+    ? "delivery"
+    : pickupEnabled
+      ? "pickup"
+      : deliveryEnabled
+        ? "delivery"
+        : "pickup";
   const [method, setMethod] = useState<"pickup" | "delivery">(defaultMethod);
-  const appliedDelivery = method === "delivery" ? deliveryFee : 0;
+  const lockedMethod: "pickup" | "delivery" | null =
+    campaignLocked && deliveryEnabled && !pickupEnabled
+      ? "delivery"
+      : campaignLocked && pickupEnabled && !deliveryEnabled
+        ? "pickup"
+        : null;
+  const effectiveMethod = lockedMethod ?? method;
+  const appliedDelivery = effectiveMethod === "delivery" ? deliveryFee : 0;
   const totalDue = subtotal + appliedDelivery;
+
+  const maxLead = maxCartLeadDays(
+    lines.map(({ product }) => ({
+      lead_time_days: product.lead_time_days ?? 0,
+    })),
+  );
+  const needsDate = fulfilmentDateRequired(fulfillment, maxLead);
+  const configuredWindows = resolveWindows(fulfillment);
+  const allowedDates = needsDate
+    ? allowedFulfilmentDates({
+        cartLeadDays: lines.map(
+          ({ product }) => product.lead_time_days ?? 0,
+        ),
+        fulfillment,
+        usage: capacityUsage,
+      })
+    : [];
+  const singleDateLock = campaignLocked && allowedDates.length === 1;
+  const [fulfillmentDate, setFulfillmentDate] = useState(
+    () => allowedDates[0] ?? "",
+  );
+  const selectedDate =
+    needsDate && fulfillmentDate && allowedDates.includes(fulfillmentDate)
+      ? fulfillmentDate
+      : (allowedDates[0] ?? "");
+  const openWindows =
+    needsDate && selectedDate && configuredWindows.length > 0
+      ? availableWindowsForDate(selectedDate, fulfillment, capacityUsage)
+      : [];
+  const needsWindow = configuredWindows.length > 1;
+  const [fulfillmentWindowId, setFulfillmentWindowId] = useState(
+    () => openWindows[0]?.id ?? configuredWindows[0]?.id ?? "",
+  );
+  const selectedWindowId =
+    openWindows.length === 0
+      ? ""
+      : openWindows.some((w) => w.id === fulfillmentWindowId)
+        ? fulfillmentWindowId
+        : (openWindows[0]?.id ?? "");
+  const singleWindowId =
+    configuredWindows.length === 1 ? (openWindows[0]?.id ?? "") : "";
+  const effectiveWindowId = needsWindow
+    ? selectedWindowId
+    : singleWindowId;
+  const dateUnavailable = needsDate && allowedDates.length === 0;
+  const windowUnavailable =
+    needsDate &&
+    configuredWindows.length > 0 &&
+    Boolean(selectedDate) &&
+    openWindows.length === 0;
+  const liveEmptyMessage = dateUnavailable
+    ? campaignCheckoutEmptyMessage(
+        lines.map(({ product }) => ({
+          name: product.name,
+          lead_time_days: product.lead_time_days ?? 0,
+        })),
+        rawFulfillment,
+      )
+    : null;
 
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
@@ -246,15 +354,21 @@ export function CheckoutForm({ slug }: { slug: string }) {
           Order summary
         </h2>
         <ul className="mt-3 flex flex-col gap-2">
-          {lines.map(({ item, product }) => (
+          {lines.map(({ item, product, unit, variantLabel, customLines }) => (
             <li
-              key={product.id}
+              key={item.lineKey}
               className="flex justify-between gap-3 text-sm"
             >
               <span className="min-w-0 break-words">
-                {product.name} × {item.quantity}
+                {product.name}
+                {variantLabel ? ` (${variantLabel})` : ""} × {item.quantity}
+                {customLines.length > 0 ? (
+                  <span className="mt-0.5 block text-xs text-vibe-text-muted">
+                    {customLines.join(" · ")}
+                  </span>
+                ) : null}
               </span>
-              <span>{formatPrice(product.price_cents * item.quantity)}</span>
+              <span>{formatPrice(unit * item.quantity)}</span>
             </li>
           ))}
         </ul>
@@ -279,6 +393,31 @@ export function CheckoutForm({ slug }: { slug: string }) {
           >
             Fulfillment
           </legend>
+          {campaignLocked && pickupEnabled !== deliveryEnabled ? (
+            <>
+              <input
+                type="hidden"
+                name="fulfillment_method"
+                value={deliveryEnabled ? "delivery" : "pickup"}
+              />
+              <p className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-sm">
+                <span className="font-medium">
+                  {deliveryEnabled
+                    ? `Delivery (+${formatPrice(deliveryFee)})`
+                    : "Pickup"}
+                </span>
+                <span className="mt-0.5 block text-xs text-vibe-text-muted">
+                  Locked for Live
+                  {deliveryEnabled && fulfillment.delivery?.instructions
+                    ? ` — ${fulfillment.delivery.instructions}`
+                    : !deliveryEnabled && fulfillment.pickup?.instructions
+                      ? ` — ${fulfillment.pickup.instructions}`
+                      : ""}
+                </span>
+              </p>
+            </>
+          ) : (
+            <>
           {pickupEnabled && (
             <label
               className={cn(
@@ -379,8 +518,203 @@ export function CheckoutForm({ slug }: { slug: string }) {
               </span>
             </label>
           )}
+            </>
+          )}
         </fieldset>
       )}
+
+      {needsDate ? (
+        <fieldset className="flex flex-col gap-3">
+          <legend
+            className={cn(
+              "vibe-display text-xs font-semibold text-vibe-text-muted uppercase",
+              atelier && "checkout-atelier-section-label",
+              expedition && "checkout-expedition-section-label",
+              cyberpunk && "checkout-cyberpunk-section-label",
+              candyland && "checkout-candyland-section-label",
+              market && "checkout-market-section-label",
+              gallery && "checkout-gallery-section-label",
+              studio && "checkout-studio-section-label",
+              laura && "checkout-laura-section-label",
+              atlantic && "checkout-atlantic-section-label",
+              strada && "checkout-strada-section-label",
+            )}
+          >
+            {effectiveMethod === "delivery" ? "Delivery date" : "Pickup date"}
+          </legend>
+          {dateUnavailable ? (
+            <p
+              className="rounded-[var(--vibe-radius)] border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-vibe-text"
+              role="alert"
+            >
+              {liveEmptyMessage ??
+                "No available dates right now — this week may be fully booked. Please contact the seller."}
+            </p>
+          ) : singleDateLock ? (
+            <>
+              <input
+                type="hidden"
+                name="fulfillment_date"
+                value={selectedDate}
+              />
+              <p className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-sm">
+                <span className="font-medium">
+                  {formatFulfilmentDateLabel(selectedDate)}
+                </span>
+                <span className="mt-0.5 block text-xs text-vibe-text-muted">
+                  Locked for Live
+                  {maxLead > 0
+                    ? ` · needs ${maxLead} ${maxLead === 1 ? "day" : "days"} prep`
+                    : ""}
+                </span>
+              </p>
+              {windowUnavailable ? (
+                <p
+                  className="rounded-[var(--vibe-radius)] border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-vibe-text"
+                  role="alert"
+                >
+                  All time windows for this date are full. Pick another date.
+                </p>
+              ) : needsWindow ? (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs text-vibe-text-muted">
+                    Choose a time window
+                  </span>
+                  <select
+                    name="fulfillment_window_id"
+                    required
+                    value={selectedWindowId}
+                    onChange={(e) => setFulfillmentWindowId(e.target.value)}
+                    className={cn(
+                      "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+                      atelier && "checkout-atelier-input",
+                      expedition && "checkout-expedition-input",
+                      cyberpunk && "checkout-cyberpunk-input",
+                      candyland && "checkout-candyland-input",
+                      market && "checkout-market-input",
+                      gallery && "checkout-gallery-input",
+                      studio && "checkout-studio-input",
+                      laura && "checkout-laura-input",
+                      atlantic && "checkout-atlantic-input",
+                      strada && "checkout-strada-input",
+                    )}
+                  >
+                    {openWindows.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : configuredWindows.length === 1 && effectiveWindowId ? (
+                <>
+                  <input
+                    type="hidden"
+                    name="fulfillment_window_id"
+                    value={effectiveWindowId}
+                  />
+                  <p className="text-xs text-vibe-text-muted">
+                    Window:{" "}
+                    <span className="font-medium text-vibe-text">
+                      {openWindows[0]?.label}
+                    </span>
+                    {campaignLocked ? " · Locked for Live" : ""}
+                  </p>
+                </>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs text-vibe-text-muted">
+                  Choose an available date
+                  {maxLead > 0
+                    ? ` (needs ${maxLead} ${maxLead === 1 ? "day" : "days"} prep)`
+                    : ""}
+                </span>
+                <select
+                  name="fulfillment_date"
+                  required
+                  value={selectedDate}
+                  onChange={(e) => setFulfillmentDate(e.target.value)}
+                  className={cn(
+                    "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+                    atelier && "checkout-atelier-input",
+                    expedition && "checkout-expedition-input",
+                    cyberpunk && "checkout-cyberpunk-input",
+                    candyland && "checkout-candyland-input",
+                    market && "checkout-market-input",
+                    gallery && "checkout-gallery-input",
+                    studio && "checkout-studio-input",
+                    laura && "checkout-laura-input",
+                    atlantic && "checkout-atlantic-input",
+                    strada && "checkout-strada-input",
+                  )}
+                >
+                  {allowedDates.map((ymd) => (
+                    <option key={ymd} value={ymd}>
+                      {formatFulfilmentDateLabel(ymd)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {windowUnavailable ? (
+                <p
+                  className="rounded-[var(--vibe-radius)] border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-vibe-text"
+                  role="alert"
+                >
+                  All time windows for this date are full. Pick another date.
+                </p>
+              ) : needsWindow ? (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs text-vibe-text-muted">
+                    Choose a time window
+                  </span>
+                  <select
+                    name="fulfillment_window_id"
+                    required
+                    value={selectedWindowId}
+                    onChange={(e) => setFulfillmentWindowId(e.target.value)}
+                    className={cn(
+                      "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
+                      atelier && "checkout-atelier-input",
+                      expedition && "checkout-expedition-input",
+                      cyberpunk && "checkout-cyberpunk-input",
+                      candyland && "checkout-candyland-input",
+                      market && "checkout-market-input",
+                      gallery && "checkout-gallery-input",
+                      studio && "checkout-studio-input",
+                      laura && "checkout-laura-input",
+                      atlantic && "checkout-atlantic-input",
+                      strada && "checkout-strada-input",
+                    )}
+                  >
+                    {openWindows.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : configuredWindows.length === 1 && effectiveWindowId ? (
+                <>
+                  <input
+                    type="hidden"
+                    name="fulfillment_window_id"
+                    value={effectiveWindowId}
+                  />
+                  <p className="text-xs text-vibe-text-muted">
+                    Window:{" "}
+                    <span className="font-medium text-vibe-text">
+                      {openWindows[0]?.label}
+                    </span>
+                  </p>
+                </>
+              ) : null}
+            </>
+          )}
+        </fieldset>
+      ) : null}
 
       <section
         className={cn(
@@ -403,7 +737,7 @@ export function CheckoutForm({ slug }: { slug: string }) {
             <span>Subtotal</span>
             <span>{formatPrice(subtotal)}</span>
           </div>
-          {method === "delivery" && (
+          {effectiveMethod === "delivery" && (
             <div className="flex justify-between text-vibe-text-muted">
               <span>Delivery</span>
               <span>{formatPrice(appliedDelivery)}</span>
@@ -507,7 +841,7 @@ export function CheckoutForm({ slug }: { slug: string }) {
             for your receipt and status.
           </span>
         </label>
-        {deliveryEnabled && method === "delivery" && (
+        {deliveryEnabled && effectiveMethod === "delivery" && (
           <label className="flex flex-col gap-1.5">
             <span className="text-xs text-vibe-text-muted">
               Delivery address
@@ -574,7 +908,7 @@ export function CheckoutForm({ slug }: { slug: string }) {
 
       <button
         type="submit"
-        disabled={pending || !paynowReady}
+        disabled={pending || !paynowReady || dateUnavailable || windowUnavailable}
         className={cn(
           "vibe-display w-full rounded-[var(--vibe-radius)] bg-vibe-primary py-3.5 text-sm font-semibold text-vibe-primary-fg uppercase transition-transform active:scale-[0.98] disabled:opacity-60",
           atelier && "checkout-atelier-cta",

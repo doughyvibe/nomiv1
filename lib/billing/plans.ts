@@ -3,10 +3,10 @@
 export type BillingInterval = "four_weekly" | "yearly";
 
 export const BILLING_COPY = {
-  weeklyPrice: "S$3.90",
+  weeklyPrice: "$3.90",
   weeklyCadence: "per week",
   billedEvery: "Billed every 4 weeks",
-  yearlyPrice: "S$149",
+  yearlyPrice: "$149",
   yearlyCadence: "per year",
 } as const;
 

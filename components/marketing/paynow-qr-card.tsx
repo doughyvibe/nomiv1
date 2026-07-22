@@ -34,7 +34,7 @@ export function PayNowQrCard({ showBadge = true }: { showBadge?: boolean } = {})
               Amount due
             </p>
             <p className="font-display text-3xl font-extrabold tracking-tight text-foreground">
-              S$48.00
+              $48.00
             </p>
           </div>
           <div className="text-right">

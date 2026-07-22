@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Plus, Star } from "lucide-react";
 
 import { useCart } from "@/components/storefront/cart-context";
 import { resolveFeaturedSectionTitle } from "@/lib/featured-section";
-import { formatPrice } from "@/lib/money";
+import { formatOfferPrice } from "@/lib/products/offer-price";
+import { productRequiresConfig } from "@/lib/products/customisations";
+import { isProductSoldOut } from "@/lib/products/inventory";
 import type { Product, Vibe } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
@@ -93,8 +96,13 @@ export function FeaturedProduct({
   sectionTitle,
   vibe = "strada",
 }: FeaturedProductProps) {
+  const router = useRouter();
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
+  const needsChoices = productRequiresConfig(product);
+  const soldOut = isProductSoldOut(product);
+  const priceLabel = formatOfferPrice(product);
+  const priceDisplay = priceLabel;
   const noir = isNoirVibe(vibe);
   const atelier = isAtelierVibe(vibe);
   const expedition = isExpeditionVibe(vibe);
@@ -113,10 +121,23 @@ export function FeaturedProduct({
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    if (soldOut) return;
+    if (needsChoices) {
+      router.push(`/product/${product.id}`);
+      return;
+    }
     addToCart(product.id, 1);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
+
+  const ctaLabel = soldOut
+    ? "Sold out"
+    : needsChoices
+      ? "Choose options"
+      : expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || vows || strada
+        ? "Add to cart"
+        : "Add to Cart";
 
   return (
     <section
@@ -289,7 +310,7 @@ export function FeaturedProduct({
             <div className="featured-expedition-name-row">
               <p className="featured-expedition-name">{product.name}</p>
               <p className="featured-expedition-price">
-                {formatPrice(product.price_cents)}
+                {priceDisplay}
               </p>
             </div>
           ) : (
@@ -369,14 +390,21 @@ export function FeaturedProduct({
                   strada && "featured-strada-price",
                 )}
               >
-                {formatPrice(product.price_cents)}
+                {priceDisplay}
               </p>
             ) : null}
 
             <button
               type="button"
               onClick={handleQuickAdd}
-              aria-label={`Add ${product.name} to cart`}
+              disabled={soldOut}
+              aria-label={
+                soldOut
+                  ? `${product.name} sold out`
+                  : needsChoices
+                    ? `Choose options for ${product.name}`
+                    : `Add ${product.name} to cart`
+              }
               className={cn(
                 "flex size-11 shrink-0 items-center justify-center rounded-full border border-vibe-border/40 bg-vibe-surface transition-colors",
                 noir && "featured-noir-add",
@@ -391,6 +419,7 @@ export function FeaturedProduct({
                   atlantic && "featured-atlantic-add",
                   vows && "featured-vows-add",
                   strada && "featured-strada-add",
+                soldOut && "cursor-not-allowed opacity-60",
                 added && "bg-vibe-primary text-vibe-primary-fg",
               )}
             >
@@ -398,7 +427,7 @@ export function FeaturedProduct({
                 added ? (
                   <span>Added</span>
                 ) : (
-                  <span>{expedition || cyberpunk || candyland || market || gallery || studio || laura || atlantic || vows || strada ? "Add to cart" : "Add to Cart"}</span>
+                  <span>{ctaLabel}</span>
                 )
               ) : added ? (
                 <span className="text-xs font-semibold">✓</span>

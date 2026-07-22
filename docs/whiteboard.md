@@ -1,100 +1,170 @@
 # Nomi — Whiteboard
 
 > Scratch space for orchestration, decisions, and "where are we" notes.
-> Read this + `docs/Implementation.md` at the start of every session.
 
 ---
 
-## What Nomi is (product north star)
+## Current focus — Manual QA (Product + Fulfilment Phases 0–9)
 
-**Nomi** is a Singapore-first storefront builder for sellers who sell via social (IG / TikTok / WhatsApp).
+**Status:** Phases 0–9 done · apply `20260722110000_drop_compare_at_and_draft.sql` · **re-test after mobile trim**  
+**Plan SoT:** `docs/PRODUCT_FULFILMENT_IMPLEMENTATION_PLAN.md`  
+**Boundaries:** Product ≠ Fulfilment ≠ Checkout (`docs/SYSTEM_BOUNDARIES.md`)
 
-| Layer | Claim |
-|-------|--------|
-| **Outcome** | A beautiful shop buyers can browse and order from — one link |
-| **USP** | Dynamic **PayNow**: exact amount + order reference on every checkout QR |
-| **Model** | Build free → pay when you publish (go live) |
-| **Not** | Generic “link in bio” (Linktree already owns that sentence) |
+**Trim note:** No product draft, compare-at, or duplicate. Status = live \| removed (archived). Delete forever only if never ordered.
 
-Sellers: signup → onboarding → build (products, vibe, fulfillment, PayNow) → publish (gated by readiness + billing) → take orders → manually verify PayNow payments.
+Work through the scripts below in order. For each step: do the action → check **Expected** → if wrong, note the step ID (e.g. `T4.3`) and what you saw.
 
-Buyers: open store link → browse/cart → PayNow QR → seller confirms paid.
+### Before you start
 
-**Brand (marketing / dashboard chrome):** Warm Tactile — sand / warm ink / yellow `#F7C518`, Hanken. Storefront look is per-**vibe** (Strada default + curated themes).
-
----
-
-## Phase Status
-
-**Phase 7 — Vibes + Marketing:** ✅ COMPLETE  
-**Phase 8 — Polish, Hardening & Launch:** in progress → **Product Refinement**  
-**Just finished:** Marketing landing + carousel polish; publish/billing gate; storefront coming-soon  
-**Next up:** **Dashboard visual redesign** — start with Home (`components/dashboard/dashboard-home.tsx`)
-
-**Launch note:** Real PayNow verified. Production deploy + domain deferred until polish confidence.
+1. Run the app locally (`npm run dev`) and open the dashboard logged in as your seller.
+2. Have your public shop URL ready: `/s/{your-slug}`.
+3. Use **two browsers** (or one normal + one private/incognito) for stock and capacity races.
+4. Keep a notepad for fails: step ID · what you did · what you expected · what happened.
+5. After Live mode tests, always click **End Live** so the shop returns to normal calendar.
 
 ---
 
-## Current work — Dashboard visual redesign
+### T1 — Live / remove products
 
-> **Status:** 🟡 Starting  
-> **Surface:** Dashboard **Home** first (then other dashboard pages as we go)  
-> **Code entry:** `app/(dashboard)/dashboard/page.tsx` → `components/dashboard/dashboard-home.tsx`  
-> **Shared chrome:** `components/dashboard/dashboard-shell.tsx`, `dashboard-ui.tsx`
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T1.1 | Dashboard → Products → New | Create product, save | Appears on **Shop** list and public store |
+| T1.2 | Edit product | **Remove from shop** | Hidden on public shop; listed under **Removed** |
+| T1.3 | Edit removed product | **Put back on shop** | Live again on shop |
+| T1.4 | Unused product (never ordered) | **Delete forever** | Gone from list |
+| T1.5 | Product that appeared on an order | Try delete | Blocked — “Sold before — remove instead” |
 
-### Home today (as-built inventory)
-
-Vertical stack, top → bottom:
-
-1. **Header** — `👋 Welcome Back`
-2. **Readiness checklist** — progress %, featured next step, collapsible list (publish step = Mark done only; no duplicate Publish CTA)
-3. **Publish CTA** — only if unpublished/draft; “Ready when you are” invite copy
-4. **Store Control card** — status → URL+Copy → Share → QR · Preview (hybrid B+C)
-
-**Removed from Home:** Orders stats · Quick actions · Tips · old Store Link utility panel
-
-### Redesign notes
-
-- Hierarchy locked: Welcome → Checklist → Publish → Store Control
-- Checklist last step (“Publish with confidence”) has no Publish button — dedicated section below
-- Checklist open rule (soft): incomplete always expands on load (mid-session collapse OK, not persisted); 100% defaults collapsed and remembers preference
-- Publish CTA copy: “Ready when you are” / invite, not urgency — does not compete with checklist
-- **Store Control card** shipped (hybrid): Live/Paused/Not live yet + URL/Copy + Share (native) + QR dialog + Preview
-- **Pause (product):** proposal below — not built yet
-
-### Pause store — product note (open)
-
-Holiday / restock need is real. Today `unpublished` already takes the shop offline (public → “Store closed”); Settings has Unpublish; billing lapse also → `unpublished`.
-
-| Approach | Idea | Verdict |
-|----------|------|---------|
-| A. UX-only | Relabel Unpublish→Pause, resume via Publish if sub active | **v1 pick** — no schema |
-| B. New `paused` status | Distinct from billing unpublished | Defer until we need different gates |
-| C. Soft pause | Stay `published`, block checkout only | Different product (browse-but-closed); later |
-
-**Affects if we deepen Pause:** storefront gate, Settings copy, Home status, resume vs paywall, orders still reachable, optional public “temporarily closed” page, billing-lapse vs intentional pause distinction.
+**Fail if:** Removed product still sells, or delete works on a sold product.
 
 ---
 
-### Decision needed
+### T2 — Choices (variants) + honest Quick Add
 
-| # | Item | Status |
-|---|------|--------|
-| 1 | Store Control card layout | ✅ Hybrid B+C shipped |
-| 2 | Pause v1 = relabel `unpublished` (no new status)? | ⏳ Open |
-| 3 | Visual direction for rest of dashboard Home | ⏳ Open |
-| 4 | Scope: Home only vs shell + nav in same pass | ⏳ Open |
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T2.1 | Edit a simple product (no Choices) | Leave Choices off | Shop: **one-tap Quick Add** still works |
+| T2.2 | New/edit product | Turn **Choices** on → e.g. Flavour (Chocolate / Vanilla), save & live | Catalog/featured **Choose options** opens **PDP** (not a sheet) |
+| T2.3 | Shop | Tap add → pick Flavour → add to cart → checkout → place order | Cart/checkout show the flavour; **seller order detail** shows the choice |
+
+**Fail if:** Product with required choices adds with one tap and no picker, or order loses the variant text.
 
 ---
 
-## Durable locks (still true)
+### T3 — Customisations (messages / add-ons)
 
-| Lock | Detail |
-|------|--------|
-| Storefront default vibe | **Strada** (`strada`) — white/`#111`, Inter, solid black CTAs |
-| Marketing claim↔proof | Hero = better storefront; Exact PayNow = later chapter |
-| Docs reading order | `whiteboard.md` → architecture → `Implementation.md` → code. `PRD.md` = intent only (as-built banner) |
-| Guardrails | Don’t reopen vibe theme CSS unless asked; minimal diffs; PayNow/cart/RLS only when asked |
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T3.1 | Edit product | Add **Ask customer** required text field (e.g. “Cake message”), save | Shop → Choose options goes to **PDP**; message required before add |
+| T3.2 | Shop → order | Enter “Happy Birthday”, complete order | **Dashboard order** shows “Happy Birthday” |
+| T3.3 | Optional | Add a priced add-on; select it | Line total / order total includes add-on price |
+
+**Fail if:** Required message can be skipped, or message never appears on the seller order.
+
+---
+
+### T4 — Stock / sold-out
+
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T4.1 | Edit a thrift-style product | **Stock** on, qty **1**, policy **Show as sold out**, live | Shop shows product (not hidden) |
+| T4.2 | Browser A + B | Both add to cart and **place** orders (do not confirm paid yet) | Both orders can be created (no soft-hold on stock) |
+| T4.3 | Dashboard → Orders | Confirm **paid** on order A | Stock goes to **0**; product shows sold-out / add disabled |
+| T4.4 | Dashboard | Confirm **paid** on order B | **Fails** with not-enough-stock (or clear error) |
+| T4.5 | Optional | Cancel order A from **paid** | Stock restores to **1** |
+
+**Fail if:** Second paid confirm succeeds, stock never decrements, or cancel-from-paid does not restore.
+
+---
+
+### T5 — Prep time (lead days)
+
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T5.1 | Edit product | **Prep** on, **3** days, save | Shop/PDP shows prep copy (needs ~3 days) |
+| T5.2 | Product page | Look for a date picker on the **product** | **No** product-level calendar / pickup dates |
+
+**Fail if:** Buyer picks dates on the product page, or prep copy never shows.
+
+---
+
+### T6 — Fulfilment dates at checkout
+
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T6.1 | Settings → Fulfillment | Enable **Ask for a date**, weekdays e.g. Mon–Sat, save | Preview list looks right |
+| T6.2 | Cart with prep **3** days | Open checkout on a **Monday** (or pretend via allowed list) | Too-soon dates blocked; first OK date is after lead (e.g. Thu if Tue/Wed not allowed) |
+| T6.3 | Calendar **off**, all products prep **0** | Checkout | **No** date field (method-only) |
+| T6.4 | Calendar **off**, any product prep **> 0** | Checkout | Date field **still appears** |
+| T6.5 | Place order with a date | Seller order + buyer receipt | Selected **date** shown |
+
+**Fail if:** Buyer can pick an impossible early date, or date missing on order when it was required.
+
+---
+
+### T7 — Blackouts, windows, capacity
+
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T7.1 | Settings → Fulfillment | Add a **blackout** date, save | That date **gone** from checkout |
+| T7.2 | Settings | Enable **AM / PM** (or two named windows), save | Checkout shows window picker when both open |
+| T7.3 | Settings | Set a busy day (e.g. Saturday) **daily capacity = 2** | — |
+| T7.4 | Shop | Place **2** orders for that Saturday (complete checkout) | Both succeed; window/date on orders |
+| T7.5 | Shop | Third checkout for same Saturday | **Blocked** — “fully booked” / clear message |
+| T7.6 | Dashboard | Cancel one of the first two | Slot frees; third attempt can succeed |
+| T7.7 | Order views | Open seller order + buyer receipt | **Date + window label** visible |
+
+**Fail if:** Blackout still selectable, third order sneaks through, or window missing on order.
+
+---
+
+### T8 — Live mode (TikTok-style)
+
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T8.1 | Settings → Fulfillment | Ensure **Delivery** is enabled | — |
+| T8.2 | Settings → **Live mode** | **Go Live — tomorrow delivery 1–5pm** | Storefront shows **Live banner** |
+| T8.3 | Checkout (simple product, prep 0) | Open checkout | **Delivery only**; tomorrow + **1–5pm** locked/preselected; pickup hidden |
+| T8.4 | Cart with prep **3** days product | Try checkout while Live | Clear error/warning (not a blank silent picker) |
+| T8.5 | Settings | **End Live** (or wait past auto-expire) | Banner gone; normal methods/dates return |
+| T8.6 | Optional | Start Live while catalog has a 3-day product | Dashboard **warns**; you can still Go Live anyway |
+
+**Fail if:** Pickup still available during Live, date not locked, or expired Live silently bricks the shop with no merchant signal.
+
+---
+
+### T9 — Publish readiness (no draft / compare-at / duplicate)
+
+| Step | Where | Do this | Expected |
+|------|-------|---------|----------|
+| T9.1 | Product form | Look for Draft, Compare-at, Duplicate | **Not present** |
+| T9.2 | Publish / readiness | Check publish checklist | Still only needs fulfilment **methods** (+ usual PayNow/vibe/product) — **not** variants or calendar |
+
+**Fail if:** Draft/compare-at/duplicate UI is back, or publish forces calendar/variants.
+
+---
+
+### Smoke path (always run last)
+
+1. Simple live product → Quick Add → cart → checkout → PayNow QR with reference.  
+2. Confirm paid in dashboard → order status updates.  
+3. Confirm no leftover **Live mode** and capacity still makes sense for tomorrow’s real selling day.
+
+---
+
+### Issue log (fill while testing)
+
+| Step ID | What happened | Severity (blocker / annoying / niggle) |
+|---------|---------------|----------------------------------------|
+| | | |
+| | | |
+| | | |
+
+---
+
+## Product north star (short)
+
+**Nomi** = SG social sellers → one shop link → dynamic **PayNow** (exact amount + reference).  
+Build free → pay when you publish. Product ≠ Fulfilment ≠ Checkout.
 
 ---
 
@@ -102,25 +172,7 @@ Holiday / restock need is real. Today `unpublished` already takes the shop offli
 
 | Date | Decision | Why |
 |---|---|---|
-| 2026-07-21 | Store Control card (hybrid B+C) replaces Store Link on Home | Post-publish: status → share tools |
-| 2026-07-21 | Pause: propose UX-only over `unpublished` first; no new status yet | Holiday need real; avoid schema until gates differ |
-| 2026-07-21 | Checklist open: incomplete always expands on load (session-only collapse); 100% defaults closed + persists preference | Soft variant — coach stays visible until done |
-| 2026-07-21 | Home hierarchy: Welcome → Checklist → Publish → Store link; drop Orders / Quick actions / Tips; checklist publish step has no Publish CTA | Founder: avoid duplicate publish; Home = setup + share |
-| 2026-07-21 | Whiteboard reset for **dashboard visual redesign**; archive completed marketing/carousel scratch | Founder: prior whiteboard work done; next surface = dashboard |
-| 2026-07-17 | Landing carousel v2: CSS phone + peeks + Embla | DaisyUI-inspired; founder approved |
-| 2026-07-15 | Landing v3.1 shipped (Warm Tactile, logo monument, dual CTA, demos, PayNow chapter) | Claim↔proof fix |
-| 2026-07-14 | Sprints 0–4 (non-marketing polish) done; H4 deploy deferred | PayNow live-tested; deploy after polish confidence |
-| 2026-07-14 | Strada = system default | Strict B&W + Inter |
-
----
-
-## Open Questions / Blockers
-
-| Item | Status |
-|---|---|
-| Dashboard Home visual redesign | 🟡 In progress (this chat) |
-| Real-phone mobile verification (8.3) | 👤 Checklist |
-| Production deploy + domain (8.4) | ⏸️ Deferred |
-| Delete `docs/*_storefront` mockup packs | Safe — human choice |
-
----
+| 2026-07-22 | Mobile trim: drop draft, compare-at, duplicate; Remove + Delete-if-never-ordered; slash helper copy on new product/fulfilment UI | Phone-first clutter |
+| 2026-07-22 | Product + Fulfilment Phases 0–9 shipped; whiteboard → founder manual QA scripts | Migrations applied; need structured smoke/regression pass |
+| 2026-07-21 | Store Control card (hybrid B+C) on Home | Post-publish: status → share tools |
+| 2026-07-21 | Pause: propose UX-only over `unpublished` first | Holiday need; avoid schema until gates differ |

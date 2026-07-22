@@ -102,24 +102,17 @@ export function OrderStatusActions({
           <DialogHeader>
             <DialogTitle>Mark payment verified?</DialogTitle>
             <DialogDescription>
-              Only continue after checking your bank/PayLah app. This confirms
-              the buyer&apos;s payment and updates their order status page.
+              Only after you&apos;ve checked your bank or PayLah.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-end">
+          <DialogFooter>
             <Button
               type="button"
-              variant="outline"
-              onClick={() => setVerifyOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
+              className="w-full sm:w-auto"
               disabled={pending}
               onClick={() => run(() => markPaymentVerifiedAction(reference))}
             >
-              {pending ? "Updating…" : "Yes, payment verified"}
+              {pending ? "Updating…" : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -130,21 +123,14 @@ export function OrderStatusActions({
           <DialogHeader>
             <DialogTitle>Cancel this order?</DialogTitle>
             <DialogDescription>
-              The buyer&apos;s order status page will show this order as
-              cancelled.
+              The buyer will see this order as cancelled.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setCancelOpen(false)}
-            >
-              Keep order
-            </Button>
+          <DialogFooter>
             <Button
               type="button"
               variant="destructive"
+              className="w-full sm:w-auto"
               disabled={pending}
               onClick={() => run(() => markOrderCancelledAction(reference))}
             >

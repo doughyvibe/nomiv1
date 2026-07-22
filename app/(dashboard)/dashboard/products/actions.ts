@@ -7,6 +7,9 @@ import {
   validateProductInput,
 } from "@/lib/products/validate";
 import { collectCategories, normalizeCategory } from "@/lib/products/category";
+import { replaceProductChoices } from "@/lib/products/replace-choices";
+import { replaceProductCustomisations } from "@/lib/products/replace-customisations";
+import { statusWriteFields } from "@/lib/products/status";
 import { friendlyDbError } from "@/lib/errors/friendly-db";
 import { deriveOnboardingStep } from "@/lib/stores/progress";
 import type { Product, Store } from "@/lib/stores/types";
@@ -16,7 +19,12 @@ export type { ProductInput } from "@/lib/products/validate";
 
 type ActionResult =
   | { error: string }
-  | { success: true; filtersLive?: boolean; categories?: string[] };
+  | {
+      success: true;
+      filtersLive?: boolean;
+      categories?: string[];
+      productId?: string;
+    };
 
 async function ownedStoreContext(): Promise<
   | { error: string }
@@ -52,7 +60,7 @@ async function sellerContext(): Promise<
     .from("products")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id)
-    .eq("archived", false);
+    .neq("status", "archived");
 
   if (deriveOnboardingStep(store, count ?? 0) !== "done") {
     return { error: "Store not ready" };
@@ -62,12 +70,31 @@ async function sellerContext(): Promise<
 }
 
 function cleanProductFields(product: ProductInput) {
+  const choicesOn =
+    product.choices != null && (product.choices.options?.length ?? 0) > 0;
+  const inventory = product.inventory;
+  const inventoryFields =
+    inventory == null
+      ? {}
+      : {
+          track_inventory: inventory.track_inventory,
+          sold_out_policy: inventory.sold_out_policy,
+          // Product-level qty only when tracking a simple (no choices) offer
+          stock_qty:
+            inventory.track_inventory && !choicesOn
+              ? inventory.stock_qty
+              : null,
+        };
+
   return {
     name: product.name.trim(),
     price_cents: product.price_cents,
     description: product.description.trim(),
     image_url: product.image_url || null,
     category: normalizeCategory(product.category),
+    // Default 0 when omitted (onboarding / basic create paths)
+    lead_time_days: product.lead_time_days ?? 0,
+    ...inventoryFields,
   };
 }
 
@@ -88,7 +115,7 @@ async function filterStatus(
     .from("products")
     .select("category")
     .eq("store_id", storeId)
-    .eq("archived", false);
+    .eq("status", "live");
 
   const categories = collectCategories((products as Product[]) ?? []);
   return { filtersLive: categories.length >= 2, categories };
@@ -111,7 +138,7 @@ export async function addProductAction(
         .from("products")
         .select("category")
         .eq("store_id", store.id)
-        .eq("archived", false)
+        .eq("status", "live")
     ).data ?? [],
   );
 
@@ -121,16 +148,42 @@ export async function addProductAction(
     priorCategories.length === 1 &&
     !priorCategories.some((c) => c.toLowerCase() === nextCategory!.toLowerCase());
 
+  // New products are always live
   const { data: inserted, error } = await supabase
     .from("products")
     .insert({
       store_id: store.id,
       ...cleanProductFields(product),
+      ...statusWriteFields("live"),
     })
     .select("id")
     .single();
 
   if (error) return { error: friendlyDbError(error) };
+
+  if (product.choices !== undefined && inserted?.id) {
+    const choicesResult = await replaceProductChoices(
+      supabase,
+      inserted.id,
+      product.choices,
+    );
+    if ("error" in choicesResult) {
+      await supabase.from("products").delete().eq("id", inserted.id);
+      return { error: friendlyDbError({ message: choicesResult.error }) };
+    }
+  }
+
+  if (product.customisations !== undefined && inserted?.id) {
+    const customsResult = await replaceProductCustomisations(
+      supabase,
+      inserted.id,
+      product.customisations,
+    );
+    if ("error" in customsResult) {
+      await supabase.from("products").delete().eq("id", inserted.id);
+      return { error: friendlyDbError({ message: customsResult.error }) };
+    }
+  }
 
   if (!store.featured_product_id && inserted?.id) {
     await supabase
@@ -163,21 +216,48 @@ export async function updateProductAction(
   const { supabase, store } = ctx;
   const { data: existing } = await supabase
     .from("products")
-    .select("id, archived")
+    .select("id, status, archived")
     .eq("id", productId)
     .eq("store_id", store.id)
-    .maybeSingle<{ id: string; archived: boolean }>();
+    .maybeSingle<{ id: string; status: Product["status"]; archived: boolean }>();
 
   if (!existing) return { error: "Product not found" };
-  if (existing.archived) return { error: "Archived products cannot be edited" };
+  if (existing.status === "archived" || existing.archived) {
+    return { error: "Restore this product before editing" };
+  }
 
   const { error } = await supabase
     .from("products")
-    .update(cleanProductFields(product))
+    .update({
+      ...cleanProductFields(product),
+      ...statusWriteFields("live"),
+    })
     .eq("id", productId)
     .eq("store_id", store.id);
 
   if (error) return { error: friendlyDbError(error) };
+
+  if (product.choices !== undefined) {
+    const choicesResult = await replaceProductChoices(
+      supabase,
+      productId,
+      product.choices,
+    );
+    if ("error" in choicesResult) {
+      return { error: friendlyDbError({ message: choicesResult.error }) };
+    }
+  }
+
+  if (product.customisations !== undefined) {
+    const customsResult = await replaceProductCustomisations(
+      supabase,
+      productId,
+      product.customisations,
+    );
+    if ("error" in customsResult) {
+      return { error: friendlyDbError({ message: customsResult.error }) };
+    }
+  }
 
   const { filtersLive, categories } = await filterStatus(supabase, store.id);
 
@@ -214,7 +294,7 @@ export async function setFeaturedProductAction(
     .select("id")
     .eq("id", productId)
     .eq("store_id", store.id)
-    .eq("archived", false)
+    .eq("status", "live")
     .maybeSingle();
 
   if (!product) return { error: "Product not found" };
@@ -240,17 +320,17 @@ export async function archiveProductAction(
   const { supabase, store } = ctx;
   const { data: existing } = await supabase
     .from("products")
-    .select("id, archived")
+    .select("id, status, archived")
     .eq("id", productId)
     .eq("store_id", store.id)
-    .maybeSingle<{ id: string; archived: boolean }>();
+    .maybeSingle<{ id: string; status: Product["status"]; archived: boolean }>();
 
   if (!existing) return { error: "Product not found" };
-  if (existing.archived) return { success: true };
+  if (existing.status === "archived" || existing.archived) return { success: true };
 
   const { error } = await supabase
     .from("products")
-    .update({ archived: true })
+    .update(statusWriteFields("archived"))
     .eq("id", productId)
     .eq("store_id", store.id);
 
@@ -261,7 +341,7 @@ export async function archiveProductAction(
       .from("products")
       .select("id")
       .eq("store_id", store.id)
-      .eq("archived", false)
+      .eq("status", "live")
       .neq("id", productId)
       .order("created_at", { ascending: true })
       .limit(1)
@@ -274,5 +354,143 @@ export async function archiveProductAction(
   }
 
   revalidateProductPaths(store, productId);
+  return { success: true };
+}
+
+export async function restoreProductAction(
+  productId: string,
+): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const { supabase, store } = ctx;
+  const { data: existing } = await supabase
+    .from("products")
+    .select("id, status, archived")
+    .eq("id", productId)
+    .eq("store_id", store.id)
+    .maybeSingle<{ id: string; status: Product["status"]; archived: boolean }>();
+
+  if (!existing) return { error: "Product not found" };
+  if (existing.status !== "archived" && !existing.archived) {
+    return { success: true };
+  }
+
+  const { error } = await supabase
+    .from("products")
+    .update(statusWriteFields("live"))
+    .eq("id", productId)
+    .eq("store_id", store.id);
+
+  if (error) return { error: friendlyDbError(error) };
+
+  // Re-star if nothing featured (e.g. last live product was Removed)
+  if (!store.featured_product_id) {
+    await supabase
+      .from("stores")
+      .update({ featured_product_id: productId })
+      .eq("id", store.id);
+  }
+
+  revalidateProductPaths(store, productId);
+  return { success: true };
+}
+
+/**
+ * Hard-delete only when the product has never appeared on an order.
+ * Otherwise use Remove from shop (archive).
+ */
+export async function deleteProductAction(
+  productId: string,
+): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const { supabase, store } = ctx;
+  const { data: existing } = await supabase
+    .from("products")
+    .select("id")
+    .eq("id", productId)
+    .eq("store_id", store.id)
+    .maybeSingle();
+
+  if (!existing) return { error: "Product not found" };
+
+  const { count } = await supabase
+    .from("order_items")
+    .select("*", { count: "exact", head: true })
+    .eq("product_id", productId);
+
+  if ((count ?? 0) > 0) {
+    return { error: "Sold before — remove from shop instead" };
+  }
+
+  if (store.featured_product_id === productId) {
+    const { data: next } = await supabase
+      .from("products")
+      .select("id")
+      .eq("store_id", store.id)
+      .eq("status", "live")
+      .neq("id", productId)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    await supabase
+      .from("stores")
+      .update({ featured_product_id: next?.id ?? null })
+      .eq("id", store.id);
+  }
+
+  const { error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId)
+    .eq("store_id", store.id);
+
+  if (error) return { error: friendlyDbError(error) };
+
+  revalidatePath("/dashboard/products");
+  revalidatePath(`/s/${store.slug}`);
+  return { success: true };
+}
+
+/** Clear a category label from every product in the store (normalized match). */
+export async function clearStoreCategoryAction(
+  label: string,
+): Promise<ActionResult> {
+  const ctx = await sellerContext();
+  if ("error" in ctx) return ctx;
+
+  const { supabase, store } = ctx;
+  const target = normalizeCategory(label);
+  if (!target) return { error: "Invalid category" };
+
+  const { data: rows, error: fetchError } = await supabase
+    .from("products")
+    .select("id, category")
+    .eq("store_id", store.id)
+    .not("category", "is", null);
+
+  if (fetchError) return { error: friendlyDbError(fetchError) };
+
+  const ids = (rows ?? [])
+    .filter((r) => normalizeCategory(r.category) === target)
+    .map((r) => r.id as string);
+
+  if (ids.length === 0) {
+    revalidateProductPaths(store);
+    return { success: true };
+  }
+
+  const { error } = await supabase
+    .from("products")
+    .update({ category: null })
+    .eq("store_id", store.id)
+    .in("id", ids);
+
+  if (error) return { error: friendlyDbError(error) };
+
+  revalidateProductPaths(store);
   return { success: true };
 }

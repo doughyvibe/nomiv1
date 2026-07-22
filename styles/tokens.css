@@ -52,6 +52,43 @@
   background: transparent;
 }
 
+/*
+ * PDP option rows — purchase selection (not category filter pills).
+ * Unlayered so selected fill wins over vibe Tailwind collisions.
+ */
+.option-row-active {
+  border-color: rgb(var(--vibe-primary));
+  background: rgb(var(--vibe-primary));
+  color: rgb(var(--vibe-primary-fg));
+}
+
+.option-row-inactive {
+  border-color: rgb(var(--vibe-border) / 0.5);
+  background: rgb(var(--vibe-surface));
+  color: rgb(var(--vibe-text));
+}
+
+.option-row-inactive:hover {
+  border-color: rgb(var(--vibe-primary) / 0.6);
+}
+
+.option-row-disabled {
+  cursor: not-allowed;
+  border-color: rgb(var(--vibe-border) / 0.3);
+  background: transparent;
+  color: rgb(var(--vibe-text-muted));
+  opacity: 0.55;
+}
+
+/* Disabled PDP CTA must beat vibe .pdp-*-add primary fills */
+[data-surface="storefront"] .pdp-add:disabled {
+  background: rgb(var(--vibe-border) / 0.4);
+  color: rgb(var(--vibe-text-muted));
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .hero-logo-s {
   width: 3rem;
   height: 3rem;
@@ -1130,8 +1167,8 @@
   box-shadow: 0 4px 20px rgb(51 69 55 / 0.18);
 }
 
-[data-vibe="atelier"] .pdp-atelier-add:hover,
-[data-vibe="unicorn"] .pdp-atelier-add:hover {
+[data-vibe="atelier"] .pdp-atelier-add:hover:not(:disabled),
+[data-vibe="unicorn"] .pdp-atelier-add:hover:not(:disabled) {
   opacity: 0.92;
 }
 
