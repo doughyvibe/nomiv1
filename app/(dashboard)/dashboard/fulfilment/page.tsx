@@ -1,11 +1,7 @@
 import { DashboardBackLink } from "@/components/dashboard/dashboard-back-link";
 import { saveFulfillmentAction } from "@/app/(dashboard)/dashboard/settings/actions";
 import { FulfillmentForm } from "@/components/dashboard/fulfillment-form";
-import {
-  DashboardPageHeader,
-  DashboardPanel,
-  DashboardPanelBody,
-} from "@/components/dashboard/dashboard-ui";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
 import { requireSellerStore } from "@/lib/stores/require-seller";
 
 import type { Metadata } from "next";
@@ -20,18 +16,11 @@ export default async function FulfilmentPage() {
       <div>
         <DashboardBackLink href="/more" label="More" />
         <div className="mt-4">
-          <DashboardPageHeader
-            title="Fulfilment"
-            description="Pickup, delivery, dates buyers can choose, and capacity."
-          />
+          <DashboardPageHeader title="Fulfilment" />
         </div>
       </div>
 
-      <DashboardPanel>
-        <DashboardPanelBody>
-          <FulfillmentForm store={store} onSave={saveFulfillmentAction} />
-        </DashboardPanelBody>
-      </DashboardPanel>
+      <FulfillmentForm store={store} onSave={saveFulfillmentAction} />
     </div>
   );
 }

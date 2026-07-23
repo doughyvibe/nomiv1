@@ -20,6 +20,11 @@ import {
   resolveActiveCampaign,
 } from "@/lib/fulfilment/campaigns";
 import {
+  centsUntilFreeDelivery,
+  resolveDeliveryFeeCents,
+  resolveDeliveryMethods,
+} from "@/lib/fulfilment/delivery-methods";
+import {
   allowedFulfilmentDates,
   availableWindowsForDate,
   EMPTY_CAPACITY_USAGE,
@@ -84,8 +89,8 @@ export function CheckoutForm({
   );
 
   const pickupEnabled = Boolean(fulfillment.pickup?.enabled);
-  const deliveryEnabled = Boolean(fulfillment.delivery?.enabled);
-  const deliveryFee = fulfillment.delivery?.fee_cents ?? 0;
+  const deliveryMethods = resolveDeliveryMethods(fulfillment);
+  const deliveryEnabled = deliveryMethods.length > 0;
   const liveCampaign = resolveActiveCampaign(rawFulfillment);
   const campaignLocked =
     Boolean(liveCampaign) &&
@@ -100,6 +105,9 @@ export function CheckoutForm({
         ? "delivery"
         : "pickup";
   const [method, setMethod] = useState<"pickup" | "delivery">(defaultMethod);
+  const [deliveryMethodId, setDeliveryMethodId] = useState(
+    () => deliveryMethods[0]?.id ?? "",
+  );
   const lockedMethod: "pickup" | "delivery" | null =
     campaignLocked && deliveryEnabled && !pickupEnabled
       ? "delivery"
@@ -107,8 +115,29 @@ export function CheckoutForm({
         ? "pickup"
         : null;
   const effectiveMethod = lockedMethod ?? method;
-  const appliedDelivery = effectiveMethod === "delivery" ? deliveryFee : 0;
+  const selectedDelivery =
+    deliveryMethods.find((m) => m.id === deliveryMethodId) ??
+    deliveryMethods[0];
+  const effectiveDeliveryMethodId =
+    effectiveMethod === "delivery" ? (selectedDelivery?.id ?? "") : "";
+  const feeResolved =
+    effectiveMethod === "delivery" && effectiveDeliveryMethodId
+      ? resolveDeliveryFeeCents({
+          fulfillment,
+          deliveryMethodId: effectiveDeliveryMethodId,
+          subtotalCents: subtotal,
+        })
+      : { feeCents: 0, waived: false, thresholdCents: null as number | null };
+  const appliedDelivery = feeResolved.feeCents;
   const totalDue = subtotal + appliedDelivery;
+  const untilFree =
+    effectiveMethod === "delivery" && effectiveDeliveryMethodId
+      ? centsUntilFreeDelivery({
+          fulfillment,
+          deliveryMethodId: effectiveDeliveryMethodId,
+          subtotalCents: subtotal,
+        })
+      : null;
 
   const maxLead = maxCartLeadDays(
     lines.map(({ product }) => ({
@@ -116,7 +145,6 @@ export function CheckoutForm({
     })),
   );
   const needsDate = fulfilmentDateRequired(fulfillment, maxLead);
-  const configuredWindows = resolveWindows(fulfillment);
   const allowedDates = needsDate
     ? allowedFulfilmentDates({
         cartLeadDays: lines.map(
@@ -124,6 +152,7 @@ export function CheckoutForm({
         ),
         fulfillment,
         usage: capacityUsage,
+        method: effectiveMethod,
       })
     : [];
   const singleDateLock = campaignLocked && allowedDates.length === 1;
@@ -134,9 +163,20 @@ export function CheckoutForm({
     needsDate && fulfillmentDate && allowedDates.includes(fulfillmentDate)
       ? fulfillmentDate
       : (allowedDates[0] ?? "");
+  const configuredWindows = selectedDate
+    ? resolveWindows(fulfillment, {
+        method: effectiveMethod,
+        date: selectedDate,
+      })
+    : [];
   const openWindows =
     needsDate && selectedDate && configuredWindows.length > 0
-      ? availableWindowsForDate(selectedDate, fulfillment, capacityUsage)
+      ? availableWindowsForDate(
+          selectedDate,
+          fulfillment,
+          capacityUsage,
+          effectiveMethod,
+        )
       : [];
   const needsWindow = configuredWindows.length > 1;
   const [fulfillmentWindowId, setFulfillmentWindowId] = useState(
@@ -400,16 +440,27 @@ export function CheckoutForm({
                 name="fulfillment_method"
                 value={deliveryEnabled ? "delivery" : "pickup"}
               />
+              {deliveryEnabled && effectiveDeliveryMethodId ? (
+                <input
+                  type="hidden"
+                  name="delivery_method_id"
+                  value={effectiveDeliveryMethodId}
+                />
+              ) : null}
               <p className="rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-sm">
                 <span className="font-medium">
                   {deliveryEnabled
-                    ? `Delivery (+${formatPrice(deliveryFee)})`
+                    ? `${selectedDelivery?.name ?? "Delivery"} (${
+                        feeResolved.waived
+                          ? "Free"
+                          : `+${formatPrice(feeResolved.feeCents)}`
+                      })`
                     : "Pickup"}
                 </span>
                 <span className="mt-0.5 block text-xs text-vibe-text-muted">
                   Locked for Live
-                  {deliveryEnabled && fulfillment.delivery?.instructions
-                    ? ` — ${fulfillment.delivery.instructions}`
+                  {deliveryEnabled && selectedDelivery?.instructions
+                    ? ` — ${selectedDelivery.instructions}`
                     : !deliveryEnabled && fulfillment.pickup?.instructions
                       ? ` — ${fulfillment.pickup.instructions}`
                       : ""}
@@ -468,8 +519,15 @@ export function CheckoutForm({
               </span>
             </label>
           )}
-          {deliveryEnabled && (
+          {deliveryMethods.map((dm) => {
+            const dmFee = resolveDeliveryFeeCents({
+              fulfillment,
+              deliveryMethodId: dm.id,
+              subtotalCents: subtotal,
+            });
+            return (
             <label
+              key={dm.id}
               className={cn(
                 "metal-panel rust-edge flex cursor-pointer items-start gap-3 rounded-[var(--vibe-radius)] p-3",
                 atelier && "checkout-atelier-option",
@@ -488,8 +546,13 @@ export function CheckoutForm({
                 type="radio"
                 name="fulfillment_method"
                 value="delivery"
-                checked={method === "delivery"}
-                onChange={() => setMethod("delivery")}
+                checked={
+                  method === "delivery" && deliveryMethodId === dm.id
+                }
+                onChange={() => {
+                  setMethod("delivery");
+                  setDeliveryMethodId(dm.id);
+                }}
                 className={cn("mt-1", atelier && "checkout-atelier-radio",
                   expedition && "checkout-expedition-radio",
                   cyberpunk && "checkout-cyberpunk-radio",
@@ -508,16 +571,25 @@ export function CheckoutForm({
                     atelier && "checkout-atelier-option-title",
                   )}
                 >
-                  Delivery (+{formatPrice(deliveryFee)})
+                  {dm.name} (
+                  {dmFee.waived ? "Free" : `+${formatPrice(dmFee.feeCents)}`})
                 </span>
-                {fulfillment.delivery?.instructions && (
+                {dm.instructions ? (
                   <span className="text-xs text-vibe-text-muted">
-                    {fulfillment.delivery.instructions}
+                    {dm.instructions}
                   </span>
-                )}
+                ) : null}
               </span>
             </label>
-          )}
+            );
+          })}
+          {method === "delivery" && effectiveDeliveryMethodId ? (
+            <input
+              type="hidden"
+              name="delivery_method_id"
+              value={effectiveDeliveryMethodId}
+            />
+          ) : null}
             </>
           )}
         </fieldset>
@@ -740,8 +812,15 @@ export function CheckoutForm({
           {effectiveMethod === "delivery" && (
             <div className="flex justify-between text-vibe-text-muted">
               <span>Delivery</span>
-              <span>{formatPrice(appliedDelivery)}</span>
+              <span>
+                {feeResolved.waived ? "Free" : formatPrice(appliedDelivery)}
+              </span>
             </div>
+          )}
+          {untilFree !== null && (
+            <p className="text-xs text-vibe-text-muted">
+              {formatPrice(untilFree)} more for free delivery
+            </p>
           )}
           <div className="flex justify-between border-t border-vibe-border/30 pt-2 font-medium text-vibe-text">
             <span>Total due</span>

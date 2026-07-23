@@ -24,19 +24,8 @@ const base = {
   updated_at: "",
 } as Store;
 
-const empty = deriveReadiness(base, 0);
-assert.equal(empty.store_created, true);
-assert.equal(empty.add_products, false);
-assert.equal(empty.fulfillment, false);
-assert.equal(empty.personalise, false);
-assert.equal(empty.style, false);
-assert.equal(empty.payments, false);
-assert.equal(empty.preview, false);
-assert.equal(empty.install, false);
-assert.equal(empty.publish, false);
-assert.equal(READINESS_ITEM_IDS.length, 9);
-
-const ready = deriveReadiness(
+// Even with products / fulfillment / paynow / published — only foundation is auto-done
+const afterOnboarding = deriveReadiness(
   {
     ...base,
     status: "published",
@@ -53,21 +42,33 @@ const ready = deriveReadiness(
   },
   2,
 );
-assert.equal(ready.add_products, true);
-assert.equal(ready.fulfillment, true);
-assert.equal(ready.personalise, true);
-assert.equal(ready.style, false);
-assert.equal(ready.payments, true);
-assert.equal(ready.publish, true);
-assert.equal(ready.preview, false);
-assert.equal(ready.install, false);
+assert.equal(afterOnboarding.store_created, true);
+assert.equal(afterOnboarding.add_products, false);
+assert.equal(afterOnboarding.fulfillment, false);
+assert.equal(afterOnboarding.personalise, false);
+assert.equal(afterOnboarding.style, false);
+assert.equal(afterOnboarding.payments, false);
+assert.equal(afterOnboarding.preview, false);
+assert.equal(afterOnboarding.install, false);
+assert.equal(afterOnboarding.publish, false);
+assert.equal(READINESS_ITEM_IDS.length, 9);
+assert.equal(countDone(afterOnboarding, {}), 1);
 
-const derived: ReadinessDerived = ready;
+const derived: ReadinessDerived = afterOnboarding;
 assert.equal(isItemDone("preview", derived, {}), false);
 assert.equal(isItemDone("preview", derived, { preview: true }), true);
-assert.equal(isItemDone("personalise", derived, { personalise: false }), false);
+assert.equal(isItemDone("store_created", derived, { store_created: false }), true);
 assert.equal(
-  countDone(derived, { preview: true, style: true, install: true }),
+  countDone(derived, {
+    add_products: true,
+    fulfillment: true,
+    personalise: true,
+    style: true,
+    payments: true,
+    preview: true,
+    install: true,
+    publish: true,
+  }),
   9,
 );
 

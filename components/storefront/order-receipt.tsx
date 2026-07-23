@@ -35,8 +35,11 @@ export function OrderReceipt({
   const { order, store, items } = data;
   const fulfillmentSummary = formatFulfillmentSummary(order);
   const methodLabel =
-    order.fulfillment_method.charAt(0).toUpperCase() +
-    order.fulfillment_method.slice(1);
+    order.fulfillment_method === "delivery" &&
+    order.delivery_method_label?.trim()
+      ? order.delivery_method_label.trim()
+      : order.fulfillment_method.charAt(0).toUpperCase() +
+        order.fulfillment_method.slice(1);
   // Avoid "Pickup / Pickup" — only show summary when it adds detail
   const showSummaryDetail =
     fulfillmentSummary.toLowerCase() !== methodLabel.toLowerCase();
@@ -122,12 +125,20 @@ export function OrderReceipt({
           <dt className="text-vibe-text-muted">Subtotal</dt>
           <dd>{formatPrice(order.subtotal_cents)}</dd>
         </div>
-        {order.fulfillment_fee_cents > 0 && (
+        {order.fulfillment_method === "delivery" &&
+        order.fulfillment_fee_cents === 0 ? (
           <div className="flex justify-between">
-            <dt className="text-vibe-text-muted">Delivery fee</dt>
+            <dt className="text-vibe-text-muted">Delivery</dt>
+            <dd>Free</dd>
+          </div>
+        ) : order.fulfillment_fee_cents > 0 ? (
+          <div className="flex justify-between">
+            <dt className="text-vibe-text-muted">
+              {order.delivery_method_label?.trim() || "Delivery"} fee
+            </dt>
             <dd>{formatPrice(order.fulfillment_fee_cents)}</dd>
           </div>
-        )}
+        ) : null}
         <div
           className={cn(
             "flex justify-between font-semibold text-vibe-primary",

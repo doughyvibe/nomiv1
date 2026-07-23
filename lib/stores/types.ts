@@ -73,6 +73,25 @@ export type FulfilmentWindow = {
   capacity?: number | null;
 };
 
+/** One open range on a weekday (24h HH:mm). */
+export type FulfilmentHourRange = {
+  start: string;
+  end: string;
+};
+
+/** Per-weekday open ranges for pickup or delivery slots. */
+export type FulfilmentHoursDay = {
+  /** JS weekday: 0=Sun … 6=Sat */
+  weekday: number;
+  enabled: boolean;
+  ranges: FulfilmentHourRange[];
+};
+
+export type FulfilmentHoursConfig = {
+  enabled: boolean;
+  days: FulfilmentHoursDay[];
+};
+
 /**
  * Store-level handoff calendar (Phase 6 dates + Phase 7 windows/blackouts/capacity).
  */
@@ -82,13 +101,33 @@ export type FulfilmentCalendarConfig = {
   allowed_weekdays: number[];
   /** Calendar days from earliest to offer (default 28). */
   horizon_days?: number;
-  /** YYYY-MM-DD dates never offerable. */
+  /** YYYY-MM-DD dates never offerable (legacy singles). */
   blackouts?: string[];
-  /** Named windows; empty/absent = date-only checkout. */
+  /** Inclusive date ranges never offerable. */
+  blackout_ranges?: BlackoutRange[];
+  /** Named windows; empty/absent = date-only. Prefer pickup_hours / delivery_hours. */
   windows?: FulfilmentWindow[];
   /** Max orders per day across windows; omit/null = unlimited. */
   daily_capacity?: number | null;
 };
+
+/** Inclusive YYYY-MM-DD blackout span. */
+export type BlackoutRange = {
+  start: string;
+  end: string;
+};
+
+/** Named delivery option (max 3 per store). Shared delivery_hours apply to all. */
+export type DeliveryMethodConfig = {
+  id: string;
+  /** Buyer-facing label, e.g. "Standard". */
+  name: string;
+  fee_cents: number;
+  notes_enabled?: boolean;
+  instructions?: string;
+};
+
+export const MAX_DELIVERY_METHODS = 3;
 
 /**
  * Live / campaign override (Phase 8). Stored on `stores.fulfillment.campaign`.
@@ -118,14 +157,32 @@ export type FulfillmentConfig = {
     enabled: boolean;
     instructions: string;
     location?: string;
+    /** When false/omit with empty instructions, notes field is off in UI. */
+    notes_enabled?: boolean;
   };
+  /**
+   * Legacy / mirror of first delivery method for Live Mode and old readers.
+   * Prefer `delivery_methods` when present.
+   */
   delivery?: {
     enabled: boolean;
     fee_cents: number;
     instructions: string;
+    notes_enabled?: boolean;
   };
+  /** Up to 3 named delivery options. */
+  delivery_methods?: DeliveryMethodConfig[];
+  /**
+   * Store-wide free delivery when cart subtotal ≥ this (cents).
+   * Omit/null/0 = rule off. Applies to every delivery method.
+   */
+  delivery_free_above_cents?: number | null;
   /** Optional calendar; date step also fires when cart max lead_time > 0 (§8 #2). */
   calendar?: FulfilmentCalendarConfig;
+  /** Cococart-style open hours → checkout windows for pickup. */
+  pickup_hours?: FulfilmentHoursConfig;
+  /** Shared open hours → checkout windows for any delivery method. */
+  delivery_hours?: FulfilmentHoursConfig;
   /** Optional Live mode override (Phase 8). */
   campaign?: FulfilmentCampaign;
 };
@@ -194,7 +251,9 @@ export function heroIsComplete(hero: Partial<HeroConfig>): boolean {
 }
 
 export function fulfillmentIsComplete(f: FulfillmentConfig): boolean {
-  return Boolean(f.pickup?.enabled || f.delivery?.enabled);
+  if (f.pickup?.enabled) return true;
+  if (f.delivery?.enabled) return true;
+  return Boolean(f.delivery_methods && f.delivery_methods.length > 0);
 }
 
 export function paynowIsComplete(p: Partial<PayNowConfig>): boolean {

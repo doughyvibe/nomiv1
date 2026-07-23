@@ -1,8 +1,18 @@
 import type {
+  BlackoutRange,
   FulfilmentCalendarConfig,
+  FulfilmentHourRange,
+  FulfilmentHoursConfig,
+  FulfilmentHoursDay,
   FulfilmentWindow,
   FulfillmentConfig,
 } from "@/lib/stores/types";
+import {
+  mirrorDeliveryFromMethods,
+  normalizeDeliveryMethods,
+  normalizeFreeDeliveryAboveCents,
+  resolveDeliveryMethods,
+} from "@/lib/fulfilment/delivery-methods";
 
 /** How many calendar days from earliest to scan for allowed handoff dates. */
 export const DEFAULT_FULFILMENT_HORIZON_DAYS = 28;
@@ -60,18 +70,187 @@ export function fulfilmentDateRequired(
 }
 
 /** Weekdays used by the engine (0=Sun … 6=Sat). */
-export function resolveAllowedWeekdays(fulfillment: FulfillmentConfig): number[] {
-  if (fulfillment.calendar?.enabled) {
-    const raw = fulfillment.calendar.allowed_weekdays ?? [];
-    const cleaned = [
-      ...new Set(
-        raw.filter((d) => Number.isInteger(d) && d >= 0 && d <= 6),
-      ),
-    ].sort((a, b) => a - b);
-    return cleaned;
+export function resolveAllowedWeekdays(
+  fulfillment: FulfillmentConfig,
+  method?: "pickup" | "delivery",
+): number[] {
+  if (!fulfillment.calendar?.enabled) {
+    return [...ALL_WEEKDAYS];
   }
-  // Lead-time forced, calendar off → any weekday
+
+  const fromHours = weekdaysFromHours(fulfillment, method);
+  if (fromHours !== null) return fromHours;
+
+  // Date-only (slots off): every weekday. Legacy allowed_weekdays ignored.
   return [...ALL_WEEKDAYS];
+}
+
+/** Weekdays with ≥1 open range for method hours; null if hours not in play. */
+function weekdaysFromHours(
+  fulfillment: FulfillmentConfig,
+  method?: "pickup" | "delivery",
+): number[] | null {
+  // Hours only apply when the date calendar is on.
+  if (!fulfillment.calendar?.enabled) return null;
+
+  const configs: FulfilmentHoursConfig[] = [];
+  if (method === "pickup") {
+    if (fulfillment.pickup_hours?.enabled) configs.push(fulfillment.pickup_hours);
+  } else if (method === "delivery") {
+    if (fulfillment.delivery_hours?.enabled) {
+      configs.push(fulfillment.delivery_hours);
+    }
+  } else {
+    if (fulfillment.pickup_hours?.enabled) configs.push(fulfillment.pickup_hours);
+    if (fulfillment.delivery_hours?.enabled) {
+      configs.push(fulfillment.delivery_hours);
+    }
+  }
+  if (configs.length === 0) return null;
+
+  const days = new Set<number>();
+  for (const h of configs) {
+    for (const day of h.days ?? []) {
+      if (
+        day.enabled &&
+        Number.isInteger(day.weekday) &&
+        day.weekday >= 0 &&
+        day.weekday <= 6 &&
+        (day.ranges ?? []).some(isValidHourRange)
+      ) {
+        days.add(day.weekday);
+      }
+    }
+  }
+  // Enabled flag but zero open days → not in play (date-only / legacy).
+  if (days.size === 0) return null;
+  return [...days].sort((a, b) => a - b);
+}
+
+const HHMM = /^\d{2}:\d{2}$/;
+
+export function isValidHourRange(r: FulfilmentHourRange): boolean {
+  if (!HHMM.test(r.start) || !HHMM.test(r.end)) return false;
+  return r.start < r.end;
+}
+
+export function formatHourLabel(hhmm: string): string {
+  const [hs, ms] = hhmm.split(":").map(Number);
+  if (!Number.isFinite(hs) || !Number.isFinite(ms)) return hhmm;
+  const period = hs >= 12 ? "PM" : "AM";
+  const h12 = hs % 12 === 0 ? 12 : hs % 12;
+  return `${h12}:${String(ms).padStart(2, "0")} ${period}`;
+}
+
+export function formatHourRangeLabel(start: string, end: string): string {
+  return `${formatHourLabel(start)} – ${formatHourLabel(end)}`;
+}
+
+export function hourWindowId(
+  method: "pickup" | "delivery",
+  weekday: number,
+  start: string,
+  end: string,
+): string {
+  return `${method}_${weekday}_${start.replace(":", "")}_${end.replace(":", "")}`;
+}
+
+export function defaultFulfilmentHoursDays(): FulfilmentHoursDay[] {
+  // Mon–Sat open 09:00–17:00; Sun off
+  return [1, 2, 3, 4, 5, 6, 0].map((weekday) => ({
+    weekday,
+    enabled: weekday !== 0,
+    ranges: [{ start: "09:00", end: "17:00" }],
+  }));
+}
+
+/** Half-hour options for hour pickers. */
+export const FULFILMENT_TIME_OPTIONS: string[] = Array.from(
+  { length: 48 },
+  (_, i) => {
+    const h = Math.floor(i / 2);
+    const m = i % 2 === 0 ? "00" : "30";
+    return `${String(h).padStart(2, "0")}:${m}`;
+  },
+);
+
+export function windowsFromHoursForDate(
+  hours: FulfilmentHoursConfig | undefined,
+  method: "pickup" | "delivery",
+  ymd: string,
+): FulfilmentWindow[] {
+  if (!hours?.enabled || !isValidYmd(ymd)) return [];
+  const wd = weekdayOfYmd(ymd);
+  const day = (hours.days ?? []).find((d) => d.weekday === wd && d.enabled);
+  if (!day) return [];
+  const seen = new Set<string>();
+  const out: FulfilmentWindow[] = [];
+  for (const r of day.ranges ?? []) {
+    if (!isValidHourRange(r)) continue;
+    const id = hourWindowId(method, wd, r.start, r.end);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push({
+      id,
+      label: formatHourRangeLabel(r.start, r.end),
+    });
+  }
+  return out;
+}
+
+export type ResolveWindowsOpts = {
+  method?: "pickup" | "delivery";
+  /** YYYY-MM-DD — required to resolve hour ranges for a day. */
+  date?: string;
+};
+
+/** Windows for checkout: hours for method+date, else legacy calendar.windows. */
+export function resolveWindows(
+  fulfillment: FulfillmentConfig,
+  opts?: ResolveWindowsOpts,
+): FulfilmentWindow[] {
+  const method = opts?.method;
+  const date = opts?.date;
+
+  // Hours only when calendar is on and method has ≥1 open day (stale/empty hours → legacy).
+  if (
+    method &&
+    date &&
+    fulfillment.calendar?.enabled &&
+    methodHoursEnabled(fulfillment, method)
+  ) {
+    const hours =
+      method === "pickup"
+        ? fulfillment.pickup_hours
+        : fulfillment.delivery_hours;
+    return windowsFromHoursForDate(hours, method, date);
+  }
+
+  // Legacy / campaign named windows on calendar
+  const raw = fulfillment.calendar?.windows ?? [];
+  return raw.filter(
+    (w) =>
+      typeof w?.id === "string" &&
+      w.id.trim() &&
+      typeof w?.label === "string" &&
+      w.label.trim(),
+  );
+}
+
+/** True when method uses hours-based slots (not date-only). */
+export function methodHoursEnabled(
+  fulfillment: FulfillmentConfig,
+  method: "pickup" | "delivery",
+): boolean {
+  if (!fulfillment.calendar?.enabled) return false;
+  const hours =
+    method === "pickup"
+      ? fulfillment.pickup_hours
+      : fulfillment.delivery_hours;
+  if (!hours?.enabled) return false;
+  // Enabled flag with zero open days → treat as off (date-only / legacy).
+  const days = weekdaysFromHours(fulfillment, method);
+  return days !== null && days.length > 0;
 }
 
 /** Civil today in Asia/Singapore as YYYY-MM-DD. */
@@ -125,32 +304,94 @@ export function formatFulfilmentDateLabel(ymd: string): string {
   });
 }
 
+/** Expand inclusive YYYY-MM-DD range into individual dates (cap 366 days). */
+export function expandBlackoutRange(range: BlackoutRange): string[] {
+  if (!isValidYmd(range.start) || !isValidYmd(range.end)) return [];
+  if (range.start > range.end) return [];
+  const out: string[] = [];
+  let cur = range.start;
+  // ponytail: 366-day ceiling prevents bad merchant input from hanging the engine
+  for (let i = 0; i < 366; i++) {
+    out.push(cur);
+    if (cur === range.end) break;
+    cur = addDaysYmd(cur, 1);
+  }
+  return out;
+}
+
+export function isValidBlackoutRange(range: BlackoutRange): boolean {
+  return (
+    isValidYmd(range.start) &&
+    isValidYmd(range.end) &&
+    range.start <= range.end
+  );
+}
+
+export function normalizeBlackoutRanges(
+  raw: BlackoutRange[] | undefined,
+): BlackoutRange[] | undefined {
+  if (!raw || raw.length === 0) return undefined;
+  const seen = new Set<string>();
+  const out: BlackoutRange[] = [];
+  for (const r of raw) {
+    if (!isValidBlackoutRange(r)) continue;
+    const key = `${r.start}_${r.end}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ start: r.start, end: r.end });
+  }
+  out.sort((a, b) =>
+    a.start === b.start
+      ? a.end.localeCompare(b.end)
+      : a.start.localeCompare(b.start),
+  );
+  return out.length > 0 ? out : undefined;
+}
+
+export function formatBlackoutRangeLabel(range: BlackoutRange): string {
+  if (range.start === range.end) return range.start;
+  return `${range.start} – ${range.end}`;
+}
+
 export function resolveBlackouts(
   fulfillment: FulfillmentConfig,
 ): Set<string> {
-  const raw = fulfillment.calendar?.blackouts ?? [];
-  return new Set(raw.filter(isValidYmd));
-}
-
-/** Windows configured on the calendar (may be empty = date-only). */
-export function resolveWindows(
-  fulfillment: FulfillmentConfig,
-): FulfilmentWindow[] {
-  const raw = fulfillment.calendar?.windows ?? [];
-  return raw.filter(
-    (w) =>
-      typeof w?.id === "string" &&
-      w.id.trim() &&
-      typeof w?.label === "string" &&
-      w.label.trim(),
-  );
+  const out = new Set<string>();
+  for (const ymd of fulfillment.calendar?.blackouts ?? []) {
+    if (isValidYmd(ymd)) out.add(ymd);
+  }
+  for (const range of fulfillment.calendar?.blackout_ranges ?? []) {
+    for (const ymd of expandBlackoutRange(range)) out.add(ymd);
+  }
+  return out;
 }
 
 export function windowById(
   fulfillment: FulfillmentConfig,
   windowId: string,
 ): FulfilmentWindow | undefined {
-  return resolveWindows(fulfillment).find((w) => w.id === windowId);
+  const fromCal = resolveWindows(fulfillment).find((w) => w.id === windowId);
+  if (fromCal) return fromCal;
+  for (const method of ["pickup", "delivery"] as const) {
+    const hours =
+      method === "pickup"
+        ? fulfillment.pickup_hours
+        : fulfillment.delivery_hours;
+    if (!hours?.enabled) continue;
+    for (const day of hours.days ?? []) {
+      for (const r of day.ranges ?? []) {
+        if (!isValidHourRange(r)) continue;
+        const id = hourWindowId(method, day.weekday, r.start, r.end);
+        if (id === windowId) {
+          return {
+            id,
+            label: formatHourRangeLabel(r.start, r.end),
+          };
+        }
+      }
+    }
+  }
+  return undefined;
 }
 
 export function resolveDailyCapacity(
@@ -211,8 +452,9 @@ export function availableWindowsForDate(
   ymd: string,
   fulfillment: FulfillmentConfig,
   usage: CapacityUsage = EMPTY_CAPACITY_USAGE,
+  method?: "pickup" | "delivery",
 ): FulfilmentWindow[] {
-  const windows = resolveWindows(fulfillment);
+  const windows = resolveWindows(fulfillment, { method, date: ymd });
   if (windows.length === 0) return [];
   if (!dateHasDailyCapacity(ymd, fulfillment, usage)) return [];
   return windows.filter((w) => {
@@ -231,6 +473,8 @@ export type AllowedFulfilmentDatesInput = {
   horizonDays?: number;
   /** Soft-hold usage; omit when no capacity configured. */
   usage?: CapacityUsage;
+  /** When set, filter by that method's hours. */
+  method?: "pickup" | "delivery";
 };
 
 /**
@@ -252,7 +496,11 @@ export function allowedFulfilmentDates(
   const today = input.today ?? todaySgYmd();
   const earliest = addDaysYmd(today, maxLead);
   const usage = input.usage ?? EMPTY_CAPACITY_USAGE;
-  const windows = resolveWindows(input.fulfillment);
+  const method = input.method;
+  const hoursOn = method
+    ? methodHoursEnabled(input.fulfillment, method)
+    : methodHoursEnabled(input.fulfillment, "pickup") ||
+      methodHoursEnabled(input.fulfillment, "delivery");
 
   // Phase 8: campaign date lock — prefer campaign ∩ lead ∩ capacity
   const campaignDates = (
@@ -265,19 +513,23 @@ export function allowedFulfilmentDates(
     for (const ymd of [...campaignDates].sort()) {
       if (ymd < earliest) continue;
       if (!dateHasDailyCapacity(ymd, input.fulfillment, usage)) continue;
+      const windows = resolveWindows(input.fulfillment, { method, date: ymd });
       if (windows.length > 0) {
         if (
-          availableWindowsForDate(ymd, input.fulfillment, usage).length === 0
+          availableWindowsForDate(ymd, input.fulfillment, usage, method)
+            .length === 0
         ) {
           continue;
         }
+      } else if (hoursOn && method) {
+        continue;
       }
       out.push(ymd);
     }
     return out;
   }
 
-  const weekdays = resolveAllowedWeekdays(input.fulfillment);
+  const weekdays = resolveAllowedWeekdays(input.fulfillment, method);
   if (weekdays.length === 0) return [];
 
   const horizon =
@@ -292,8 +544,25 @@ export function allowedFulfilmentDates(
     if (!weekdays.includes(weekdayOfYmd(ymd))) continue;
     if (blackouts.has(ymd)) continue;
     if (!dateHasDailyCapacity(ymd, input.fulfillment, usage)) continue;
+    const windows = resolveWindows(input.fulfillment, { method, date: ymd });
     if (windows.length > 0) {
-      if (availableWindowsForDate(ymd, input.fulfillment, usage).length === 0) {
+      if (
+        availableWindowsForDate(ymd, input.fulfillment, usage, method)
+          .length === 0
+      ) {
+        continue;
+      }
+    } else if (hoursOn && method) {
+      // Hours on but this weekday has no ranges → skip
+      continue;
+    } else if (
+      !hoursOn &&
+      (input.fulfillment.calendar?.windows?.length ?? 0) > 0
+    ) {
+      // Legacy named windows: date needs ≥1 open window
+      if (
+        availableWindowsForDate(ymd, input.fulfillment, usage).length === 0
+      ) {
         continue;
       }
     }
@@ -361,11 +630,12 @@ function normalizeBlackouts(raw: string[] | undefined): string[] | undefined {
 /** Normalize calendar blob from merchant form / JSON. */
 export function normalizeCalendarConfig(
   calendar: FulfillmentConfig["calendar"] | undefined,
+  opts?: { clearWindows?: boolean },
 ): FulfillmentConfig["calendar"] | undefined {
   if (!calendar?.enabled) return undefined;
   const weekdays = [
     ...new Set(
-      (calendar.allowed_weekdays ?? [...DEFAULT_ALLOWED_WEEKDAYS]).filter(
+      (calendar.allowed_weekdays ?? [...ALL_WEEKDAYS]).filter(
         (d) => Number.isInteger(d) && d >= 0 && d <= 6,
       ),
     ),
@@ -379,7 +649,10 @@ export function normalizeCalendarConfig(
       : DEFAULT_FULFILMENT_HORIZON_DAYS;
 
   const blackouts = normalizeBlackouts(calendar.blackouts);
-  const windows = normalizeWindows(calendar.windows);
+  const blackoutRanges = normalizeBlackoutRanges(calendar.blackout_ranges);
+  const windows = opts?.clearWindows
+    ? undefined
+    : normalizeWindows(calendar.windows);
   const daily =
     typeof calendar.daily_capacity === "number" &&
     Number.isInteger(calendar.daily_capacity) &&
@@ -390,12 +663,113 @@ export function normalizeCalendarConfig(
   const out: FulfilmentCalendarConfig = {
     enabled: true,
     allowed_weekdays:
-      weekdays.length > 0 ? weekdays : [...DEFAULT_ALLOWED_WEEKDAYS],
+      weekdays.length > 0 ? weekdays : [...ALL_WEEKDAYS],
     horizon_days: horizon,
   };
   if (blackouts) out.blackouts = blackouts;
+  if (blackoutRanges) out.blackout_ranges = blackoutRanges;
   if (windows) out.windows = windows;
   if (daily !== undefined) out.daily_capacity = daily;
+  return out;
+}
+
+/** Normalize pickup/delivery hours from merchant form. */
+export function normalizeHoursConfig(
+  hours: FulfilmentHoursConfig | undefined,
+): FulfilmentHoursConfig | undefined {
+  if (!hours?.enabled) return undefined;
+  const byWd = new Map<number, FulfilmentHoursDay>();
+  for (const day of hours.days ?? []) {
+    if (!Number.isInteger(day.weekday) || day.weekday < 0 || day.weekday > 6) {
+      continue;
+    }
+    const ranges = (day.ranges ?? []).filter(isValidHourRange);
+    // Deduplicate identical ranges
+    const seen = new Set<string>();
+    const unique = ranges.filter((r) => {
+      const k = `${r.start}-${r.end}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+    byWd.set(day.weekday, {
+      weekday: day.weekday,
+      enabled: Boolean(day.enabled) && unique.length > 0,
+      ranges:
+        unique.length > 0 ? unique : [{ start: "09:00", end: "17:00" }],
+    });
+  }
+  const days = [1, 2, 3, 4, 5, 6, 0].map(
+    (weekday) =>
+      byWd.get(weekday) ?? {
+        weekday,
+        enabled: false,
+        ranges: [{ start: "09:00", end: "17:00" }],
+      },
+  );
+  // Hours with zero open days → treat as off (don't brick checkout).
+  if (!days.some((d) => d.enabled && d.ranges.some(isValidHourRange))) {
+    return undefined;
+  }
+  return { enabled: true, days };
+}
+
+/**
+ * Coerce a fulfilment blob into a safe persisted shape.
+ * Drops hours when calendar/method off or empty; clears legacy windows only if hours survive.
+ */
+export function sanitizeFulfillmentConfig(
+  config: FulfillmentConfig,
+): FulfillmentConfig {
+  const out: FulfillmentConfig = {};
+
+  if (config.pickup?.enabled) {
+    const notesEnabled =
+      config.pickup.notes_enabled ??
+      Boolean(config.pickup.instructions?.trim());
+    out.pickup = {
+      enabled: true,
+      instructions: notesEnabled
+        ? (config.pickup.instructions?.trim() ?? "")
+        : "",
+      location: config.pickup.location?.trim() || undefined,
+      notes_enabled: notesEnabled,
+    };
+  }
+
+  // Prefer delivery_methods; else legacy delivery; mirror first method onto delivery.
+  const fromPayload = normalizeDeliveryMethods(config.delivery_methods);
+  const methods =
+    fromPayload ??
+    (config.delivery?.enabled
+      ? resolveDeliveryMethods({ delivery: config.delivery })
+      : undefined);
+  if (methods && methods.length > 0) {
+    out.delivery_methods = methods;
+    out.delivery = mirrorDeliveryFromMethods(methods);
+    const freeAbove = normalizeFreeDeliveryAboveCents(
+      config.delivery_free_above_cents,
+    );
+    if (freeAbove !== null) out.delivery_free_above_cents = freeAbove;
+  }
+
+  const calendarOn = Boolean(config.calendar?.enabled);
+  const pickupHours =
+    calendarOn && out.pickup?.enabled
+      ? normalizeHoursConfig(config.pickup_hours)
+      : undefined;
+  const deliveryHours =
+    calendarOn && out.delivery?.enabled
+      ? normalizeHoursConfig(config.delivery_hours)
+      : undefined;
+
+  const calendar = normalizeCalendarConfig(config.calendar, {
+    clearWindows: Boolean(pickupHours || deliveryHours),
+  });
+  if (calendar) out.calendar = calendar;
+  if (pickupHours) out.pickup_hours = pickupHours;
+  if (deliveryHours) out.delivery_hours = deliveryHours;
+  if (config.campaign) out.campaign = config.campaign;
   return out;
 }
 

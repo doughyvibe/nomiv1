@@ -105,6 +105,12 @@ export function fulfillmentWithCampaign(
   const out: FulfillmentConfig = {
     pickup: methods.pickup ? fulfillment.pickup : undefined,
     delivery: methods.delivery ? fulfillment.delivery : undefined,
+    delivery_methods: methods.delivery
+      ? fulfillment.delivery_methods
+      : undefined,
+    delivery_free_above_cents: methods.delivery
+      ? fulfillment.delivery_free_above_cents
+      : undefined,
     campaign: c,
   };
 
@@ -117,8 +123,9 @@ export function fulfillmentWithCampaign(
             c.window_ids!.includes(w.id),
           )
         : fulfillment.calendar?.windows;
+  const campaignOwnsWindows = Boolean(windows && windows.length > 0);
 
-  if (dates.length > 0 || (windows && windows.length > 0)) {
+  if (dates.length > 0 || campaignOwnsWindows) {
     out.calendar = {
       enabled: true,
       allowed_weekdays: fulfillment.calendar?.allowed_weekdays?.length
@@ -126,11 +133,20 @@ export function fulfillmentWithCampaign(
         : [0, 1, 2, 3, 4, 5, 6],
       horizon_days: fulfillment.calendar?.horizon_days,
       blackouts: fulfillment.calendar?.blackouts,
+      blackout_ranges: fulfillment.calendar?.blackout_ranges,
       daily_capacity: fulfillment.calendar?.daily_capacity,
-      windows: windows && windows.length > 0 ? windows : undefined,
+      windows: campaignOwnsWindows ? windows : undefined,
     };
   } else if (fulfillment.calendar) {
     out.calendar = fulfillment.calendar;
+  }
+
+  // Campaign named windows win; otherwise keep store hours for method+date.
+  if (!campaignOwnsWindows) {
+    if (fulfillment.pickup_hours) out.pickup_hours = fulfillment.pickup_hours;
+    if (fulfillment.delivery_hours) {
+      out.delivery_hours = fulfillment.delivery_hours;
+    }
   }
 
   return out;

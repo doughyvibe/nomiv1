@@ -40,15 +40,17 @@ export function formatFulfillmentSummary(
     | "fulfillment_method"
     | "delivery_address"
     | "fulfillment_fee_cents"
+    | "delivery_method_label"
   >,
 ): string {
   if (order.fulfillment_method === "pickup") return "Pickup";
+  const label = order.delivery_method_label?.trim() || "Delivery";
   const fee =
     order.fulfillment_fee_cents > 0
       ? ` (fee $${(order.fulfillment_fee_cents / 100).toFixed(2)})`
-      : "";
+      : " (free)";
   const addr = order.delivery_address?.trim();
-  return addr ? `Delivery${fee}: ${addr}` : `Delivery${fee}`;
+  return addr ? `${label}${fee}: ${addr}` : `${label}${fee}`;
 }
 
 /** Method + optional handoff date/window for WhatsApp / email copy. */
@@ -58,6 +60,7 @@ export function formatFulfillmentWithDate(
     | "fulfillment_method"
     | "delivery_address"
     | "fulfillment_fee_cents"
+    | "delivery_method_label"
     | "fulfillment_date"
     | "fulfillment_window_label"
   >,

@@ -8,7 +8,7 @@ import {
 } from "@/app/(dashboard)/dashboard/products/actions";
 import { friendlyDbError } from "@/lib/errors/friendly-db";
 import { normalizeCampaignConfig } from "@/lib/fulfilment/campaigns";
-import { normalizeCalendarConfig } from "@/lib/fulfilment/dates";
+import { sanitizeFulfillmentConfig } from "@/lib/fulfilment/dates";
 import { isRateLimited, RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 import { isValidSgMobile, isValidUen } from "@/lib/paynow";
 import { suggestAlternatives, validateSlugFormat } from "@/lib/slug";
@@ -348,41 +348,72 @@ export async function saveFulfillment(
     };
   }
 
-  const clean: FulfillmentConfig = {};
-  if (config.pickup?.enabled) {
-    clean.pickup = {
-      enabled: true,
-      instructions: config.pickup.instructions?.trim() ?? "",
-      location: config.pickup.location?.trim() || undefined,
-    };
-  }
-  if (config.delivery?.enabled) {
-    const fee = Number(config.delivery.fee_cents);
-    clean.delivery = {
-      enabled: true,
-      fee_cents: Number.isFinite(fee) && fee >= 0 ? Math.round(fee) : 0,
-      instructions: config.delivery.instructions?.trim() ?? "",
-    };
-  }
-
   const { supabase, store } = await getOwnedStore();
   if (!store) return { ok: false, error: "No store yet" };
 
-  // Settings always sends `calendar`; onboarding omits it → preserve existing
-  if ("calendar" in config) {
-    const calendar = normalizeCalendarConfig(config.calendar);
-    if (calendar) clean.calendar = calendar;
-  } else if (store.fulfillment?.calendar?.enabled) {
-    clean.calendar = store.fulfillment.calendar;
+  const draft: FulfillmentConfig = {
+    pickup: config.pickup,
+    delivery: config.delivery,
+  };
+
+  // Settings sends delivery_methods; onboarding omits → preserve / synthesize later
+  if ("delivery_methods" in config) {
+    draft.delivery_methods = config.delivery_methods;
+  } else if (store.fulfillment?.delivery_methods?.length) {
+    draft.delivery_methods = store.fulfillment.delivery_methods;
   }
 
-  // Live campaign: settings form omits it → preserve; Live Mode actions set it
+  if ("delivery_free_above_cents" in config) {
+    draft.delivery_free_above_cents = config.delivery_free_above_cents;
+  } else if (store.fulfillment?.delivery_free_above_cents) {
+    draft.delivery_free_above_cents =
+      store.fulfillment.delivery_free_above_cents;
+  }
+
+  // Settings always sends `calendar`; onboarding omits it → preserve existing
+  if ("calendar" in config) {
+    const incoming = config.calendar;
+    draft.calendar = incoming?.enabled
+      ? {
+          ...incoming,
+          horizon_days:
+            incoming.horizon_days ??
+            store.fulfillment?.calendar?.horizon_days,
+          daily_capacity:
+            incoming.daily_capacity ??
+            store.fulfillment?.calendar?.daily_capacity,
+          windows:
+            incoming.windows ?? store.fulfillment?.calendar?.windows,
+          blackouts: incoming.blackouts,
+          blackout_ranges:
+            incoming.blackout_ranges ??
+            store.fulfillment?.calendar?.blackout_ranges,
+          allowed_weekdays: incoming.allowed_weekdays?.length
+            ? incoming.allowed_weekdays
+            : [0, 1, 2, 3, 4, 5, 6],
+        }
+      : incoming;
+  } else if (store.fulfillment?.calendar?.enabled) {
+    draft.calendar = store.fulfillment.calendar;
+  }
+
+  // Hours: settings form sends keys; onboarding omits → preserve
+  if ("pickup_hours" in config || "delivery_hours" in config) {
+    draft.pickup_hours = config.pickup_hours;
+    draft.delivery_hours = config.delivery_hours;
+  } else {
+    draft.pickup_hours = store.fulfillment?.pickup_hours;
+    draft.delivery_hours = store.fulfillment?.delivery_hours;
+  }
+
   if ("campaign" in config) {
     const campaign = normalizeCampaignConfig(config.campaign);
-    if (campaign) clean.campaign = campaign;
+    if (campaign) draft.campaign = campaign;
   } else if (store.fulfillment?.campaign?.active) {
-    clean.campaign = store.fulfillment.campaign;
+    draft.campaign = store.fulfillment.campaign;
   }
+
+  const clean = sanitizeFulfillmentConfig(draft);
 
   const { error } = await supabase
     .from("stores")

@@ -21,6 +21,10 @@ import {
   fulfillmentWithCampaign,
 } from "@/lib/fulfilment/campaigns";
 import {
+  resolveDeliveryFeeCents,
+  resolveDeliveryMethods,
+} from "@/lib/fulfilment/delivery-methods";
+import {
   holdFulfilmentCapacity,
   loadCapacityUsage,
   releaseFulfilmentCapacitySlot,
@@ -118,8 +122,27 @@ export async function createOrderAction(
   if (method === "pickup" && !fulfillment.pickup?.enabled) {
     return { error: "Pickup is not available" };
   }
-  if (method === "delivery" && !fulfillment.delivery?.enabled) {
+
+  const deliveryMethods = resolveDeliveryMethods(fulfillment);
+  if (method === "delivery" && deliveryMethods.length === 0) {
     return { error: "Delivery is not available" };
+  }
+
+  const deliveryMethodIdRaw = String(
+    formData.get("delivery_method_id") ?? "",
+  ).trim();
+  let deliveryMethodId: string | null = null;
+  let deliveryMethodLabel: string | null = null;
+
+  if (method === "delivery") {
+    const chosen =
+      deliveryMethods.find((m) => m.id === deliveryMethodIdRaw) ??
+      (deliveryMethods.length === 1 ? deliveryMethods[0] : undefined);
+    if (!chosen) {
+      return { error: "Select a delivery option" };
+    }
+    deliveryMethodId = chosen.id;
+    deliveryMethodLabel = chosen.name;
   }
 
   const customerName = String(formData.get("customer_name") ?? "").trim();
@@ -253,6 +276,7 @@ export async function createOrderAction(
       }),
       fulfillment,
       usage,
+      method,
     });
     if (allowed.length === 0) {
       const liveMsg = campaignCheckoutEmptyMessage(
@@ -279,12 +303,16 @@ export async function createOrderAction(
     }
     fulfillmentDate = fulfillmentDateRaw;
 
-    const windows = resolveWindows(fulfillment);
+    const windows = resolveWindows(fulfillment, {
+      method,
+      date: fulfillmentDate,
+    });
     if (windows.length > 0) {
       const open = availableWindowsForDate(
         fulfillmentDate,
         fulfillment,
         usage,
+        method,
       );
       if (open.length === 0) {
         return {
@@ -310,7 +338,13 @@ export async function createOrderAction(
   }
 
   const fulfillmentFeeCents =
-    method === "delivery" ? (fulfillment.delivery?.fee_cents ?? 0) : 0;
+    method === "delivery" && deliveryMethodId
+      ? resolveDeliveryFeeCents({
+          fulfillment,
+          deliveryMethodId,
+          subtotalCents,
+        }).feeCents
+      : 0;
   const totalCents = subtotalCents + fulfillmentFeeCents;
 
   const { dailyCap, windowCap } = capacityHoldCaps(
@@ -348,6 +382,8 @@ export async function createOrderAction(
       fulfillment_date: fulfillmentDate,
       fulfillment_window_id: fulfillmentWindowId,
       fulfillment_window_label: fulfillmentWindowLabel,
+      delivery_method_id: deliveryMethodId,
+      delivery_method_label: deliveryMethodLabel,
       capacity_held_daily: heldDaily,
       capacity_held_window: heldWindow,
       delivery_address: method === "delivery" ? deliveryAddress : null,

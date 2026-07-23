@@ -23,6 +23,10 @@ export type OrderRow = {
   fulfillment_window_id?: string | null;
   /** Window label snapshot (Phase 7). */
   fulfillment_window_label?: string | null;
+  /** Named delivery option id (when method=delivery). */
+  delivery_method_id?: string | null;
+  /** Named delivery option label snapshot. */
+  delivery_method_label?: string | null;
   delivery_address: string | null;
   order_notes: string | null;
   subtotal_cents: number;

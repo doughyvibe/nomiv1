@@ -1,8 +1,4 @@
-import {
-  fulfillmentIsComplete,
-  paynowIsComplete,
-  type Store,
-} from "@/lib/stores/types";
+import type { Store } from "@/lib/stores/types";
 
 export const READINESS_ITEM_IDS = [
   "store_created",
@@ -105,21 +101,21 @@ export const READINESS_ITEMS: ReadinessItemDef[] = [
 
 export type ReadinessDerived = Record<ReadinessItemId, boolean>;
 
+/** Only foundation is auto-done. Everything else is manual (localStorage overrides). */
 export function deriveReadiness(
-  store: Store,
-  productCount: number,
+  _store: Store,
+  _productCount: number,
 ): ReadinessDerived {
   return {
     store_created: true,
-    add_products: productCount >= 1,
-    fulfillment: fulfillmentIsComplete(store.fulfillment),
-    personalise: Boolean(store.hero.subheading?.trim()),
-    // vibe is defaulted at create — treat style / install / preview as manual
+    add_products: false,
+    fulfillment: false,
+    personalise: false,
     style: false,
-    payments: paynowIsComplete(store.paynow),
+    payments: false,
     preview: false,
     install: false,
-    publish: store.status === "published",
+    publish: false,
   };
 }
 

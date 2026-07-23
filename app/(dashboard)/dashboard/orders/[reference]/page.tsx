@@ -125,12 +125,20 @@ export default async function OrderDetailPage({
               <dt className="text-muted-foreground">Subtotal</dt>
               <dd>{formatPrice(order.subtotal_cents)}</dd>
             </div>
-            {order.fulfillment_fee_cents > 0 && (
+            {order.fulfillment_method === "delivery" &&
+            order.fulfillment_fee_cents === 0 ? (
               <div className="flex justify-between">
-                <dt className="text-muted-foreground">Delivery fee</dt>
+                <dt className="text-muted-foreground">Delivery</dt>
+                <dd>Free</dd>
+              </div>
+            ) : order.fulfillment_fee_cents > 0 ? (
+              <div className="flex justify-between">
+                <dt className="text-muted-foreground">
+                  {order.delivery_method_label?.trim() || "Delivery"} fee
+                </dt>
                 <dd>{formatPrice(order.fulfillment_fee_cents)}</dd>
               </div>
-            )}
+            ) : null}
             <div className="flex justify-between font-display text-base font-extrabold">
               <dt>Total</dt>
               <dd>{formatPrice(order.total_cents)}</dd>
@@ -143,7 +151,10 @@ export default async function OrderDetailPage({
         <DashboardPanelHeader title="Fulfillment" />
         <DashboardPanelBody>
           <p className="text-sm font-semibold capitalize">
-            {order.fulfillment_method}
+            {order.fulfillment_method === "delivery" &&
+            order.delivery_method_label?.trim()
+              ? order.delivery_method_label.trim()
+              : order.fulfillment_method}
           </p>
           {order.fulfillment_date ? (
             <p className="mt-1 text-sm font-medium">
