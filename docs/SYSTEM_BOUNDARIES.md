@@ -13,7 +13,7 @@ Do not invent a fourth system. Do not duplicate the full strategy here.
 |--------|------|--------------|
 | **Product** | Offer identity: name, price, single image, description, category, status (`live` \| `archived`); opt-in variants (≤2 dims); customisation *definitions*; optional inventory; `lead_time_days` (constraint only) | Pickup/delivery dates, slots, methods, capacity, campaigns, “same-day” flags; compare-at; draft; duplicate |
 | **Fulfilment** | Store ops: methods, calendar, windows/slots, blackouts, capacity, cutoffs, campaign overrides; computes allowed dates using `max(cart lead times)` | Flavour/size/message; permanent catalog fields |
-| **Checkout** | Per-order collection: line config snapshot (variant + customisation answers + qty); fulfilment method + date/slot *from allowed set*; contact/address; PayNow | Inventing business rules; rewriting paid order snapshots |
+| **Checkout** | Per-order collection: line config snapshot (variant + customisation answers + qty); fulfilment method + date/slot *from allowed set* (collected on **Cart** when a choice is needed, validated + snapshotted at Checkout); contact/address; PayNow | Inventing business rules; rewriting paid order snapshots |
 
 **North star:** Product describes the offer. Fulfilment describes store operations. Checkout assembles one legal order from both.
 

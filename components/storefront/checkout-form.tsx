@@ -13,7 +13,13 @@ import {
   cartLineVariantLabel,
   resolveCartLineUnitPrice,
 } from "@/lib/cart/line-price";
+import { clearFulfilmentDraft, loadFulfilmentDraft } from "@/lib/cart/fulfillment-draft";
 import { clearCart } from "@/lib/cart/storage";
+import {
+  FulfilmentDatePicker,
+  FulfilmentWindowChips,
+} from "@/components/storefront/fulfilment-date-picker";
+import { buyerNeedsCartFulfilmentStep } from "@/lib/fulfilment/buyer-cart-step";
 import {
   campaignCheckoutEmptyMessage,
   fulfillmentWithCampaign,
@@ -209,11 +215,51 @@ export function CheckoutForm({
       )
     : null;
 
+  const needsCartStep = buyerNeedsCartFulfilmentStep(
+    fulfillment,
+    lines.map(({ product }) => ({
+      lead_time_days: product.lead_time_days ?? 0,
+    })),
+  );
+  const [draftHydrated, setDraftHydrated] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+
+  useEffect(() => {
+    const d = loadFulfilmentDraft(slug);
+    setHasDraft(Boolean(d));
+    if (d?.method === "pickup" || d?.method === "delivery") {
+      setMethod(d.method);
+    }
+    if (d?.deliveryMethodId) setDeliveryMethodId(d.deliveryMethodId);
+    if (d?.date) setFulfillmentDate(d.date);
+    if (d?.windowId) setFulfillmentWindowId(d.windowId);
+    setDraftHydrated(true);
+    // ponytail: hydrate once per slug
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
+
+  const draftLooksValid =
+    (!needsDate || Boolean(selectedDate)) &&
+    (!needsWindow || Boolean(effectiveWindowId)) &&
+    !dateUnavailable &&
+    !windowUnavailable;
+
+  useEffect(() => {
+    if (!draftHydrated) return;
+    if (needsCartStep && (!hasDraft || !draftLooksValid)) {
+      router.replace("/cart");
+    }
+  }, [draftHydrated, needsCartStep, hasDraft, draftLooksValid, router]);
+
+  const showFulfilmentRecap =
+    draftHydrated && needsCartStep && hasDraft && draftLooksValid;
+
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       const result = await createOrderAction(slug, formData);
       if ("error" in result) return { error: result.error };
       clearCart(slug);
+      clearFulfilmentDraft(slug);
       router.push(result.redirectTo);
       return null;
     },
@@ -414,6 +460,46 @@ export function CheckoutForm({
         </ul>
       </section>
 
+      {showFulfilmentRecap ? (
+        <div className="flex items-start justify-between gap-3 rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-3 text-sm">
+          <input type="hidden" name="fulfillment_method" value={effectiveMethod} />
+          {effectiveMethod === "delivery" && effectiveDeliveryMethodId ? (
+            <input
+              type="hidden"
+              name="delivery_method_id"
+              value={effectiveDeliveryMethodId}
+            />
+          ) : null}
+          {needsDate && selectedDate ? (
+            <input type="hidden" name="fulfillment_date" value={selectedDate} />
+          ) : null}
+          {needsDate && effectiveWindowId ? (
+            <input
+              type="hidden"
+              name="fulfillment_window_id"
+              value={effectiveWindowId}
+            />
+          ) : null}
+          <p className="min-w-0 font-medium leading-snug">
+            {effectiveMethod === "delivery"
+              ? (selectedDelivery?.name ?? "Delivery")
+              : "Pickup"}
+            {needsDate && selectedDate
+              ? ` · ${formatFulfilmentDateLabel(selectedDate)}`
+              : ""}
+            {needsDate && openWindows.find((w) => w.id === effectiveWindowId)?.label
+              ? ` · ${openWindows.find((w) => w.id === effectiveWindowId)?.label}`
+              : ""}
+          </p>
+          <Link
+            href="/cart"
+            className="shrink-0 font-semibold underline-offset-2 hover:underline"
+          >
+            Edit
+          </Link>
+        </div>
+      ) : (
+        <>
       {(pickupEnabled || deliveryEnabled) && (
         <fieldset className="flex flex-col gap-3">
           <legend
@@ -648,145 +734,55 @@ export function CheckoutForm({
                   All time windows for this date are full. Pick another date.
                 </p>
               ) : needsWindow ? (
-                <label className="flex flex-col gap-1.5">
-                  <span className="text-xs text-vibe-text-muted">
-                    Choose a time window
-                  </span>
-                  <select
-                    name="fulfillment_window_id"
-                    required
-                    value={selectedWindowId}
-                    onChange={(e) => setFulfillmentWindowId(e.target.value)}
-                    className={cn(
-                      "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
-                      atelier && "checkout-atelier-input",
-                      expedition && "checkout-expedition-input",
-                      cyberpunk && "checkout-cyberpunk-input",
-                      candyland && "checkout-candyland-input",
-                      market && "checkout-market-input",
-                      gallery && "checkout-gallery-input",
-                      studio && "checkout-studio-input",
-                      laura && "checkout-laura-input",
-                      atlantic && "checkout-atlantic-input",
-                      strada && "checkout-strada-input",
-                    )}
-                  >
-                    {openWindows.map((w) => (
-                      <option key={w.id} value={w.id}>
-                        {w.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <FulfilmentWindowChips
+                  name="fulfillment_window_id"
+                  windows={openWindows}
+                  value={selectedWindowId}
+                  onChange={setFulfillmentWindowId}
+                />
               ) : configuredWindows.length === 1 && effectiveWindowId ? (
-                <>
-                  <input
-                    type="hidden"
-                    name="fulfillment_window_id"
-                    value={effectiveWindowId}
-                  />
-                  <p className="text-xs text-vibe-text-muted">
-                    Window:{" "}
-                    <span className="font-medium text-vibe-text">
-                      {openWindows[0]?.label}
-                    </span>
-                    {campaignLocked ? " · Locked for Live" : ""}
-                  </p>
-                </>
+                <input
+                  type="hidden"
+                  name="fulfillment_window_id"
+                  value={effectiveWindowId}
+                />
               ) : null}
             </>
           ) : (
             <>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-xs text-vibe-text-muted">
-                  Choose an available date
-                  {maxLead > 0
-                    ? ` (needs ${maxLead} ${maxLead === 1 ? "day" : "days"} prep)`
-                    : ""}
-                </span>
-                <select
-                  name="fulfillment_date"
-                  required
-                  value={selectedDate}
-                  onChange={(e) => setFulfillmentDate(e.target.value)}
-                  className={cn(
-                    "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
-                    atelier && "checkout-atelier-input",
-                    expedition && "checkout-expedition-input",
-                    cyberpunk && "checkout-cyberpunk-input",
-                    candyland && "checkout-candyland-input",
-                    market && "checkout-market-input",
-                    gallery && "checkout-gallery-input",
-                    studio && "checkout-studio-input",
-                    laura && "checkout-laura-input",
-                    atlantic && "checkout-atlantic-input",
-                    strada && "checkout-strada-input",
-                  )}
-                >
-                  {allowedDates.map((ymd) => (
-                    <option key={ymd} value={ymd}>
-                      {formatFulfilmentDateLabel(ymd)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <FulfilmentDatePicker
+                name="fulfillment_date"
+                dates={allowedDates}
+                value={selectedDate}
+                onChange={setFulfillmentDate}
+              />
               {windowUnavailable ? (
                 <p
                   className="rounded-[var(--vibe-radius)] border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-vibe-text"
                   role="alert"
                 >
-                  All time windows for this date are full. Pick another date.
+                  All windows for this date are full.
                 </p>
               ) : needsWindow ? (
-                <label className="flex flex-col gap-1.5">
-                  <span className="text-xs text-vibe-text-muted">
-                    Choose a time window
-                  </span>
-                  <select
-                    name="fulfillment_window_id"
-                    required
-                    value={selectedWindowId}
-                    onChange={(e) => setFulfillmentWindowId(e.target.value)}
-                    className={cn(
-                      "rounded-[var(--vibe-radius)] border border-vibe-border/40 bg-vibe-surface px-3 py-2.5 text-base outline-none focus:border-vibe-primary",
-                      atelier && "checkout-atelier-input",
-                      expedition && "checkout-expedition-input",
-                      cyberpunk && "checkout-cyberpunk-input",
-                      candyland && "checkout-candyland-input",
-                      market && "checkout-market-input",
-                      gallery && "checkout-gallery-input",
-                      studio && "checkout-studio-input",
-                      laura && "checkout-laura-input",
-                      atlantic && "checkout-atlantic-input",
-                      strada && "checkout-strada-input",
-                    )}
-                  >
-                    {openWindows.map((w) => (
-                      <option key={w.id} value={w.id}>
-                        {w.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <FulfilmentWindowChips
+                  name="fulfillment_window_id"
+                  windows={openWindows}
+                  value={selectedWindowId}
+                  onChange={setFulfillmentWindowId}
+                />
               ) : configuredWindows.length === 1 && effectiveWindowId ? (
-                <>
-                  <input
-                    type="hidden"
-                    name="fulfillment_window_id"
-                    value={effectiveWindowId}
-                  />
-                  <p className="text-xs text-vibe-text-muted">
-                    Window:{" "}
-                    <span className="font-medium text-vibe-text">
-                      {openWindows[0]?.label}
-                    </span>
-                  </p>
-                </>
+                <input
+                  type="hidden"
+                  name="fulfillment_window_id"
+                  value={effectiveWindowId}
+                />
               ) : null}
             </>
           )}
         </fieldset>
       ) : null}
+        </>
+      )}
 
       <section
         className={cn(

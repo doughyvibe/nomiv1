@@ -51,6 +51,8 @@ import { cn } from "@/lib/utils";
 const fieldInputClass =
   "h-12 rounded-xl border border-border/60 bg-card px-4 text-[15px] font-medium shadow-none placeholder:font-normal placeholder:text-muted-foreground/60 focus-visible:border-foreground/25 focus-visible:ring-2 focus-visible:ring-primary/35";
 
+const PRODUCT_IMAGE_HINT = "Square (1:1) works best · JPG or PNG";
+
 type ProductFormProps = {
   initial?: Partial<ProductInput> & {
     options?: ProductOption[];
@@ -342,7 +344,8 @@ export function ProductForm({
             disabled={disabled}
             emptyTitleMobile="Tap to add a photo"
             emptyTitleDesktop="Drop a photo or click to browse"
-            hint="Recommended 1200×1200 or larger"
+            hint={PRODUCT_IMAGE_HINT}
+            aspectRatio="square"
             objectFit="cover"
           />
         </div>
@@ -617,31 +620,33 @@ export function ProductForm({
       )}
 
       {/* Clearance for floating Save (above mobile tab bar) */}
-      <div className="shrink-0 pb-24 lg:pb-24" aria-hidden />
+      {!disabled ? (
+        <div className="shrink-0 pb-24 lg:pb-24" aria-hidden />
+      ) : null}
 
-      {/* Save — floating CTA; desktop starts after sidebar (17.5rem) */}
-      <div
-        className={cn(
-          "pointer-events-none fixed z-30 px-4 sm:px-6 lg:px-10",
-          // Match shell nav clearance (6.5rem) + gap so the CTA sits fully above the tab bar
-          "inset-x-0 bottom-[calc(6.5rem+0.75rem+env(safe-area-inset-bottom,0px))]",
-          "lg:inset-x-auto lg:left-[17.5rem] lg:right-0 lg:bottom-6",
-        )}
-      >
-        <div className="pointer-events-auto mx-auto w-full max-w-3xl lg:max-w-4xl">
-          <Button
-            type="button"
-            onClick={handleSave}
-            disabled={
-              disabled || pending || uploading || !name.trim() || !price.trim()
-            }
-            className="h-14 w-full rounded-2xl text-base font-bold shadow-[0_8px_24px_rgb(0_0_0/0.18)]"
-            aria-live="polite"
-          >
-            {saveLabel(pending, submitLabel)}
-          </Button>
+      {/* Save — floating CTA; hidden when form is read-only (e.g. archived product) */}
+      {!disabled ? (
+        <div
+          className={cn(
+            "pointer-events-none fixed z-30 px-4 sm:px-6 lg:px-10",
+            // Match shell nav clearance (6.5rem) + gap so the CTA sits fully above the tab bar
+            "inset-x-0 bottom-[calc(6.5rem+0.75rem+env(safe-area-inset-bottom,0px))]",
+            "lg:inset-x-auto lg:left-[17.5rem] lg:right-0 lg:bottom-6",
+          )}
+        >
+          <div className="pointer-events-auto mx-auto w-full max-w-3xl lg:max-w-4xl">
+            <Button
+              type="button"
+              onClick={handleSave}
+              disabled={pending || uploading || !name.trim() || !price.trim()}
+              className="h-14 w-full rounded-2xl text-base font-bold shadow-[0_8px_24px_rgb(0_0_0/0.18)]"
+              aria-live="polite"
+            >
+              {saveLabel(pending, submitLabel)}
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

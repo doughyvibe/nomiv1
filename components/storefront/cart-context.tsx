@@ -12,6 +12,7 @@ import {
 import {
   addToCart as addItem,
   cartItemCount,
+  clearCart as clearCartStorage,
   loadCart,
   removeFromCart,
   saveCart,
@@ -69,7 +70,7 @@ export function CartProvider({
         setCart(removeFromCart(slug, lineKey));
       },
       clear: () => {
-        saveCart(slug, { items: [] });
+        clearCartStorage(slug);
         setCart({ items: [] });
       },
       refresh,

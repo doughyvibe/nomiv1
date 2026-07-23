@@ -4,6 +4,16 @@
 
 ---
 
+## Buyer fulfilment UX (cart-forward) — shipped 2026-07-23 · polish 2026-07-24
+
+- **Cart** collects method + date (4 earliest cards + Calendar “More dates”) + window when needed
+- Order Summary collapsible (collapsed by default when fulfilment step shown)
+- Sticky bar hidden on `/cart` — single in-page Continue → checkout
+- Selection = vibe primary fill; draft in `localStorage`; Checkout recap + Edit → cart
+- Calendar dialog: vibe portal (no brand chrome / no RDP blue). Days after cutoff = **28-day horizon** (`DEFAULT_FULFILMENT_HORIZON_DAYS`), not a picker bug.
+
+---
+
 ## Current focus — Manual QA (Product + Fulfilment Phases 0–9)
 
 **Status:** Phases 0–9 done · apply `20260722110000_drop_compare_at_and_draft.sql` · **re-test after mobile trim**  

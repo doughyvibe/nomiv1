@@ -7,18 +7,31 @@ import { useCart } from "@/components/storefront/cart-context";
 import { useStorefront } from "@/components/storefront/storefront-context";
 import { resolveCartLineUnitPrice } from "@/lib/cart/line-price";
 import { availableCartSummary } from "@/lib/cart/storage";
+import { buyerNeedsCartFulfilmentStep } from "@/lib/fulfilment/buyer-cart-step";
 import { formatPrice } from "@/lib/money";
+import type { FulfillmentConfig } from "@/lib/stores/types";
 import { cn } from "@/lib/utils";
 
 export function StickyCheckoutBar() {
   const { cart } = useCart();
-  const { products } = useStorefront();
+  const { products, store } = useStorefront();
 
   const productMap = new Map(products.map((p) => [p.id, p]));
-  const { count, subtotalCents } = availableCartSummary(cart.items, (line) =>
-    resolveCartLineUnitPrice(line, productMap.get(line.productId)),
+  const { count, subtotalCents, availableItems } = availableCartSummary(
+    cart.items,
+    (line) => resolveCartLineUnitPrice(line, productMap.get(line.productId)),
   );
   const hasItems = count > 0;
+  const cartLeadLines = availableItems.map((line) => {
+    const p = productMap.get(line.productId);
+    return { lead_time_days: p?.lead_time_days ?? 0 };
+  });
+  const viaCart = buyerNeedsCartFulfilmentStep(
+    store.fulfillment as FulfillmentConfig,
+    cartLeadLines,
+  );
+  const ctaHref = viaCart ? "/cart" : "/checkout";
+  const ctaLabel = viaCart ? "Continue" : "Checkout";
 
   return (
     <div
@@ -49,11 +62,11 @@ export function StickyCheckoutBar() {
         </Link>
 
         <Link
-          href="/checkout"
+          href={ctaHref}
           tabIndex={hasItems ? undefined : -1}
           className="checkout-bar-cta inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-vibe-primary px-5 text-base font-semibold text-vibe-primary-fg transition-transform active:scale-95"
         >
-          Checkout
+          {ctaLabel}
         </Link>
       </div>
     </div>

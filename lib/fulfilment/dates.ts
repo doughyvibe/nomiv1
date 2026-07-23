@@ -304,6 +304,34 @@ export function formatFulfilmentDateLabel(ymd: string): string {
   });
 }
 
+/** Compact card parts for buyer date picker (TODAY / FRI · 23 · JUL). */
+export function fulfilmentDateCardParts(
+  ymd: string,
+  todayYmd: string = todaySgYmd(),
+): { weekday: string; day: string; month: string } {
+  const parsed = parseYmd(ymd);
+  if (!parsed) return { weekday: "", day: ymd, month: "" };
+  const dt = new Date(Date.UTC(parsed.y, parsed.m - 1, parsed.d, 12));
+  if (ymd === todayYmd) {
+    return {
+      weekday: "TODAY",
+      day: String(parsed.d),
+      month: dt
+        .toLocaleDateString("en-SG", { timeZone: "UTC", month: "short" })
+        .toUpperCase(),
+    };
+  }
+  return {
+    weekday: dt
+      .toLocaleDateString("en-SG", { timeZone: "UTC", weekday: "short" })
+      .toUpperCase(),
+    day: String(parsed.d),
+    month: dt
+      .toLocaleDateString("en-SG", { timeZone: "UTC", month: "short" })
+      .toUpperCase(),
+  };
+}
+
 /** Expand inclusive YYYY-MM-DD range into individual dates (cap 366 days). */
 export function expandBlackoutRange(range: BlackoutRange): string[] {
   if (!isValidYmd(range.start) || !isValidYmd(range.end)) return [];

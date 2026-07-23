@@ -133,7 +133,8 @@ export function StepProduct({
         disabled={pending}
         emptyTitleMobile="Tap to add a photo"
         emptyTitleDesktop="Drop a photo or click to browse"
-        hint="Recommended 1200×1200 or larger"
+        hint="Square (1:1) works best · JPG or PNG"
+        aspectRatio="square"
         objectFit="cover"
       />
 

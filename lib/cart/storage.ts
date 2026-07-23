@@ -4,6 +4,7 @@ import {
   type CartLine,
   type CartLineCustomisations,
 } from "./types";
+import { clearFulfilmentDraft } from "@/lib/cart/fulfillment-draft";
 import {
   customisationAnswersComplete,
   productHasRequiredCustomisations,
@@ -56,6 +57,7 @@ export function saveCart(slug: string, cart: Cart): void {
 
 export function clearCart(slug: string): void {
   localStorage.removeItem(cartKey(slug));
+  clearFulfilmentDraft(slug);
 }
 
 export function cartItemCount(cart: Cart): number {

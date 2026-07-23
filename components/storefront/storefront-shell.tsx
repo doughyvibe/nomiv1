@@ -13,8 +13,12 @@ import { resolveCartLineUnitPrice } from "@/lib/cart/line-price";
 import { availableCartSummary } from "@/lib/cart/storage";
 
 function showStickyBar(pathname: string): boolean {
-  // Hide on checkout/order so payment CTAs aren't covered (existing product decision)
-  if (pathname.includes("/checkout") || pathname.includes("/order/")) {
+  // Hide on cart/checkout/order — cart has its own Continue; payment CTAs need space
+  if (
+    pathname.includes("/cart") ||
+    pathname.includes("/checkout") ||
+    pathname.includes("/order/")
+  ) {
     return false;
   }
   return true;

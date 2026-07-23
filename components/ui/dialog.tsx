@@ -43,19 +43,30 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  chrome = "brand",
+  vibe,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean
+  /** Portals mount on body — brand = Warm Tactile; storefront = shop vibe tokens. */
+  chrome?: "brand" | "storefront"
+  /** Required when chrome="storefront" so --vibe-* resolves to the shop theme. */
+  vibe?: string
 }) {
+  const storefront = chrome === "storefront"
   return (
     <DialogPortal>
       <DialogOverlay />
-      {/* data-brand: portals mount on body, outside the dashboard shell */}
       <DialogPrimitive.Popup
-        data-brand
+        {...(storefront
+          ? { "data-surface": "storefront", "data-vibe": vibe ?? "atelier" }
+          : { "data-brand": true })}
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-border bg-card p-5 text-sm text-card-foreground shadow-[0_8px_32px_rgb(22_19_14/0.12)] duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] p-5 text-sm shadow-[0_8px_32px_rgb(22_19_14/0.12)] duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          storefront
+            ? "border border-vibe-border/40 bg-vibe-surface text-vibe-text"
+            : "border border-border bg-card text-card-foreground",
           className
         )}
         {...props}
@@ -67,7 +78,10 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2.5 right-2.5"
+                className={cn(
+                  "absolute top-2.5 right-2.5",
+                  storefront && "text-vibe-text hover:bg-vibe-border/25"
+                )}
                 size="icon-sm"
               />
             }

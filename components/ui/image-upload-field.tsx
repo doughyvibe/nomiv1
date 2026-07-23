@@ -20,6 +20,10 @@ type ImageUploadFieldProps = {
   accept?: string;
   /** Preview fit when filled — logos usually contain, products cover */
   objectFit?: "contain" | "cover";
+  /** Filled preview frame — square matches catalog/PDP crop */
+  aspectRatio?: "auto" | "square";
+  /** Shown below the field (empty + filled) */
+  helperText?: string;
   id?: string;
 };
 
@@ -36,6 +40,8 @@ export function ImageUploadField({
   hint = "JPG or PNG",
   accept = "image/*",
   objectFit = "contain",
+  aspectRatio = "auto",
+  helperText,
   id: idProp,
 }: ImageUploadFieldProps) {
   const autoId = useId();
@@ -80,18 +86,29 @@ export function ImageUploadField({
         <div
           className={cn(
             "relative overflow-hidden rounded-2xl border border-border bg-muted/30",
+            aspectRatio === "square" && "mx-auto w-full max-w-md",
             locked && "opacity-60",
           )}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={valueUrl}
-            alt=""
+          <div
             className={cn(
-              "mx-auto max-h-56 w-full min-h-[9rem]",
-              objectFit === "cover" ? "object-cover" : "object-contain p-4",
+              "relative w-full overflow-hidden bg-muted/40",
+              aspectRatio === "square" && "aspect-square",
             )}
-          />
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={valueUrl}
+              alt=""
+              className={cn(
+                "size-full",
+                objectFit === "cover"
+                  ? "object-cover"
+                  : "object-contain p-4",
+                aspectRatio === "auto" && "mx-auto max-h-56 min-h-[9rem] w-full",
+              )}
+            />
+          </div>
           <div className="flex items-center justify-between gap-3 border-t border-border bg-card/80 px-3 py-2.5">
             <button
               type="button"
@@ -135,7 +152,10 @@ export function ImageUploadField({
             pickFile(e.dataTransfer.files?.[0]);
           }}
           className={cn(
-            "flex min-h-[11rem] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed bg-muted/30 px-4 py-8 text-center transition-colors",
+            "flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed bg-muted/30 px-4 py-8 text-center transition-colors",
+            aspectRatio === "square"
+              ? "mx-auto aspect-square max-w-md"
+              : "min-h-[11rem]",
             "border-border hover:border-primary/60 hover:bg-primary/5",
             "focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/30 focus-visible:outline-none",
             dragging && "border-primary bg-primary/10",
@@ -162,6 +182,10 @@ export function ImageUploadField({
           </span>
         </button>
       )}
+
+      {helperText ? (
+        <p className="text-sm leading-snug text-muted-foreground">{helperText}</p>
+      ) : null}
     </div>
   );
 }
