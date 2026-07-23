@@ -5,14 +5,18 @@ import { usePathname } from "next/navigation";
 import {
   ClipboardList,
   Home,
+  MoreHorizontal,
   Package,
-  Palette,
   Settings,
 } from "lucide-react";
 
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { UnsavedChangesProvider } from "@/components/dashboard/unsaved-changes";
 import { Wordmark } from "@/components/marketing/wordmark";
+import {
+  isMoreDestinationPath,
+  isSettingsNavPath,
+} from "@/lib/dashboard/more-destinations";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -38,18 +42,16 @@ const NAV_ITEMS = [
       p.startsWith("/products") || p.startsWith("/dashboard/products"),
   },
   {
-    href: "/storefront",
-    label: "Storefront",
-    Icon: Palette,
-    match: (p: string) =>
-      p.startsWith("/storefront") || p.startsWith("/dashboard/storefront"),
-  },
-  {
     href: "/settings",
     label: "Settings",
     Icon: Settings,
-    match: (p: string) =>
-      p.startsWith("/settings") || p.startsWith("/dashboard/settings"),
+    match: isSettingsNavPath,
+  },
+  {
+    href: "/more",
+    label: "More",
+    Icon: MoreHorizontal,
+    match: isMoreDestinationPath,
   },
 ] as const;
 

@@ -20,11 +20,7 @@ export default async function OrdersPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <DashboardPageHeader
-        eyebrow={store.name}
-        title="Orders"
-        description="Track PayNow orders, verify payments, and confirm buyers."
-      />
+      <DashboardPageHeader title="Orders" />
       <OrdersListView
         orders={orders}
         statusFilter={statusFilter}

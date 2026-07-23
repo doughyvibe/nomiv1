@@ -1,9 +1,8 @@
 import { ArrowUpRight } from "lucide-react";
 
 import { StorefrontEditor } from "@/components/dashboard/storefront-editor";
-import {
-  DashboardPageHeader,
-} from "@/components/dashboard/dashboard-ui";
+import { DashboardBackLink } from "@/components/dashboard/dashboard-back-link";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
 import { getStorefrontPreviewUrl, getStorefrontUrl } from "@/lib/host";
 import type { Product } from "@/lib/stores/types";
 import { requireSellerStore } from "@/lib/stores/require-seller";
@@ -30,22 +29,26 @@ export default async function StorefrontPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <DashboardPageHeader
-        eyebrow={store.name}
-        title="Storefront"
-        description="Choose your vibe, logo, and tagline buyers see first."
-        action={
-          <a
-            href={openUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-brand-dark inline-flex h-11 items-center gap-2 px-5"
-          >
-            {isPublished ? "Open storefront" : "Preview store"}
-            <ArrowUpRight className="size-4" strokeWidth={2.5} />
-          </a>
-        }
-      />
+      <div>
+        <DashboardBackLink href="/more" label="More" />
+        <div className="mt-4">
+          <DashboardPageHeader
+            title="Storefront"
+            description="Choose your vibe, logo, and tagline buyers see first."
+            action={
+              <a
+                href={openUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-brand-dark inline-flex h-11 items-center gap-2 px-5"
+              >
+                {isPublished ? "Open storefront" : "Preview store"}
+                <ArrowUpRight className="size-4" strokeWidth={2.5} />
+              </a>
+            }
+          />
+        </div>
+      </div>
 
       <StorefrontEditor
         store={store}

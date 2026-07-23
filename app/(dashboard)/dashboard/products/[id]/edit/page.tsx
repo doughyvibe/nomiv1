@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { DeleteProductButton } from "@/components/dashboard/delete-product-button";
+import { DashboardBackLink } from "@/components/dashboard/dashboard-back-link";
 import { EditProductForm } from "@/components/dashboard/edit-product-form";
 import { ProductStatusBadge } from "@/components/dashboard/product-status-badge";
 import { RestoreProductButton } from "@/components/dashboard/restore-product-button";
@@ -59,12 +59,7 @@ export default async function EditProductPage({
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <Link
-          href="/products"
-          className="inline-flex min-h-10 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-        >
-          ← Products
-        </Link>
+        <DashboardBackLink href="/products" label="Products" />
         <div className="mt-4">
           <DashboardPageHeader
             title={

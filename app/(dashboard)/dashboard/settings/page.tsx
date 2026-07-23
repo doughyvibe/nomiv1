@@ -1,14 +1,12 @@
 import Link from "next/link";
 
 import {
-  saveFulfillmentAction,
   savePayNowAction,
   saveStoreIdentityAction,
   startLiveModeAction,
   stopLiveModeAction,
 } from "@/app/(dashboard)/dashboard/settings/actions";
 import { SignOutButton } from "@/components/auth/sign-out-button";
-import { FulfillmentForm } from "@/components/dashboard/fulfillment-form";
 import { LiveModePanel } from "@/components/dashboard/live-mode-panel";
 import {
   DashboardPageHeader,
@@ -22,7 +20,6 @@ import { PushAlertsSettings } from "@/components/dashboard/push-alerts-settings"
 import { StoreIdentityForm } from "@/components/dashboard/store-identity-form";
 import { StoreStatusSettings } from "@/components/dashboard/store-status-settings";
 import { ResetOnboardingButton } from "@/components/onboarding/reset-onboarding-button";
-import { Button } from "@/components/ui/button";
 import { listUserPushSubscriptions } from "@/lib/push/subscriptions";
 import { getVapidPublicKey } from "@/lib/push/vapid";
 import {
@@ -59,11 +56,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <DashboardPageHeader
-        eyebrow={store.name}
-        title="Settings"
-        description="Store identity, fulfillment, PayNow, status, and notifications."
-      />
+      <DashboardPageHeader title="Settings" />
 
       <div className="flex flex-col gap-5">
         <DashboardPanel>
@@ -93,13 +86,6 @@ export default async function SettingsPage() {
                 <ManageBillingButton />
               </div>
             ) : null}
-          </DashboardPanelBody>
-        </DashboardPanel>
-
-        <DashboardPanel>
-          <DashboardPanelHeader title="Fulfillment" />
-          <DashboardPanelBody>
-            <FulfillmentForm store={store} onSave={saveFulfillmentAction} />
           </DashboardPanelBody>
         </DashboardPanel>
 
@@ -135,18 +121,6 @@ export default async function SettingsPage() {
               serverSubscriptionCount={subscriptions.length}
             />
           </DashboardPanelBody>
-        </DashboardPanel>
-
-        <DashboardPanel>
-          <DashboardPanelHeader
-            title="Install Nomi App"
-            description="Add Nomi to your phone for order alerts and quick access"
-            action={
-              <Button render={<Link href="/settings/install" />} size="sm">
-                Open
-              </Button>
-            }
-          />
         </DashboardPanel>
 
         {isDev ? (

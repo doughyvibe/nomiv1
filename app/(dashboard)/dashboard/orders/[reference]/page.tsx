@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ConfirmationBuyerActions } from "@/components/dashboard/confirmation-buyer-actions";
 import { ContactBuyerActions } from "@/components/dashboard/contact-buyer-actions";
+import { DashboardBackLink } from "@/components/dashboard/dashboard-back-link";
 import {
   DashboardPanel,
   DashboardPanelBody,
@@ -50,12 +50,7 @@ export default async function OrderDetailPage({
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <Link
-          href="/orders"
-          className="inline-flex min-h-10 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-        >
-          ← Back to orders
-        </Link>
+        <DashboardBackLink href="/orders" label="Orders" />
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <h1 className="font-display break-all text-[1.75rem] font-extrabold tracking-[-0.02em]">
             {order.reference}

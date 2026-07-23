@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { NewProductForm } from "@/components/dashboard/new-product-form";
+import { DashboardBackLink } from "@/components/dashboard/dashboard-back-link";
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-ui";
 import { collectCategories } from "@/lib/products/category";
 import type { Product } from "@/lib/stores/types";
@@ -25,12 +24,7 @@ export default async function NewProductPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <Link
-          href="/products"
-          className="inline-flex min-h-10 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-        >
-          ← Back to products
-        </Link>
+        <DashboardBackLink href="/products" label="Products" />
         <div className="mt-4">
           <DashboardPageHeader title="Add product" />
         </div>
