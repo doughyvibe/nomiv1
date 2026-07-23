@@ -10,7 +10,11 @@ import { Label } from "@/components/ui/label";
 import { FEATURED_SECTION_TITLE_SUGGESTIONS } from "@/lib/featured-section";
 import type { Store } from "@/lib/stores/types";
 
-export function FeaturedSectionEditor({ store }: { store: Store }) {
+export function FeaturedSectionEditor({
+  store,
+}: {
+  store: Pick<Store, "featured_section_title">;
+}) {
   const router = useRouter();
   const [title, setTitle] = useState(store.featured_section_title ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
@@ -57,9 +61,7 @@ export function FeaturedSectionEditor({ store }: { store: Store }) {
           className="placeholder:text-muted-foreground/60"
         />
         <p className="text-muted-foreground text-xs">
-          Shown above your featured product. Leave blank to use &ldquo;Feature
-          Product&rdquo;. Set your featured product from the Products page (star
-          icon).
+          Tap the star on a product below to make it a feature product.
         </p>
       </div>
 

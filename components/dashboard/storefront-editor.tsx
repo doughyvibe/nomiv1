@@ -5,7 +5,6 @@ import {
   saveVibeAction,
 } from "@/app/(dashboard)/dashboard/storefront/actions";
 import { HeroEditor } from "@/components/dashboard/hero-editor";
-import { FeaturedSectionEditor } from "@/components/dashboard/featured-section-editor";
 import { VibePicker } from "@/components/dashboard/vibe-picker";
 import {
   DashboardPanel,
@@ -34,16 +33,6 @@ export function StorefrontEditor({
             products={products}
             onSaveVibe={saveVibeAction}
           />
-        </DashboardPanelBody>
-      </DashboardPanel>
-
-      <DashboardPanel>
-        <DashboardPanelHeader
-          title="Featured product"
-          description="Section title and styling for your highlighted product"
-        />
-        <DashboardPanelBody>
-          <FeaturedSectionEditor store={store} />
         </DashboardPanelBody>
       </DashboardPanel>
 

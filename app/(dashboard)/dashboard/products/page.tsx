@@ -59,6 +59,10 @@ export default async function ProductsPage({
     }
   }
 
+  const list = (products as Product[]) ?? [];
+  const featuredProductName =
+    list.find((p) => p.id === store.featured_product_id)?.name ?? null;
+
   return (
     <div className="flex flex-col gap-6">
       <DashboardPageHeader
@@ -75,10 +79,11 @@ export default async function ProductsPage({
         }
       />
       <ProductsListView
-        products={(products as Product[]) ?? []}
+        products={list}
         store={store}
         filter={filter}
         counts={counts}
+        featuredProductName={featuredProductName}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Package } from "lucide-react";
 
+import { FeaturedOnProductsPanel } from "@/components/dashboard/featured-on-products-panel";
 import { FeaturedProductButton } from "@/components/dashboard/featured-product-button";
 import { ProductStatusBadge } from "@/components/dashboard/product-status-badge";
 import {
@@ -47,14 +48,17 @@ export function ProductsListView({
   store,
   filter,
   counts,
+  featuredProductName,
 }: {
   products: Product[];
-  store: Pick<Store, "featured_product_id">;
+  store: Pick<Store, "featured_product_id" | "featured_section_title">;
   filter: ProductsListFilter;
   counts: { active: number; archived: number };
+  featuredProductName: string | null;
 }) {
   const emptyTitle =
     filter === "archived" ? "No archived products" : "No products yet";
+  const showFeaturedPanel = filter === "active" && counts.active > 0;
 
   return (
     <div className="flex flex-col gap-5">
@@ -88,6 +92,13 @@ export function ProductsListView({
           );
         })}
       </div>
+
+      {showFeaturedPanel ? (
+        <FeaturedOnProductsPanel
+          store={store}
+          featuredProductName={featuredProductName}
+        />
+      ) : null}
 
       {products.length === 0 ? (
         <DashboardPanel>
